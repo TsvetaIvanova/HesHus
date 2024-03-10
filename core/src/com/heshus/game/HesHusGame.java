@@ -1,5 +1,9 @@
 package com.heshus.game;
+
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.Texture;
@@ -9,13 +13,14 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
-public class HesHusGame extends ApplicationAdapter {
+public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 	private SpriteBatch batch;
 	private TiledMap tiledMap;
 	private OrthogonalTiledMapRenderer tiledMapRenderer;
 	private OrthographicCamera camera;
 	private Sprite sprite;
 	private Texture spriteTexture;
+	private float speed = 200;
 
 	@Override
 	public void create () {
@@ -26,16 +31,19 @@ public class HesHusGame extends ApplicationAdapter {
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 800, 480);
 
-		// Load the texture and create the sprite
-		spriteTexture = new Texture("bucket.png"); // Replace "sprite.png" with your sprite's file name
+		spriteTexture = new Texture("duck.png");
 		sprite = new Sprite(spriteTexture);
 
-
 		sprite.setPosition(400 - sprite.getWidth() / 2, 200);
+
+		// Set this class as the input processor
+		Gdx.input.setInputProcessor(this);
 	}
 
 	@Override
 	public void render () {
+		handleInput(Gdx.graphics.getDeltaTime());
+
 		ScreenUtils.clear(1, 0, 0, 1);
 		camera.update();
 		batch.setProjectionMatrix(camera.combined);
@@ -44,7 +52,7 @@ public class HesHusGame extends ApplicationAdapter {
 		tiledMapRenderer.render();
 
 		batch.begin();
-		sprite.draw(batch); // Draw the sprite
+		sprite.draw(batch);
 		batch.end();
 	}
 
@@ -52,6 +60,70 @@ public class HesHusGame extends ApplicationAdapter {
 	public void dispose() {
 		batch.dispose();
 		tiledMap.dispose();
-		spriteTexture.dispose(); // Dispose of the sprite texture as well
+		spriteTexture.dispose();
+	}
+
+	private void handleInput(float deltaTime) {
+		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
+			sprite.translateX(-speed * deltaTime);
+		}
+		if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
+			sprite.translateX(speed * deltaTime);
+		}
+		if (Gdx.input.isKeyPressed(Keys.UP)) {
+			sprite.translateY(speed * deltaTime);
+		}
+		if (Gdx.input.isKeyPressed(Keys.DOWN)) {
+			sprite.translateY(-speed * deltaTime);
+		}
+	}
+
+	// InputProcessor methods
+
+	@Override
+	public boolean keyDown(int keycode) {
+
+		return false;
+	}
+
+	@Override
+	public boolean keyUp(int keycode) {
+
+		return false;
+	}
+
+	@Override
+	public boolean keyTyped(char character) {
+		return false;
+	}
+
+	@Override
+	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		return false;
+	}
+
+	@Override
+	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		return false;
+	}
+
+	@Override
+	public boolean touchCancelled(int i, int i1, int i2, int i3) {
+		return false;
+	}
+
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		return false;
+	}
+
+	@Override
+	public boolean mouseMoved(int screenX, int screenY) {
+		return false;
+	}
+
+	@Override
+	public boolean scrolled(float amountX, float amountY) {
+		return false;
 	}
 }
