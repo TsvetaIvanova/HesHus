@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.heshus.game.controller.DayManager;
 
 public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 	private SpriteBatch batch;
@@ -31,7 +32,7 @@ public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 800, 480);
 
-		spriteTexture = new Texture("duck.png");
+		spriteTexture = new Texture("bucket.png");
 		sprite = new Sprite(spriteTexture);
 
 		sprite.setPosition(400 - sprite.getWidth() / 2, 200);
@@ -43,6 +44,7 @@ public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 	@Override
 	public void render () {
 		handleInput(Gdx.graphics.getDeltaTime());
+		handleLogic(Gdx.graphics.getDeltaTime());
 
 		ScreenUtils.clear(1, 0, 0, 1);
 		camera.update();
@@ -75,6 +77,18 @@ public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 		}
 		if (Gdx.input.isKeyPressed(Keys.DOWN)) {
 			sprite.translateY(-speed * deltaTime);
+		}
+	}
+
+	//This will change when screens are added
+	private void handleLogic(float deltaTime){
+		if(Gdx.input.isKeyJustPressed(Keys.SPACE)){
+			DayManager.incrementDay();
+		}
+
+		//Teleport player to centre of screen to test if working
+		if(DayManager.gameOver){
+			sprite.setPosition(400 - sprite.getWidth() / 2, 200);
 		}
 	}
 
