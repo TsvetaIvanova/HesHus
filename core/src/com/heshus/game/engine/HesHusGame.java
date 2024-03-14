@@ -30,7 +30,7 @@ public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		tiledMap = new TmxMapLoader().load("testmap.tmx");
+		tiledMap = new TmxMapLoader().load("Tilemaps/testmap.tmx");
 		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
 
 
