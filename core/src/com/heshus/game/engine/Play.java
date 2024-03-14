@@ -25,9 +25,14 @@ public class Play implements Screen {
         ScreenUtils.clear(0,0,0,1);
 
         //want: camera doesn't show black area on edge of map
+        //if the player is too close to the edge of the map, don't move the camera
+        //if (PLAYER TOO HIGH / TOO LOW) {
+        //    if (PLAYER TOO FAR LEFT / RIGHT) {
+                //camera.position.set(player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2, 0);
+        //    }
+        //}
 
         camera.position.set(player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2, 0);
-        //camera.position.set(camera.viewportWidth, camera.viewportHeight, 0);
         camera.update();
 
         renderer.setView(camera);

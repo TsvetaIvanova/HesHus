@@ -38,6 +38,8 @@ public class Player extends Sprite implements InputProcessor {
         //  COLLISION DETECTION
         //**********************
 
+        //TODO: IMPROVE: STOP GETTING CAUGHT ON WALLS
+
         //save old x,y positions
         float oldX = getX();
         float oldY = getY();
