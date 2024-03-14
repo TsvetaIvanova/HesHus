@@ -1,4 +1,4 @@
-package com.heshus.game.controller;
+package com.heshus.game.manager;
 
 public class DayManager {
     public static Day currentDay = new Day(1, 480, 0, 100, 0, 0);

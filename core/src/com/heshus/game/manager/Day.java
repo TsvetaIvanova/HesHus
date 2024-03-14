@@ -1,4 +1,4 @@
-package com.heshus.game.controller;
+package com.heshus.game.manager;
 
 public class Day {
     private int dayNumber, studyScore, eatScore, energy, recreationalScore;
@@ -48,4 +48,12 @@ public class Day {
     public void resetRecreationalScore() {
         this.recreationalScore = 0;
     }
+
+    public float getTime() { return this.time; }
+
+    public int getEnergy() { return this.energy; }
+
+    public void setEnergy(int energy) { this.energy = energy; }
+
+    public void setTime(float time) { this.time = time; }
 }

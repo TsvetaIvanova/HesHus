@@ -1,4 +1,4 @@
-package com.heshus.game;
+package com.heshus.game.engine;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -7,35 +7,46 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.heshus.game.controller.DayManager;
+//import com.heshus.game.manager.ActivityManager;
+import com.heshus.game.manager.DayManager;
 
 public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 	private SpriteBatch batch;
 	private TiledMap tiledMap;
 	private OrthogonalTiledMapRenderer tiledMapRenderer;
 	private OrthographicCamera camera;
-	private Sprite sprite;
+	public Sprite sprite;
 	private Texture spriteTexture;
-	private float speed = 200;
+	private float speed = 300;
+	//private ActivityManager activityManager;
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		tiledMap = new TmxMapLoader().load("map.tmx");
+		tiledMap = new TmxMapLoader().load("testmap.tmx");
 		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
 
+
+
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 800, 480);
+		// Changing setToOrtho from 800,480 to scale the window
+		camera.setToOrtho(false, 1600, 800);
 
 		spriteTexture = new Texture("bucket.png");
 		sprite = new Sprite(spriteTexture);
 
-		sprite.setPosition(400 - sprite.getWidth() / 2, 200);
+		//placed the avatar before the first building they would need to interact with
+		sprite.setPosition(50 - sprite.getWidth() / 2, 200);
+
+		TiledMapTileLayer collisionLayer = (TiledMapTileLayer) tiledMap.getLayers().get("");
+		//activityManager = new ActivityManager(collisionLayer);
 
 		// Set this class as the input processor
 		Gdx.input.setInputProcessor(this);
@@ -53,9 +64,17 @@ public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 		tiledMapRenderer.setView(camera);
 		tiledMapRenderer.render();
 
+		//activityManager.checkCurrentActivity();
+		Vector2 spritePosition = getSpritePosition();
+		//activityManager.checkCurrentActivity(spritePosition);
+
 		batch.begin();
 		sprite.draw(batch);
 		batch.end();
+	}
+
+	public Vector2 getSpritePosition() {
+		return new Vector2(sprite.getX(), sprite.getY());
 	}
 
 	@Override
