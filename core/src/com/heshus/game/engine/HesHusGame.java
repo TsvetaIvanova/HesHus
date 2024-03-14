@@ -24,7 +24,7 @@ public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 	private OrthographicCamera camera;
 	public Sprite sprite;
 	private Texture spriteTexture;
-	private float speed = 300;
+	private float speed = 400;
 	//private ActivityManager activityManager;
 
 	@Override
