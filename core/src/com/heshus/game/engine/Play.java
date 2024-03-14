@@ -24,6 +24,8 @@ public class Play implements Screen {
     public void render(float delta) {
         ScreenUtils.clear(0,0,0,1);
 
+        //want: camera doesn't show black area on edge of map
+
         camera.position.set(player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2, 0);
         //camera.position.set(camera.viewportWidth, camera.viewportHeight, 0);
         camera.update();
@@ -63,8 +65,9 @@ public class Play implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        camera.viewportWidth = width / 1f;
-        camera.viewportHeight = height / 1f;
+        float zoomlevel = 2f;
+        camera.viewportWidth = width / zoomlevel;
+        camera.viewportHeight = height / zoomlevel;
         //camera.update();
     }
 
