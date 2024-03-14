@@ -13,7 +13,6 @@ public class Player extends Sprite implements InputProcessor {
     //movement velocity - Vector2 stores 2 values, for x and y
     private Vector2 velocity = new Vector2();
     private float speed = 200;
-    private float gravity = 1;
 
     private TiledMapTileLayer collisionLayer;
 
@@ -34,22 +33,6 @@ public class Player extends Sprite implements InputProcessor {
     }
 
     public void update(float delta) {
-
-
-        //surely gravity is not really relevant to our end goal
-        //this player movement system should be modified to account for this - no gravity, up/down movement
-
-        /*
-        //apply gravity
-        velocity.y -= gravity * delta;
-        //clamp velocity - because otherwise it's y will become massively negative as we subtract from it every frame
-        if (velocity.y > speed) {
-            velocity.y = speed;
-        } else if (velocity.y < speed) {
-            velocity.y = -speed;
-        }
-         */
-
 
         //**********************
         //  COLLISION DETECTION
@@ -137,8 +120,9 @@ public class Player extends Sprite implements InputProcessor {
                         .getTile().getProperties().containsKey("collision");
             }
 
-        } else if (velocity.x > 0) {
+        } else if (velocity.y > 0) {
             //player moving upwards
+            //THIS NEEDS FIXING
 
             //top left
             collisionY = collisionLayer.getCell((int)((getX())/ tileWidth), (int)((getY() + getHeight())/ tileHeight))

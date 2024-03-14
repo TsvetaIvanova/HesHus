@@ -25,6 +25,7 @@ public class Play implements Screen {
         ScreenUtils.clear(0,0,0,1);
 
         camera.position.set(player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2, 0);
+        //camera.position.set(camera.viewportWidth, camera.viewportHeight, 0);
         camera.update();
 
         renderer.setView(camera);
@@ -62,8 +63,8 @@ public class Play implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        camera.viewportWidth = width / 2f;
-        camera.viewportHeight = height / 2f;
+        camera.viewportWidth = width / 1f;
+        camera.viewportHeight = height / 1f;
         //camera.update();
     }
 
