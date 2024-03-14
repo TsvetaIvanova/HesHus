@@ -1,5 +1,4 @@
 
-
 package com.heshus.game.engine;
 
 import com.badlogic.gdx.graphics.Color;
@@ -36,7 +35,7 @@ public class OrthogonalTiledMapRendererWithSprites extends OrthogonalTiledMapRen
     public OrthogonalTiledMapRendererWithSprites(TiledMap map, float unitScale, Batch batch) {
         super(map, unitScale, batch);
     }
-
+/*kinda looks like a lot, but this is just libgdx's tiledmap renderer with one for loop added to draw sprites in the correct order*/
     @Override
     public void renderTileLayer (TiledMapTileLayer layer) {
         final Color batchColor = batch.getColor();
@@ -63,7 +62,6 @@ public class OrthogonalTiledMapRendererWithSprites extends OrthogonalTiledMapRen
         float y = row2 * layerTileHeight + layerOffsetY;
         float xStart = col1 * layerTileWidth + layerOffsetX;
         final float[] vertices = this.vertices;
-        int count = 0;
         for (int row = row2; row >= row1; row--) {
             float x = xStart;
             for (int col = col1; col < col2; col++) {
