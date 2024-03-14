@@ -14,6 +14,7 @@ public class Player {
         this.sprite = sprite;
         this.x = x;
         this.y = y;
+        speed = 400.f;
     }
 
     public void update(){
@@ -34,6 +35,7 @@ public class Player {
             y+=(-speed * deltaTime);
         }
         sprite.setX(x);
+        System.out.println(sprite.getX());
         sprite.setY(y);
     }
 
