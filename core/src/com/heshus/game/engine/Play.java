@@ -39,7 +39,7 @@ public class Play implements Screen {
     @Override
     public void show() {
         TmxMapLoader loader = new TmxMapLoader();
-        map = loader.load("test-tilemap.tmx");
+        map = loader.load("testmap.tmx");
         //make this one line: map = new TmxMapLoader().load(path);
         //remember to put both the map and all tilemaps in assets folder
         //also have to consider: if you create the map elsewhere (not directly in the assets folder) (and save it to desktop or something)
@@ -49,8 +49,8 @@ public class Play implements Screen {
         camera = new OrthographicCamera(); //don't need to specify width and height because resize() is called after show()
 
         player = new Player(new Sprite(new Texture("player.png")), (TiledMapTileLayer) map.getLayers().get(0));
-        float startX = 9 * player.getCollisionLayer().getTileWidth();
-        float startY = (player.getCollisionLayer().getHeight() - 4) * player.getCollisionLayer().getTileHeight();
+        float startX = 34 * player.getCollisionLayer().getTileWidth();
+        float startY = (player.getCollisionLayer().getHeight() - 25) * player.getCollisionLayer().getTileHeight();
         player.setPosition(startX, startY);
         Gdx.input.setInputProcessor(player);
     }
@@ -62,8 +62,8 @@ public class Play implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        camera.viewportWidth = width / 4f;
-        camera.viewportHeight = height / 4f;
+        camera.viewportWidth = width / 2f;
+        camera.viewportHeight = height / 2f;
         //camera.update();
     }
 
