@@ -15,6 +15,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 //import com.heshus.game.manager.ActivityManager;
+import com.heshus.game.entities.Player;
 import com.heshus.game.manager.DayManager;
 
 public class HesHusGame extends ApplicationAdapter implements InputProcessor {
@@ -22,15 +23,15 @@ public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 	private TiledMap tiledMap;
 	private OrthogonalTiledMapRenderer tiledMapRenderer;
 	private OrthographicCamera camera;
-	public Sprite sprite;
 	private Texture spriteTexture;
 	private float speed = 400;
+	private Player player;
 	//private ActivityManager activityManager;
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		tiledMap = new TmxMapLoader().load("testmap.tmx");
+		tiledMap = new TmxMapLoader().load("Tilemaps/testmap.tmx");
 		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
 
 
@@ -40,10 +41,10 @@ public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 		camera.setToOrtho(false, 1600, 800);
 
 		spriteTexture = new Texture("bucket.png");
-		sprite = new Sprite(spriteTexture);
+		Sprite sprite = new Sprite(spriteTexture);
 
 		//placed the avatar before the first building they would need to interact with
-		sprite.setPosition(50 - sprite.getWidth() / 2, 200);
+		player = new Player(sprite,50 - sprite.getWidth() / 2, 200);
 
 		TiledMapTileLayer collisionLayer = (TiledMapTileLayer) tiledMap.getLayers().get("");
 		//activityManager = new ActivityManager(collisionLayer);
@@ -54,7 +55,9 @@ public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 
 	@Override
 	public void render () {
-		handleInput(Gdx.graphics.getDeltaTime());
+		//player
+		player.update();
+
 		handleLogic(Gdx.graphics.getDeltaTime());
 
 		ScreenUtils.clear(1, 0, 0, 1);
@@ -65,18 +68,18 @@ public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 		tiledMapRenderer.render();
 
 		//activityManager.checkCurrentActivity();
-		Vector2 spritePosition = getSpritePosition();
+	//Vector2 spritePosition = getSpritePosition();
 		//activityManager.checkCurrentActivity(spritePosition);
 
 		batch.begin();
-		sprite.draw(batch);
+		player.sprite.draw(batch);
 		batch.end();
 	}
 
-	public Vector2 getSpritePosition() {
+	/*public Vector2 getSpritePosition() {
 		return new Vector2(sprite.getX(), sprite.getY());
 	}
-
+*/
 	@Override
 	public void dispose() {
 		batch.dispose();
@@ -84,7 +87,7 @@ public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 		spriteTexture.dispose();
 	}
 
-	private void handleInput(float deltaTime) {
+	/*private void handleInput(float deltaTime) {
 		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
 			sprite.translateX(-speed * deltaTime);
 		}
@@ -98,7 +101,7 @@ public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 			sprite.translateY(-speed * deltaTime);
 		}
 	}
-
+*/
 	//This will change when screens are added
 	private void handleLogic(float deltaTime){
 		if(Gdx.input.isKeyJustPressed(Keys.SPACE)){
@@ -107,7 +110,9 @@ public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 
 		//Teleport player to centre of screen to test if working
 		if(DayManager.gameOver){
-			sprite.setPosition(400 - sprite.getWidth() / 2, 200);
+			player.setX(400 - player.sprite.getWidth());
+			player.setY(400);
+
 		}
 	}
 

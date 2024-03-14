@@ -10,7 +10,6 @@ public class DesktopLauncher {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setForegroundFPS(60);
 		config.setTitle("HesHus Game");
-		//new Lwjgl3Application(new HesHusGame(), config);
 		//changing setWindowedMode from w=800, h=480, to 256 and 256 to account
 		//for the changed TiledMap
 		//config.setWindowedMode(256, 256);
