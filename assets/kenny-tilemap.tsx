@@ -455,7 +455,7 @@
  </tile>
  <tile id="455">
   <properties>
-   <property name="collision" value=""/>
+   <property name="recreation" value=""/>
   </properties>
  </tile>
  <tile id="474">
@@ -485,7 +485,7 @@
  </tile>
  <tile id="485">
   <properties>
-   <property name="recreation" value=""/>
+   <property name="collision" value=""/>
   </properties>
  </tile>
 </tileset>
