@@ -21,6 +21,16 @@ public class Day {
 
     public void incrementEatScore() { this.eatScore++; }
 
+    public void incrementStudyScore()
+    {
+        this.studyScore++;
+    }
+
+    public void incrementRecreationalScore()
+    {
+        this.recreationalScore++;
+    }
+
     public int getStudyScore(){
         return this.studyScore;
     }

@@ -157,21 +157,3 @@ public class HesHusGame extends Game {
 		}
 	}
 	*/
-
-
-	//This will change when screens are added
-	/*
-	private void handleLogic(float deltaTime){
-		if(Gdx.input.isKeyJustPressed(Keys.SPACE)){
-			DayManager.incrementDay();
-		}
-
-		//Teleport player to centre of screen to test if working
-		if(DayManager.gameOver){
-			sprite.setPosition(400 - sprite.getWidth() / 2, 200);
-		}
-	}
-	 */
-
-
-

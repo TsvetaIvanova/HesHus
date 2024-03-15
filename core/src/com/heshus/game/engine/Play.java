@@ -52,11 +52,11 @@ public class Play implements Screen {
 
         activityManager.checkActivity();
         // Just for testing of counter
-        font.draw(renderer.getBatch(), "Eat: " + DayManager.overallEatScore, 100, Gdx.graphics.getHeight() + 100);
-        font.draw(renderer.getBatch(), "Study: " + DayManager.overallStudyScore, 100, Gdx.graphics.getHeight() + 70);
+        font.draw(renderer.getBatch(), "Eat: " + DayManager.currentDay.getEatScore(), 100, Gdx.graphics.getHeight() + 100);
+        font.draw(renderer.getBatch(), "Study: " + DayManager.currentDay.getStudyScore(), 100, Gdx.graphics.getHeight() + 70);
         String dayCounter = "Day: " + DayManager.currentDay.getDayNumber() + " of 7 days";
         font.draw(renderer.getBatch(), dayCounter, 100, Gdx.graphics.getHeight() + 40);
-        font.draw(renderer.getBatch(), "Recreational Activity: " + DayManager.overallRecreationalScore, 100, Gdx.graphics.getHeight() + 10);
+        font.draw(renderer.getBatch(), "Recreational Activity: " + DayManager.currentDay.getRecreationalScore(), 100, Gdx.graphics.getHeight() + 10);
 
         //Drawing energy bar
         renderer.getBatch().setColor(Color.GRAY);

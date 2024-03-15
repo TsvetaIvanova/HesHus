@@ -1,4 +1,6 @@
 package com.heshus.game.manager;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
@@ -25,7 +27,7 @@ public class ActivityManager {
         int x = (int) avatarX;
         int y = (int) avatarY;
 
-        TiledMapTileLayer.Cell cell = collisionLayer.getCell(x, y);
+        TiledMapTileLayer.Cell cell = collisionLayer.getCell(x/collisionLayer.getTileWidth() + 1, y/collisionLayer.getTileHeight() + 1);
         if (cell != null && cell.getTile() != null) {
             if (cell.getTile().getProperties().containsKey("eat")) {
                 // just added for testing
@@ -47,10 +49,9 @@ public class ActivityManager {
     private void performEatingActivity() {
         decrementEnergy();
         incrementTime();
-        DayManager.overallEatScore++;
         DayManager.currentDay.incrementEatScore();
         // added just for testing
-        DayManager.incrementDay();
+        //DayManager.incrementDay();
 
     }
 
@@ -58,15 +59,18 @@ public class ActivityManager {
     private void performStudyingActivity() {
         decrementEnergy();
         incrementTime();
-        DayManager.overallStudyScore++;
-
+        DayManager.currentDay.incrementStudyScore();
+        // added just for testing
+        //DayManager.incrementDay();
     }
 
     // incrementing overallRecreationalScore for now will adjust later
     private void performRecreationalActivity() {
         decrementEnergy();
         incrementTime();
-        DayManager.overallRecreationalScore++;
+        DayManager.currentDay.incrementRecreationalScore();
+        // added just for testing
+        //DayManager.incrementDay();
     }
 
     private void performSleepingActivity() {
@@ -77,7 +81,7 @@ public class ActivityManager {
             // if the game is not over the avatar will move to the next day and reset their energy
             if (!DayManager.gameOver) {
                 DayManager.incrementDay();
-                resetForNewDay();
+                //resetForNewDay();
             }
         }
     }
@@ -91,7 +95,6 @@ public class ActivityManager {
         //
         if (DayManager.currentDay.getDayNumber() > 7) {
             DayManager.gameOver = true;
-
         }
     }
 
@@ -106,6 +109,8 @@ public class ActivityManager {
         if (newTime >= 840) {
             //"You need to sleep" we display a message to the player, move to next day
             performSleepingActivity();
+            //Change these coordinates
+            player.setPosition(648,224);
         } else {
             DayManager.currentDay.setTime(newTime);
         }
