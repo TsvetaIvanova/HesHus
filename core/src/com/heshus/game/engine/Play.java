@@ -1,5 +1,4 @@
 package com.heshus.game.engine;
-
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -16,7 +15,6 @@ import com.heshus.game.entities.Player;
 import com.heshus.game.manager.ActivityManager;
 import com.heshus.game.manager.DayManager;
 
-
 public class Play implements Screen {
 
     private final HesHusGame game;
@@ -27,10 +25,15 @@ public class Play implements Screen {
     private BitmapFont font;
     private TiledMapTileLayer collisionLayer;
     private ActivityManager activityManager;
-    // private Game game;
-
     private Sprite energyBar;
     private Texture energyBarTexture;
+    private Sprite burgerIcon;
+    private Sprite bookIcon;
+    private Sprite gameIcon;
+    private Texture burgerIconTexture;
+    private Texture bookIconTexture;
+    private Texture gameIconTexture;
+
 
     public Play(HesHusGame game) {
         this.game = game;
@@ -52,11 +55,11 @@ public class Play implements Screen {
 
         activityManager.checkActivity();
         // Just for testing of counter
-        font.draw(renderer.getBatch(), "Eat: " + DayManager.currentDay.getEatScore(), 100, Gdx.graphics.getHeight() + 100);
-        font.draw(renderer.getBatch(), "Study: " + DayManager.currentDay.getStudyScore(), 100, Gdx.graphics.getHeight() + 70);
-        String dayCounter = "Day: " + DayManager.currentDay.getDayNumber() + " of 7 days";
-        font.draw(renderer.getBatch(), dayCounter, 100, Gdx.graphics.getHeight() + 40);
-        font.draw(renderer.getBatch(), "Recreational Activity: " + DayManager.currentDay.getRecreationalScore(), 100, Gdx.graphics.getHeight() + 10);
+//        font.draw(renderer.getBatch(), "Eat: " + DayManager.currentDay.getEatScore(), 100, Gdx.graphics.getHeight() + 100);
+//        font.draw(renderer.getBatch(), "Study: " + DayManager.currentDay.getStudyScore(), 100, Gdx.graphics.getHeight() + 70);
+//        String dayCounter = "Day: " + DayManager.currentDay.getDayNumber() + " of 7 days";
+//        font.draw(renderer.getBatch(), dayCounter, 100, Gdx.graphics.getHeight() + 40);
+//        font.draw(renderer.getBatch(), "Recreational Activity: " + DayManager.currentDay.getRecreationalScore(), 100, Gdx.graphics.getHeight() + 10);
 
         //Drawing energy bar
         renderer.getBatch().setColor(Color.GRAY);
@@ -65,9 +68,77 @@ public class Play implements Screen {
         renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
         renderer.getBatch().setColor(Color.WHITE);
 
+        drawActivityIcons();
+
         renderer.getBatch().end();
 
 
+    }
+    private void drawActivityIcons() {
+        float iconSize = 16;
+        float iconSpacing = 5;
+        float maxIcons = 5;
+        float padding = 10;
+        float boxMargin = 10;
+
+
+        GlyphLayout eatLayout = new GlyphLayout(font, "Eat: ");
+        GlyphLayout studyLayout = new GlyphLayout(font, "Study: ");
+        GlyphLayout recreationLayout = new GlyphLayout(font, "Recreational Activity: ");
+        GlyphLayout dayCounterLayout = new GlyphLayout(font, "Day: " + DayManager.currentDay.getDayNumber() + " of 7 days");
+
+
+        float textWidth = Math.max(dayCounterLayout.width, Math.max(eatLayout.width, Math.max(studyLayout.width, recreationLayout.width)));
+
+
+        float boxWidth = padding * 2 + textWidth + (iconSize + iconSpacing) * maxIcons;
+
+
+        float boxHeight = padding + dayCounterLayout.height + padding + (iconSize + padding) * 3 + padding;
+
+        float boxX = boxMargin;
+        float boxY = camera.viewportHeight - boxHeight - boxMargin;
+        renderer.getBatch().setColor(Color.BLACK);
+        renderer.getBatch().draw(energyBarTexture, boxX, boxY, boxWidth, boxHeight);
+        renderer.getBatch().setColor(Color.WHITE);
+
+
+        font.draw(renderer.getBatch(), dayCounterLayout, boxX + padding, boxY + boxHeight - padding);
+
+        float iconY = boxY + boxHeight - padding - dayCounterLayout.height - padding - iconSize;
+
+
+        font.draw(renderer.getBatch(), "Eat: ", boxX + padding, iconY + iconSize);
+        float iconsStartX = boxX + padding + eatLayout.width;
+        for (int i = 0; i < DayManager.currentDay.getEatScore(); i++) {
+            burgerIcon.setSize(iconSize, iconSize);
+            burgerIcon.setPosition(iconsStartX + i * (iconSize + iconSpacing), iconY);
+            burgerIcon.draw(renderer.getBatch());
+        }
+
+
+        iconY -= iconSize + padding;
+
+
+        font.draw(renderer.getBatch(), "Study: ", boxX + padding, iconY + iconSize);
+        iconsStartX = boxX + padding + studyLayout.width;
+        for (int i = 0; i < DayManager.currentDay.getStudyScore(); i++) {
+            bookIcon.setSize(iconSize, iconSize);
+            bookIcon.setPosition(iconsStartX + i * (iconSize + iconSpacing), iconY);
+            bookIcon.draw(renderer.getBatch());
+        }
+
+
+        iconY -= iconSize + padding;
+
+
+        font.draw(renderer.getBatch(), "Recreational Activity: ", boxX + padding, iconY + iconSize);
+        iconsStartX = boxX + padding + recreationLayout.width;
+        for (int i = 0; i < DayManager.currentDay.getRecreationalScore(); i++) {
+            gameIcon.setSize(iconSize, iconSize);
+            gameIcon.setPosition(iconsStartX + i * (iconSize + iconSpacing), iconY);
+            gameIcon.draw(renderer.getBatch());
+        }
     }
 
 
@@ -104,37 +175,19 @@ public class Play implements Screen {
         energyBarTexture = new Texture("WhiteSquare.png");
         energyBar = new Sprite(energyBarTexture);
 
-        // Other initializations as needed...
+        burgerIconTexture = new Texture("burgerDouble.png");
+        bookIconTexture = new Texture("study.png");
+        gameIconTexture = new Texture("game.png");
+
+        burgerIcon = new Sprite(new Texture("burgerDouble.png"));
+        bookIcon = new Sprite(new Texture("study.png"));
+        gameIcon = new Sprite(new Texture("game.png"));
     }
 
 
 
 
-//    @Override
-//    public void show() {
-//        TmxMapLoader loader = new TmxMapLoader();
-//        map = loader.load("testmap.tmx");
-//        //make this one line: map = new TmxMapLoader().load(path);
-//        //remember to put both the map and all tilemaps in assets folder
-//        //also have to consider: if you create the map elsewhere (not directly in the assets folder) (and save it to desktop or something)
-//        //then you have to go into the .tsx files and change the filepaths of the tilemap png's
-//
-//        renderer = new OrthogonalTiledMapRenderer(map); //can also take a scale argument
-//        camera = new OrthographicCamera(); //don't need to specify width and height because resize() is called after show()
-//
-//        player = new Player(new Sprite(new Texture("player.png")), (TiledMapTileLayer) map.getLayers().get(0));
-//        float startX = 34 * player.getCollisionLayer().getTileWidth();
-//        float startY = (player.getCollisionLayer().getHeight() - 25) * player.getCollisionLayer().getTileHeight();
-//        activityManager.setPlayer(player);
-//        this.activityManager = new ActivityManager(collisionLayer);
-//        player.setPosition(startX, startY);
-//        Gdx.input.setInputProcessor(player);
-//
-//        // Testing counter
-//        this.font = new BitmapFont();
-//        font.setColor(Color.WHITE);
-//        font.getData().setScale(2);
-//    }
+
 
     @Override
     public void hide() {
@@ -172,6 +225,10 @@ public class Play implements Screen {
         renderer.dispose();
         player.getTexture().dispose();
         font.dispose();
+        burgerIconTexture.dispose();
+        bookIconTexture.dispose();
+        gameIconTexture.dispose();
+
     }
 }
 
