@@ -39,9 +39,10 @@ public class Play implements Screen {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0,0,0,1);
-
-        camera.position.set(player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2, 0);
-        //camera.position.set(camera.viewportWidth, camera.viewportHeight, 0);
+        int cameraSmoothness = 4; //higher looks smoother! makes it take longer for camera to reach player pos
+        camera.position.set(((player.getX() + player.getWidth() / 2)+(camera.position.x *(cameraSmoothness-1)))/cameraSmoothness, ((player.getY() + player.getHeight() / 2)+(camera.position.y *(cameraSmoothness-1)))/cameraSmoothness, 0);
+        lockCameraInTiledmaplayer(camera,(TiledMapTileLayer) map.getLayers().get(1)); //locks camera position so it cannot show out of bounds
+        camera.position.set(Math.round(camera.position.x) ,Math.round(camera.position.y),0);//This is needed to stop black lines between tiles. I think something to do with the tilemaprenderer and floats causes this
         camera.update();
 
         renderer.setView(camera);
@@ -173,5 +174,33 @@ public class Play implements Screen {
         player.getTexture().dispose();
         font.dispose();
     }
+
+    private void lockCameraInTiledmaplayer(OrthographicCamera cam, TiledMapTileLayer layer){
+        //get variables needed to find edges of map!
+        int mapPixelOffsetY =(int) layer.getOffsetY();
+        int mapPixelOffsetX =(int) layer.getOffsetX();
+        int mapPixelWidth = layer.getWidth() * layer.getTileWidth() + mapPixelOffsetX;
+        int mapPixelHeight = layer.getHeight() * layer.getTileHeight() + mapPixelOffsetY;
+
+        //check if camera would show out of bounds, lock it in bounds if it would
+        if ((cam.position.x- (cam.viewportWidth/2)< mapPixelOffsetX))//is the camera too far left.
+        {
+            cam.position.x = mapPixelOffsetX + cam.viewportWidth/2;
+        }
+        else if ((cam.position.x+ (cam.viewportWidth/2)> mapPixelWidth))//is the camera too far right.
+        {
+            cam.position.x = mapPixelWidth - cam.viewportWidth/2;
+        }
+        if ((cam.position.y- (cam.viewportHeight/2)< mapPixelOffsetY))//is the camera too low.
+        {
+            cam.position.y = mapPixelOffsetY + cam.viewportHeight/2;
+        }
+        else if ((cam.position.y+ (cam.viewportHeight/2)> mapPixelHeight))//is the camera too high.
+        {
+            cam.position.y = mapPixelHeight - cam.viewportHeight/2;
+        }
+    }
+
+
 }
 
