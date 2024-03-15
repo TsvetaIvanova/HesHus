@@ -2,11 +2,12 @@ package com.heshus.game.manager;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
+import com.heshus.game.entities.Player;
 
 public class ActivityManager {
 
     private final TiledMapTileLayer collisionLayer;
-
+    private Player player;
 
 
     public ActivityManager(TiledMapTileLayer collisionLayer) {
@@ -15,52 +16,42 @@ public class ActivityManager {
 
 
     //decide activity based on the avatar's position for collision-based interactions
-    public void checkActivity(float avatarX, float avatarY) {
-        // to work with Vector2 and getSpritePosition()
+    public void checkActivity() {
+        // Assuming you have a reference to the Player object named 'player'
+        float avatarX = player.getX();
+        float avatarY = player.getY();
+
+        // Convert avatar position to tile coordinates
         int x = (int) avatarX;
         int y = (int) avatarY;
 
         TiledMapTileLayer.Cell cell = collisionLayer.getCell(x, y);
         if (cell != null && cell.getTile() != null) {
-            if (cell.getTile().getProperties().containsKey("eating")) {
+            if (cell.getTile().getProperties().containsKey("eat")) {
+                // just added for testing
+                // System.out.println("Eating activity detected.");
+                //DayManager.incrementDay();
                 performEatingActivity();
             } else if (cell.getTile().getProperties().containsKey("study")) {
                 performStudyingActivity();
             } else if (cell.getTile().getProperties().containsKey("recreation")) {
                 performRecreationalActivity();
-            } else if (cell.getTile().getProperties().containsKey("sleeping")) {
+            } else if (cell.getTile().getProperties().containsKey("sleep")) {
                 performSleepingActivity();
             }
         }
     }
 
 
-    //
-    public void performActivity(String activityType) {
-        if (DayManager.gameOver) return;
-
-        switch (activityType) {
-            case "eat":
-                performEatingActivity();
-                break;
-            case "study":
-                performStudyingActivity();
-                break;
-            case "recreation":
-                performRecreationalActivity();
-                break;
-            case "sleep":
-                performSleepingActivity();
-                break;
-
-        }
-    }
-
-    // // incrementing overall.. for now will adjust later
+    // incrementing overall.. for now will adjust later
     private void performEatingActivity() {
         decrementEnergy();
         incrementTime();
         DayManager.overallEatScore++;
+        DayManager.currentDay.incrementEatScore();
+        // added just for testing
+        DayManager.incrementDay();
+
     }
 
     // incrementing overall.. for now will adjust later
@@ -68,6 +59,7 @@ public class ActivityManager {
         decrementEnergy();
         incrementTime();
         DayManager.overallStudyScore++;
+
     }
 
     // incrementing overallRecreationalScore for now will adjust later
@@ -117,5 +109,9 @@ public class ActivityManager {
         } else {
             DayManager.currentDay.setTime(newTime);
         }
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 }

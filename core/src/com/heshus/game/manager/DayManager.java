@@ -3,7 +3,9 @@ package com.heshus.game.manager;
 public class DayManager {
     public static Day currentDay = new Day(1, 480, 0, 100, 0, 0);
     public static boolean gameOver = false;
-    static int overallEatScore = 0, overallStudyScore = 0, overallRecreationalScore = 0;
+    public static int overallEatScore = 0;
+    public static int overallStudyScore = 0;
+    public static int overallRecreationalScore = 0;
 
     public static void incrementDay(){
         if(currentDay.getDayNumber() < 7){

@@ -4,8 +4,8 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
@@ -18,20 +18,87 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.heshus.game.entities.Player;
 import com.heshus.game.manager.DayManager;
 
-public class HesHusGame extends ApplicationAdapter implements InputProcessor {
+//LUKE IMPORTS
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.heshus.game.entities.Player;
+
+import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.heshus.game.screens.states.MainMenuScreen;
+
+public class HesHusGame extends Game {
+
+	// we can use the HesHusGame as a central game class for our screens/states
+
+	public SpriteBatch batch;
+	public BitmapFont font;
+
+	public void create() {
+		batch = new SpriteBatch();
+		font = new BitmapFont(); // use libGDX's default Arial font
+		this.setScreen(new MainMenuScreen(this));
+	}
+
+	public void render() {
+		super.render(); // important!
+	}
+
+	public void dispose() {
+		batch.dispose();
+		font.dispose();
+	}
+
+}
+
+
+
+//	@Override
+//	public void create () {
+//		//entry point to the game
+//		setScreen(new Play());
+//	}
+//
+//	@Override
+//	public void render () {
+//		super.render();
+//	}
+//
+//	@Override
+//	public void dispose () {
+//		super.dispose();
+//	}
+
+
+
+	/*
 	private SpriteBatch batch;
 	private TiledMap tiledMap;
 	private OrthogonalTiledMapRenderer tiledMapRenderer;
 	private OrthographicCamera camera;
+	public Sprite sprite;
 	private Texture spriteTexture;
 	private float speed = 400;
-	private Player player;
-	//private ActivityManager activityManager;
+	 */
 
-	@Override
-	public void create () {
+
+	//@Override
+	//public void create () {
+		/*
 		batch = new SpriteBatch();
-		tiledMap = new TmxMapLoader().load("Tilemaps/testmap.tmx");
+		tiledMap = new TmxMapLoader().load("testmap.tmx");
 		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
 
 
@@ -41,45 +108,30 @@ public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 		camera.setToOrtho(false, 1600, 800);
 
 		spriteTexture = new Texture("bucket.png");
-		Sprite sprite = new Sprite(spriteTexture);
+		sprite = new Sprite(spriteTexture);
 
 		//placed the avatar before the first building they would need to interact with
-		player = new Player(sprite,50 - sprite.getWidth() / 2, 200);
+		sprite.setPosition(50 - sprite.getWidth() / 2, 200);
 
 		TiledMapTileLayer collisionLayer = (TiledMapTileLayer) tiledMap.getLayers().get("");
 		//activityManager = new ActivityManager(collisionLayer);
 
 		// Set this class as the input processor
 		Gdx.input.setInputProcessor(this);
-	}
 
-	@Override
-	public void render () {
-		//player
-		player.update();
+		 */
+	//}
 
-		handleLogic(Gdx.graphics.getDeltaTime());
 
-		ScreenUtils.clear(1, 0, 0, 1);
-		camera.update();
-		batch.setProjectionMatrix(camera.combined);
 
-		tiledMapRenderer.setView(camera);
-		tiledMapRenderer.render();
 
-		//activityManager.checkCurrentActivity();
-	//Vector2 spritePosition = getSpritePosition();
-		//activityManager.checkCurrentActivity(spritePosition);
-
-		batch.begin();
-		player.sprite.draw(batch);
-		batch.end();
-	}
-
-	/*public Vector2 getSpritePosition() {
+	/*
+	public Vector2 getSpritePosition() {
 		return new Vector2(sprite.getX(), sprite.getY());
 	}
-*/
+	*/
+
+	/*
 	@Override
 	public void dispose() {
 		batch.dispose();
@@ -87,7 +139,10 @@ public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 		spriteTexture.dispose();
 	}
 
-	/*private void handleInput(float deltaTime) {
+	 */
+
+	/*
+	private void handleInput(float deltaTime) {
 		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
 			sprite.translateX(-speed * deltaTime);
 		}
@@ -101,8 +156,11 @@ public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 			sprite.translateY(-speed * deltaTime);
 		}
 	}
-*/
+	*/
+
+
 	//This will change when screens are added
+	/*
 	private void handleLogic(float deltaTime){
 		if(Gdx.input.isKeyJustPressed(Keys.SPACE)){
 			DayManager.incrementDay();
@@ -110,58 +168,10 @@ public class HesHusGame extends ApplicationAdapter implements InputProcessor {
 
 		//Teleport player to centre of screen to test if working
 		if(DayManager.gameOver){
-			player.setX(400 - player.sprite.getWidth());
-			player.setY(400);
-
+			sprite.setPosition(400 - sprite.getWidth() / 2, 200);
 		}
 	}
+	 */
 
-	// InputProcessor methods
 
-	@Override
-	public boolean keyDown(int keycode) {
 
-		return false;
-	}
-
-	@Override
-	public boolean keyUp(int keycode) {
-
-		return false;
-	}
-
-	@Override
-	public boolean keyTyped(char character) {
-		return false;
-	}
-
-	@Override
-	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		return false;
-	}
-
-	@Override
-	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		return false;
-	}
-
-	@Override
-	public boolean touchCancelled(int i, int i1, int i2, int i3) {
-		return false;
-	}
-
-	@Override
-	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		return false;
-	}
-
-	@Override
-	public boolean mouseMoved(int screenX, int screenY) {
-		return false;
-	}
-
-	@Override
-	public boolean scrolled(float amountX, float amountY) {
-		return false;
-	}
-}

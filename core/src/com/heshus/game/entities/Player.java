@@ -2,73 +2,225 @@ package com.heshus.game.entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.Vector2;
 
-public class Player {
+public class Player extends Sprite implements InputProcessor {
+    //movement velocity - Vector2 stores 2 values, for x and y
+    private Vector2 velocity = new Vector2();
+    private float speed = 200;
 
-    private float x;
-    private float y;
-    private float speed;
-    public Sprite sprite;
-    public Player(Sprite sprite, float x, float y){
-        this.sprite = sprite;
-        this.x = x;
-        this.y = y;
-        speed = 400.f;
+    private TiledMapTileLayer collisionLayer;
+
+    public Player(Sprite playerSprite, TiledMapTileLayer collisionLayer) {
+        //call super constructor - i.e. the constructor of the Sprite class, which takes the player sprite as an argument
+        super(playerSprite);
+        this.collisionLayer = collisionLayer;
+
     }
 
-    public void update(){
-        handleMovement(Gdx.graphics.getDeltaTime());
+    public TiledMapTileLayer getCollisionLayer() {
+        return collisionLayer;
     }
 
-    private void handleMovement(float deltaTime) {
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            x+=(-speed * deltaTime);
+    public void draw(Batch spritebatch) {
+        update(Gdx.graphics.getDeltaTime());
+        super.draw(spritebatch);
+    }
+
+    public void update(float delta) {
+
+        //**********************
+        //  COLLISION DETECTION
+        //**********************
+
+        //save old x,y positions
+        float oldX = getX();
+        float oldY = getY();
+        //variables to say if we're colliding with something
+        boolean collisionX = false, collisionY = false;
+        //map tile properties
+        float tileWidth = collisionLayer.getTileWidth();
+        float tileHeight = collisionLayer.getTileHeight();
+
+        //update x position
+        setX(getX() + velocity.x * delta);
+
+        //do the collision detection
+        if (velocity.x < 0) {
+            //player moving left
+            //want to check the tiles to the left, up/left and down/left
+
+            //top left
+            collisionX = collisionLayer.getCell((int)(getX() / tileWidth), (int)((getY() + getHeight()) / tileHeight))
+                    .getTile().getProperties().containsKey("collision");
+            //disgusting line
+            //get the cell at the player's top-left, get the tile at that cell, get that tile's properties, if it contains "blocked" then true
+
+            //middle left
+            if (!collisionX) { //if no collision yet
+                collisionX = collisionLayer.getCell((int) (getX() / tileWidth), (int) ((getY() + (getHeight() / 2)) / tileHeight))
+                        .getTile().getProperties().containsKey("collision");
+            }
+            //bottom left
+            if (!collisionX) {
+                collisionX = collisionLayer.getCell((int) (getX() / tileWidth), (int) (getY() / tileHeight))
+                        .getTile().getProperties().containsKey("collision");
+            }
+        } else if (velocity.x > 0) {
+            //player moving right
+
+            //top right
+            collisionX = collisionLayer.getCell((int)((getX() + getWidth())/ tileWidth), (int)((getY() + getHeight()) / tileHeight))
+                    .getTile().getProperties().containsKey("collision");
+
+            //middle right
+            if (!collisionX) {
+                collisionX = collisionLayer.getCell((int)((getX() + getWidth())/ tileWidth), (int)((getY() + getHeight() / 2) / tileHeight))
+                        .getTile().getProperties().containsKey("collision");
+            }
+
+            //bottom right
+            if (!collisionX) {
+                collisionX = collisionLayer.getCell((int)((getX() + getWidth())/ tileWidth), (int)(getY() / tileHeight))
+                        .getTile().getProperties().containsKey("collision");
+            }
+
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            x+=(speed * deltaTime);
+
+        //correct x-axis movement
+        if (collisionX) {
+            setX(oldX);
+            velocity.x = 0;
+        } //could put an else here to fix bug where colliding with something stops all movement in that direction
+
+        //repeat for y position
+        setY(getY() + velocity.y * delta);
+
+        if (velocity.y < 0) {
+            //player moving downwards
+
+            //bottom left
+            collisionY = collisionLayer.getCell((int)((getX())/ tileWidth), (int)(getY() / tileHeight))
+                    .getTile().getProperties().containsKey("collision");
+
+            //bottom middle
+            if (!collisionY) {
+                collisionY = collisionLayer.getCell((int)((getX() + getWidth() / 2)/ tileWidth), (int)(getY() / tileHeight))
+                        .getTile().getProperties().containsKey("collision");
+            }
+
+            //bottom right
+            if (!collisionY) {
+                collisionY = collisionLayer.getCell((int)((getX() + getWidth())/ tileWidth), (int)(getY() / tileHeight))
+                        .getTile().getProperties().containsKey("collision");
+            }
+
+        } else if (velocity.y > 0) {
+            //player moving upwards
+            //THIS NEEDS FIXING
+
+            //top left
+            collisionY = collisionLayer.getCell((int)((getX())/ tileWidth), (int)((getY() + getHeight())/ tileHeight))
+                    .getTile().getProperties().containsKey("collision");
+
+            //top middle
+            if (!collisionY) {
+                collisionY = collisionLayer.getCell((int)((getX() + getWidth() / 2)/ tileWidth), (int)((getY() + getHeight())/ tileHeight))
+                        .getTile().getProperties().containsKey("collision");
+            }
+
+            //top right
+            if (!collisionY) {
+                collisionY = collisionLayer.getCell((int)((getX() + getWidth())/ tileWidth), (int)((getY() + getHeight())/ tileHeight))
+                        .getTile().getProperties().containsKey("collision");
+            }
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            y+=(speed * deltaTime);
+
+        //react to y collision
+        if (collisionY) {
+            setY(oldY);
+            velocity.y = 0;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            y+=(-speed * deltaTime);
+    }
+
+    ////////////////////
+    //INPUT HANDLING
+    ///////////////////
+
+    @Override
+    public boolean keyDown(int keycode) {
+        switch (keycode) {
+            case Input.Keys.W:
+                velocity.y = speed;
+                break;
+            case Input.Keys.A:
+                velocity.x = -speed;
+                break;
+            case Input.Keys.S:
+                velocity.y = -speed;
+                break;
+            case Input.Keys.D:
+                velocity.x = speed;
+                break;
         }
-        sprite.setX(x);
-        System.out.println(sprite.getX());
-        sprite.setY(y);
+        return true;
     }
 
-    public float getX() {
-        return x;
+    @Override
+    public boolean keyUp(int keycode) {
+        switch (keycode) {
+            case Input.Keys.A:
+            case Input.Keys.D:
+                velocity.x = 0;
+                break;
+            case Input.Keys.W:
+            case Input.Keys.S:
+                velocity.y = 0;
+                break;
+        }
+        return true;
     }
 
-    public void setX(float x) {
-        this.x = x;
+    //DON'T NEED ANY OF THE REST OF THESE METHODS
+
+    @Override
+    public boolean keyTyped(char character) {
+        return false;
     }
 
-    public float getY() {
-        return y;
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        return false;
     }
 
-    public void setY(float y) {
-        this.y = y;
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        return false;
     }
 
-    public float getSpeed() {
-        return speed;
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        return false;
     }
 
-    public void setSpeed(float speed) {
-        this.speed = speed;
+    @Override
+    public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
+        return false;
     }
 
-    public Sprite getSprite() {
-        return sprite;
+    @Override
+    public boolean mouseMoved (int screenX, int screenY) {
+        return false;
     }
 
-    public void setSprite(Sprite sprite) {
-        this.sprite = sprite;
+    @Override
+    public boolean scrolled(float a, float b) {
+        return false;
     }
+
 }
-

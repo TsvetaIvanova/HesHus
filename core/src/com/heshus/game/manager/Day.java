@@ -19,6 +19,8 @@ public class Day {
         this.dayNumber += 1;
     }
 
+    public void incrementEatScore() { this.eatScore++; }
+
     public int getStudyScore(){
         return this.studyScore;
     }
