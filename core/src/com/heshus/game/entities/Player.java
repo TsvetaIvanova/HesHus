@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
+import com.heshus.game.manager.DayManager;
 
 public class Player extends Sprite implements InputProcessor {
     //movement velocity - Vector2 stores 2 values, for x and y
@@ -145,6 +146,11 @@ public class Player extends Sprite implements InputProcessor {
         if (collisionY) {
             setY(oldY);
             velocity.y = 0;
+        }
+
+        //energy bar test
+        if(Gdx.input.isKeyJustPressed(Input.Keys.K)){
+            DayManager.currentDay.setEnergy(DayManager.currentDay.getEnergy() - 20);
         }
     }
 

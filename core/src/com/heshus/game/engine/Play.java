@@ -6,9 +6,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -30,6 +28,9 @@ public class Play implements Screen {
     private TiledMapTileLayer collisionLayer;
     private ActivityManager activityManager;
     // private Game game;
+
+    private Sprite energyBar;
+    private Texture energyBarTexture;
 
     public Play(HesHusGame game) {
         this.game = game;
@@ -56,11 +57,15 @@ public class Play implements Screen {
         String dayCounter = "Day: " + DayManager.currentDay.getDayNumber() + " of 7 days";
         font.draw(renderer.getBatch(), dayCounter, 100, Gdx.graphics.getHeight() + 40);
         font.draw(renderer.getBatch(), "Recreational Activity: " + DayManager.overallRecreationalScore, 100, Gdx.graphics.getHeight() + 10);
-//
+
+        //Drawing energy bar
+        renderer.getBatch().setColor(Color.GRAY);
+        renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth/2) + 3, (camera.position.y - camera.viewportHeight/2) + 3, 204, 44);
+        renderer.getBatch().setColor(Color.YELLOW);
+        renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
+        renderer.getBatch().setColor(Color.WHITE);
 
         renderer.getBatch().end();
-
-
 
 
     }
@@ -94,6 +99,10 @@ public class Play implements Screen {
         font = new BitmapFont();
         font.setColor(Color.WHITE);
         font.getData().setScale(2);
+
+        // Set up texture for energy bar
+        energyBarTexture = new Texture("WhiteSquare.png");
+        energyBar = new Sprite(energyBarTexture);
 
         // Other initializations as needed...
     }

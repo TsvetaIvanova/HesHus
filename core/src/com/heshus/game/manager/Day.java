@@ -55,7 +55,15 @@ public class Day {
 
     public int getEnergy() { return this.energy; }
 
-    public void setEnergy(int energy) { this.energy = energy; }
+    public void setEnergy(int energy)
+    {
+        if(energy >= 0){
+            this.energy = energy;
+        }
+        else{
+            this.energy = 0;
+        }
+    }
 
     public void setTime(float time) { this.time = time; }
 }
