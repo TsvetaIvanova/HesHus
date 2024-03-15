@@ -12,6 +12,8 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.heshus.game.entities.Player;
 import com.heshus.game.manager.ActivityManager;
 import com.heshus.game.manager.DayManager;
@@ -31,6 +33,7 @@ public class Play implements Screen {
 
     private Sprite energyBar;
     private Texture energyBarTexture;
+    private ExtendViewport extendViewport;
 
     public Play(HesHusGame game) {
         this.game = game;
@@ -43,6 +46,8 @@ public class Play implements Screen {
         camera.position.set(((player.getX() + player.getWidth() / 2)+(camera.position.x *(cameraSmoothness-1)))/cameraSmoothness, ((player.getY() + player.getHeight() / 2)+(camera.position.y *(cameraSmoothness-1)))/cameraSmoothness, 0);
         lockCameraInTiledmaplayer(camera,(TiledMapTileLayer) map.getLayers().get(1)); //locks camera position so it cannot show out of bounds
         camera.position.set(Math.round(camera.position.x) ,Math.round(camera.position.y),0);//This is needed to stop black lines between tiles. I think something to do with the tilemaprenderer and floats causes this
+        camera.viewportWidth = Math.round(camera.viewportWidth);
+        camera.viewportHeight = Math.round(camera.viewportHeight);
         camera.update();
 
         renderer.setView(camera);
@@ -76,8 +81,8 @@ public class Play implements Screen {
     public void show() {
         // Initialize the camera
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 480);
-
+        camera.setToOrtho(false, 800, 450);
+        extendViewport = new ExtendViewport(camera.viewportWidth, camera.viewportHeight, camera);
         // Load the map and set up the renderer
         map = new TmxMapLoader().load("testmap.tmx");
         collisionLayer = (TiledMapTileLayer) map.getLayers().get(0);
@@ -145,11 +150,9 @@ public class Play implements Screen {
     @Override
     public void resize(int width, int height) {
 
-        camera.viewportWidth = width / 1f;
-        camera.viewportHeight = height / 1f;
-        camera.update();
+        extendViewport.update(width, height); //updates size of window for viewport when things get resized
 
-        renderer.setView(camera);
+        camera.update();
     }
 
     @Override
@@ -181,6 +184,7 @@ public class Play implements Screen {
         int mapPixelOffsetX =(int) layer.getOffsetX();
         int mapPixelWidth = layer.getWidth() * layer.getTileWidth() + mapPixelOffsetX;
         int mapPixelHeight = layer.getHeight() * layer.getTileHeight() + mapPixelOffsetY;
+
 
         //check if camera would show out of bounds, lock it in bounds if it would
         if ((cam.position.x- (cam.viewportWidth/2)< mapPixelOffsetX))//is the camera too far left.
