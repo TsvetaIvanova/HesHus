@@ -149,9 +149,7 @@ public class Play implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
-        extendViewport.update(width, height); //updates size of window for viewport when things get resized
-
+        extendViewport.update(((width+7)/16)*16, ((height+7)/16)*16); //updates size of window for viewport when things get resized, rounds up to the nearest tilewidth
         camera.update();
     }
 
@@ -184,7 +182,10 @@ public class Play implements Screen {
         int mapPixelOffsetX =(int) layer.getOffsetX();
         int mapPixelWidth = layer.getWidth() * layer.getTileWidth() + mapPixelOffsetX;
         int mapPixelHeight = layer.getHeight() * layer.getTileHeight() + mapPixelOffsetY;
-
+        //if the camera viewport is large enough to see outside the map on both sides at once, there is no useful way to lock it. this shouldn't happen
+        if (cam.viewportWidth>mapPixelWidth || cam.viewportHeight>mapPixelHeight){
+            return;
+        }
 
         //check if camera would show out of bounds, lock it in bounds if it would
         if ((cam.position.x- (cam.viewportWidth/2)< mapPixelOffsetX))//is the camera too far left.
