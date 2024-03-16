@@ -44,7 +44,7 @@ public class Play implements Screen {
         ScreenUtils.clear(0,0,0,1);
         int cameraSmoothness = 4; //higher looks smoother! makes it take longer for camera to reach player pos
         camera.position.set(((player.getX() + player.getWidth() / 2)+(camera.position.x *(cameraSmoothness-1)))/cameraSmoothness, ((player.getY() + player.getHeight() / 2)+(camera.position.y *(cameraSmoothness-1)))/cameraSmoothness, 0);
-        //lockCameraInTiledmaplayer(camera,(TiledMapTileLayer) map.getLayers().get(1)); //locks camera position so it cannot show out of bounds
+        lockCameraInTiledmaplayer(camera,(TiledMapTileLayer) map.getLayers().get(1)); //locks camera position so it cannot show out of bounds
         camera.position.set(Math.round(camera.position.x) ,Math.round(camera.position.y),0);//This is needed to stop black lines between tiles. I think something to do with the tilemaprenderer and floats causes this
         camera.viewportWidth = Math.round(camera.viewportWidth);
         camera.viewportHeight = Math.round(camera.viewportHeight);
