@@ -29,7 +29,6 @@ public class Player extends Sprite implements InputProcessor {
     }
 
     public void draw(Batch spritebatch) {
-        update(Gdx.graphics.getDeltaTime());
         super.draw(spritebatch);
     }
 

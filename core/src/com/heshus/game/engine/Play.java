@@ -1,7 +1,8 @@
 package com.heshus.game.engine;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -11,13 +12,14 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.heshus.game.entities.Player;
 import com.heshus.game.manager.ActivityManager;
 import com.heshus.game.manager.DayManager;
-
 
 public class Play implements Screen {
 
@@ -34,6 +36,8 @@ public class Play implements Screen {
     private Sprite energyBar;
     private Texture energyBarTexture;
     private ExtendViewport extendViewport;
+    private boolean isPaused;
+    private InputMultiplexer multiplexer;
 
     public Play(HesHusGame game) {
         this.game = game;
@@ -54,8 +58,6 @@ public class Play implements Screen {
         renderer.render(); //takes a layers[] argument if we want to specifically render certain layers
         renderer.getBatch().begin();
         player.draw(renderer.getBatch());
-
-
         activityManager.checkActivity();
         // Just for testing of counter
         font.draw(renderer.getBatch(), "Eat: " + DayManager.currentDay.getEatScore(), 100, Gdx.graphics.getHeight() + 100);
@@ -74,6 +76,16 @@ public class Play implements Screen {
         renderer.getBatch().end();
 
 
+        //logic/physics - anything that moves
+        if (!isPaused) {
+            player.update(Gdx.graphics.getDeltaTime());
+        }
+        else{
+            player.update(0);
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)||Gdx.input.isKeyJustPressed(Input.Keys.P)){//if escape is pressed, pause the game if unpaused, unpause game if paused
+            isPaused = !isPaused;
+        }
     }
 
 
@@ -97,6 +109,7 @@ public class Play implements Screen {
         player.setPosition(startX, startY);
         Gdx.input.setInputProcessor(player);
 
+
         // Set up the activity manager
         activityManager = new ActivityManager(collisionLayer);
         activityManager.setPlayer(player); // Ensure you have a setPlayer method in ActivityManager
@@ -111,6 +124,7 @@ public class Play implements Screen {
         energyBar = new Sprite(energyBarTexture);
 
         // Other initializations as needed...
+        isPaused = false;
     }
 
 
