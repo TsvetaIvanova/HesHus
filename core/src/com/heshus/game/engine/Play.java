@@ -17,6 +17,9 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.heshus.game.entities.Player;
 import com.heshus.game.manager.ActivityManager;
 import com.heshus.game.manager.DayManager;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+
+import java.awt.*;
 
 
 public class Play implements Screen {
@@ -26,13 +29,13 @@ public class Play implements Screen {
     private OrthogonalTiledMapRenderer renderer;
     private OrthographicCamera camera;
     private Player player;
-    private BitmapFont font;
+    private static BitmapFont font;
     private TiledMapTileLayer collisionLayer;
     private ActivityManager activityManager;
     // private Game game;
 
-    private Sprite energyBar;
-    private Texture energyBarTexture;
+    private Sprite blankTexture, textBubble;
+    private Texture TblankTexture, textBubbleTexture;
     private ExtendViewport extendViewport;
 
     public Play(HesHusGame game) {
@@ -66,10 +69,18 @@ public class Play implements Screen {
 
         //Drawing energy bar
         renderer.getBatch().setColor(Color.GRAY);
-        renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth/2) + 3, (camera.position.y - camera.viewportHeight/2) + 3, 204, 44);
+        renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 3, (camera.position.y - camera.viewportHeight/2) + 3, 204, 44);
         renderer.getBatch().setColor(Color.YELLOW);
-        renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
+        renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
         renderer.getBatch().setColor(Color.WHITE);
+
+        //Draw activity text
+        if(!activityManager.getText().isEmpty()){
+            GlyphLayout layout = new GlyphLayout();
+            layout.setText(font, activityManager.getText());
+            renderer.getBatch().draw(textBubble, activityManager.getTextPosition().x - 2, activityManager.getTextPosition().y, layout.width + 4, 64);
+            activityManager.drawTextBubble((SpriteBatch) renderer.getBatch(), font);
+        }
 
         renderer.getBatch().end();
 
@@ -107,8 +118,12 @@ public class Play implements Screen {
         font.getData().setScale(2);
 
         // Set up texture for energy bar
-        energyBarTexture = new Texture("WhiteSquare.png");
-        energyBar = new Sprite(energyBarTexture);
+        TblankTexture = new Texture("WhiteSquare.png");
+        blankTexture = new Sprite(TblankTexture);
+
+        // Set up text bubble
+        textBubbleTexture = new Texture("textBubble.png");
+        textBubble = new Sprite(textBubbleTexture);
 
         // Other initializations as needed...
     }
@@ -206,6 +221,9 @@ public class Play implements Screen {
         }
     }
 
+    public static BitmapFont getFont(){
+        return font;
+    }
 
 }
 
