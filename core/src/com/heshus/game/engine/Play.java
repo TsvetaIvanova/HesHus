@@ -2,7 +2,6 @@ package com.heshus.game.engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -12,17 +11,18 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.heshus.game.entities.Player;
 import com.heshus.game.manager.ActivityManager;
 import com.heshus.game.manager.DayManager;
+import com.heshus.game.screens.states.PauseMenu;
 
 public class Play implements Screen {
-
+    static final int GAME_RUNNING = 0;
+    static final int GAME_PAUSED = 1;
+    static final int GAME_OVER = 2;
+    int state;
     private final HesHusGame game;
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
@@ -37,57 +37,84 @@ public class Play implements Screen {
     private Texture energyBarTexture;
     private ExtendViewport extendViewport;
     private boolean isPaused;
-    private InputMultiplexer multiplexer;
-
+    private PauseMenu pauseMenu;
     public Play(HesHusGame game) {
         this.game = game;
 
     }
     @Override
     public void render(float delta) {
+        update();
+        draw();
+
+    }
+
+    private void draw(){
         ScreenUtils.clear(0,0,0,1);
+        //CAMERA
         int cameraSmoothness = 4; //higher looks smoother! makes it take longer for camera to reach player pos
         camera.position.set(((player.getX() + player.getWidth() / 2)+(camera.position.x *(cameraSmoothness-1)))/cameraSmoothness, ((player.getY() + player.getHeight() / 2)+(camera.position.y *(cameraSmoothness-1)))/cameraSmoothness, 0);
-        lockCameraInTiledmaplayer(camera,(TiledMapTileLayer) map.getLayers().get(1)); //locks camera position so it cannot show out of bounds
+        lockCameraInTiledMapLayer(camera,(TiledMapTileLayer) map.getLayers().get(1)); //locks camera position so it cannot show out of bounds
         camera.position.set(Math.round(camera.position.x) ,Math.round(camera.position.y),0);//This is needed to stop black lines between tiles. I think something to do with the tilemaprenderer and floats causes this
         camera.viewportWidth = Math.round(camera.viewportWidth);
         camera.viewportHeight = Math.round(camera.viewportHeight);
         camera.update();
 
+        //Tilemap
         renderer.setView(camera);
         renderer.render(); //takes a layers[] argument if we want to specifically render certain layers
         renderer.getBatch().begin();
+        //Player
         player.draw(renderer.getBatch());
-        activityManager.checkActivity();
-        // Just for testing of counter
-        font.draw(renderer.getBatch(), "Eat: " + DayManager.currentDay.getEatScore(), 100, Gdx.graphics.getHeight() + 100);
-        font.draw(renderer.getBatch(), "Study: " + DayManager.currentDay.getStudyScore(), 100, Gdx.graphics.getHeight() + 70);
-        String dayCounter = "Day: " + DayManager.currentDay.getDayNumber() + " of 7 days";
-        font.draw(renderer.getBatch(), dayCounter, 100, Gdx.graphics.getHeight() + 40);
-        font.draw(renderer.getBatch(), "Recreational Activity: " + DayManager.currentDay.getRecreationalScore(), 100, Gdx.graphics.getHeight() + 10);
 
-        //Drawing energy bar
-        renderer.getBatch().setColor(Color.GRAY);
-        renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth/2) + 3, (camera.position.y - camera.viewportHeight/2) + 3, 204, 44);
-        renderer.getBatch().setColor(Color.YELLOW);
-        renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
-        renderer.getBatch().setColor(Color.WHITE);
+        switch (state) {
+            case(GAME_RUNNING):
+                //HUD
+                // Just for testing of counter
+                font.draw(renderer.getBatch(), "Eat: " + DayManager.currentDay.getEatScore(), 100, Gdx.graphics.getHeight() + 100);
+                font.draw(renderer.getBatch(), "Study: " + DayManager.currentDay.getStudyScore(), 100, Gdx.graphics.getHeight() + 70);
+                String dayCounter = "Day: " + DayManager.currentDay.getDayNumber() + " of 7 days";
+                font.draw(renderer.getBatch(), dayCounter, 100, Gdx.graphics.getHeight() + 40);
+                font.draw(renderer.getBatch(), "Recreational Activity: " + DayManager.currentDay.getRecreationalScore(), 100, Gdx.graphics.getHeight() + 10);
 
+                //Drawing energy bar
+                renderer.getBatch().setColor(Color.GRAY);
+                renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth / 2) + 3, (camera.position.y - camera.viewportHeight / 2) + 3, 204, 44);
+                renderer.getBatch().setColor(Color.YELLOW);
+                renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth / 2) + 5, (camera.position.y - camera.viewportHeight / 2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() / 100), 40);
+                renderer.getBatch().setColor(Color.WHITE);
+                break;
+
+            case (GAME_PAUSED): {
+                //Pause menu
+                pauseMenu.draw();
+                break;
+            }
+        }
         renderer.getBatch().end();
-
-
-        //logic/physics - anything that moves
-        if (!isPaused) {
-            player.update(Gdx.graphics.getDeltaTime());
-        }
-        else{
-            player.update(0);
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)||Gdx.input.isKeyJustPressed(Input.Keys.P)){//if escape is pressed, pause the game if unpaused, unpause game if paused
-            isPaused = !isPaused;
-        }
     }
-
+    private void update(){
+        //Detect if game should be paused or not
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)||Gdx.input.isKeyJustPressed(Input.Keys.P)){
+            if (state!=GAME_PAUSED) {
+                state = GAME_PAUSED;
+            }
+            else{
+                state = GAME_RUNNING;
+            }
+        }
+        //logic/physics - anything that moves
+        switch (state){
+            case (GAME_RUNNING):
+                player.update(Gdx.graphics.getDeltaTime());
+                break;
+            case (GAME_PAUSED):
+                player.update(0);
+                pauseMenu.update(camera);
+                break;
+        }
+        activityManager.checkActivity();
+    }
 
     @Override
     public void show() {
@@ -95,6 +122,7 @@ public class Play implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 450);
         extendViewport = new ExtendViewport(camera.viewportWidth, camera.viewportHeight, camera);
+        
         // Load the map and set up the renderer
         map = new TmxMapLoader().load("testmap.tmx");
         collisionLayer = (TiledMapTileLayer) map.getLayers().get(0);
@@ -125,6 +153,9 @@ public class Play implements Screen {
 
         // Other initializations as needed...
         isPaused = false;
+        pauseMenu = new PauseMenu(extendViewport, camera);
+
+        state = GAME_RUNNING;
     }
 
 
@@ -190,7 +221,7 @@ public class Play implements Screen {
         font.dispose();
     }
 
-    private void lockCameraInTiledmaplayer(OrthographicCamera cam, TiledMapTileLayer layer){
+    private void lockCameraInTiledMapLayer(OrthographicCamera cam, TiledMapTileLayer layer){
         //get variables needed to find edges of map!
         int mapPixelOffsetY =(int) layer.getOffsetY();
         int mapPixelOffsetX =(int) layer.getOffsetX();
