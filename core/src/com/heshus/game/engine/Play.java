@@ -1,4 +1,5 @@
 package com.heshus.game.engine;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -11,9 +12,12 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.heshus.game.entities.Player;
 import com.heshus.game.manager.ActivityManager;
 import com.heshus.game.manager.DayManager;
+
 
 public class Play implements Screen {
 
@@ -27,13 +31,12 @@ public class Play implements Screen {
     private ActivityManager activityManager;
     private Sprite energyBar;
     private Texture energyBarTexture;
-    private Sprite burgerIcon;
-    private Sprite bookIcon;
-    private Sprite gameIcon;
-    private Texture burgerIconTexture;
-    private Texture bookIconTexture;
-    private Texture gameIconTexture;
-
+    private ExtendViewport extendViewport;
+    private Texture counterBoxTexture;
+    private Texture burgerIconTexture, studyIconTexture, playIconTexture;
+    private Sprite burgerIconSprite, studyIconSprite, playIconSprite;
+    private Texture verticalBarTexture;
+    private Sprite verticalBarSprite;
 
     public Play(HesHusGame game) {
         this.game = game;
@@ -42,9 +45,12 @@ public class Play implements Screen {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0,0,0,1);
-
-        camera.position.set(player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2, 0);
-        //camera.position.set(camera.viewportWidth, camera.viewportHeight, 0);
+        int cameraSmoothness = 4; //higher looks smoother! makes it take longer for camera to reach player pos
+        camera.position.set(((player.getX() + player.getWidth() / 2)+(camera.position.x *(cameraSmoothness-1)))/cameraSmoothness, ((player.getY() + player.getHeight() / 2)+(camera.position.y *(cameraSmoothness-1)))/cameraSmoothness, 0);
+        lockCameraInTiledmaplayer(camera,(TiledMapTileLayer) map.getLayers().get(1)); //locks camera position so it cannot show out of bounds
+        camera.position.set(Math.round(camera.position.x) ,Math.round(camera.position.y),0);//This is needed to stop black lines between tiles. I think something to do with the tilemaprenderer and floats causes this
+        camera.viewportWidth = Math.round(camera.viewportWidth);
+        camera.viewportHeight = Math.round(camera.viewportHeight);
         camera.update();
 
         renderer.setView(camera);
@@ -52,14 +58,7 @@ public class Play implements Screen {
         renderer.getBatch().begin();
         player.draw(renderer.getBatch());
 
-
         activityManager.checkActivity();
-        // Just for testing of counter
-//        font.draw(renderer.getBatch(), "Eat: " + DayManager.currentDay.getEatScore(), 100, Gdx.graphics.getHeight() + 100);
-//        font.draw(renderer.getBatch(), "Study: " + DayManager.currentDay.getStudyScore(), 100, Gdx.graphics.getHeight() + 70);
-//        String dayCounter = "Day: " + DayManager.currentDay.getDayNumber() + " of 7 days";
-//        font.draw(renderer.getBatch(), dayCounter, 100, Gdx.graphics.getHeight() + 40);
-//        font.draw(renderer.getBatch(), "Recreational Activity: " + DayManager.currentDay.getRecreationalScore(), 100, Gdx.graphics.getHeight() + 10);
 
         //Drawing energy bar
         renderer.getBatch().setColor(Color.GRAY);
@@ -68,86 +67,61 @@ public class Play implements Screen {
         renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
         renderer.getBatch().setColor(Color.WHITE);
 
-        drawActivityIcons();
+         ///////////////////////////////////////////////////////////////////////////
+        // The Counter and Counter Icons                                         //
+        // Upper-left corner position for the counter box set and will not move //
+        float counterBoxX = camera.position.x - camera.viewportWidth / 2;
+        float counterBoxY = (camera.position.y + camera.viewportHeight / 2) - counterBoxTexture.getHeight();
+
+        renderer.getBatch().draw(counterBoxTexture, counterBoxX, counterBoxY);
+
+        float iconSize = 20;
+        float iconSpacingX = 2;
+        float iconSpacingY = 8;
+        float verticalBarStartX = counterBoxX + iconSpacingX + 24;
+        float verticalBarStartY = counterBoxY + counterBoxTexture.getHeight() - iconSpacingY - iconSize - iconSpacingY + 13;
+
+        // setting up the font size and colour
+        font.getData().setScale(1f);
+        font.setColor(Color.BLACK);
+
+        // Defining the Y position for each row
+        float firstRowY = counterBoxY + counterBoxTexture.getHeight() - iconSpacingY - iconSize - 20;
+        float secondRowY = firstRowY - iconSize - iconSpacingY;
+        float thirdRowY = secondRowY - iconSize - iconSpacingY;
+
+        font.draw(renderer.getBatch(), String.valueOf(DayManager.overallEatScore), counterBoxX + 43, firstRowY+18);
+        font.draw(renderer.getBatch(), String.valueOf(DayManager.overallStudyScore), counterBoxX + 43, secondRowY+27);
+        font.draw(renderer.getBatch(), String.valueOf(DayManager.overallRecreationalScore), counterBoxX + 43, thirdRowY+36);
+
+        // Draw the Day icon in the first row
+        for (int i = 0; i < DayManager.currentDay.getDayNumber(); i++) {
+            renderer.getBatch().draw(verticalBarSprite, verticalBarStartX+15 + (5 + iconSpacingX) * i, verticalBarStartY, 5, 20);
+        }
+//        // Draw Eat icons in the second row
+//        for (int i = 0; i < DayManager.currentDay.getEatScore(); i++) {
+//            renderer.getBatch().draw(burgerIconSprite, counterBoxX + 20 + (iconSize + iconSpacingX) * i, firstRowY+7, iconSize, iconSize);
+//        }
+//        // Draw Study icons in the third row
+//        for (int i = 0; i < DayManager.currentDay.getStudyScore(); i++) {
+//            renderer.getBatch().draw(studyIconSprite, counterBoxX + 10 + 20 + (iconSize + iconSpacingX) * i, secondRowY + 10, iconSize, iconSize);
+//        }
+//        // Draw Recreation icons in the fourth row
+//        for (int i = 0; i < DayManager.currentDay.getRecreationalScore(); i++) {
+//            renderer.getBatch().draw(playIconSprite, counterBoxX + 20 + 30 + (iconSize + iconSpacingX) * i, thirdRowY + 15, iconSize, iconSize );
+//        }
 
         renderer.getBatch().end();
 
 
     }
-    private void drawActivityIcons() {
-        float iconSize = 16;
-        float iconSpacing = 5;
-        float maxIcons = 5;
-        float padding = 10;
-        float boxMargin = 10;
-
-
-        GlyphLayout eatLayout = new GlyphLayout(font, "Eat: ");
-        GlyphLayout studyLayout = new GlyphLayout(font, "Study: ");
-        GlyphLayout recreationLayout = new GlyphLayout(font, "Recreational Activity: ");
-        GlyphLayout dayCounterLayout = new GlyphLayout(font, "Day: " + DayManager.currentDay.getDayNumber() + " of 7 days");
-
-
-        float textWidth = Math.max(dayCounterLayout.width, Math.max(eatLayout.width, Math.max(studyLayout.width, recreationLayout.width)));
-
-
-        float boxWidth = padding * 2 + textWidth + (iconSize + iconSpacing) * maxIcons;
-
-
-        float boxHeight = padding + dayCounterLayout.height + padding + (iconSize + padding) * 3 + padding;
-
-        float boxX = boxMargin;
-        float boxY = camera.viewportHeight - boxHeight - boxMargin;
-        renderer.getBatch().setColor(Color.BLACK);
-        renderer.getBatch().draw(energyBarTexture, boxX, boxY, boxWidth, boxHeight);
-        renderer.getBatch().setColor(Color.WHITE);
-
-
-        font.draw(renderer.getBatch(), dayCounterLayout, boxX + padding, boxY + boxHeight - padding);
-
-        float iconY = boxY + boxHeight - padding - dayCounterLayout.height - padding - iconSize;
-
-
-        font.draw(renderer.getBatch(), "Eat: ", boxX + padding, iconY + iconSize);
-        float iconsStartX = boxX + padding + eatLayout.width;
-        for (int i = 0; i < DayManager.currentDay.getEatScore(); i++) {
-            burgerIcon.setSize(iconSize, iconSize);
-            burgerIcon.setPosition(iconsStartX + i * (iconSize + iconSpacing), iconY);
-            burgerIcon.draw(renderer.getBatch());
-        }
-
-
-        iconY -= iconSize + padding;
-
-
-        font.draw(renderer.getBatch(), "Study: ", boxX + padding, iconY + iconSize);
-        iconsStartX = boxX + padding + studyLayout.width;
-        for (int i = 0; i < DayManager.currentDay.getStudyScore(); i++) {
-            bookIcon.setSize(iconSize, iconSize);
-            bookIcon.setPosition(iconsStartX + i * (iconSize + iconSpacing), iconY);
-            bookIcon.draw(renderer.getBatch());
-        }
-
-
-        iconY -= iconSize + padding;
-
-
-        font.draw(renderer.getBatch(), "Recreational Activity: ", boxX + padding, iconY + iconSize);
-        iconsStartX = boxX + padding + recreationLayout.width;
-        for (int i = 0; i < DayManager.currentDay.getRecreationalScore(); i++) {
-            gameIcon.setSize(iconSize, iconSize);
-            gameIcon.setPosition(iconsStartX + i * (iconSize + iconSpacing), iconY);
-            gameIcon.draw(renderer.getBatch());
-        }
-    }
-
 
     @Override
     public void show() {
         // Initialize the camera
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 480);
-
+        camera.setToOrtho(false, 800, 450);
+        extendViewport = new ExtendViewport(camera.viewportWidth, camera.viewportHeight, camera);
         // Load the map and set up the renderer
         map = new TmxMapLoader().load("testmap.tmx");
         collisionLayer = (TiledMapTileLayer) map.getLayers().get(0);
@@ -168,25 +142,28 @@ public class Play implements Screen {
 
         // Set up the font
         font = new BitmapFont();
-        font.setColor(Color.WHITE);
+
         font.getData().setScale(2);
 
         // Set up texture for energy bar
         energyBarTexture = new Texture("WhiteSquare.png");
         energyBar = new Sprite(energyBarTexture);
 
+        // Set up the counter and counter components
+        counterBoxTexture = new Texture("counter-box.png");
+
         burgerIconTexture = new Texture("burgerDouble.png");
-        bookIconTexture = new Texture("study.png");
-        gameIconTexture = new Texture("game.png");
+        studyIconTexture = new Texture("study.png");
+        playIconTexture = new Texture("game.png");
 
-        burgerIcon = new Sprite(new Texture("burgerDouble.png"));
-        bookIcon = new Sprite(new Texture("study.png"));
-        gameIcon = new Sprite(new Texture("game.png"));
+        burgerIconSprite = new Sprite(burgerIconTexture);
+        studyIconSprite = new Sprite(studyIconTexture);
+        playIconSprite = new Sprite(playIconTexture);
+
+        verticalBarTexture = new Texture("vertical-bar.png");
+        verticalBarSprite = new Sprite(verticalBarTexture);
+
     }
-
-
-
-
 
 
     @Override
@@ -196,12 +173,8 @@ public class Play implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
-        camera.viewportWidth = width / 1f;
-        camera.viewportHeight = height / 1f;
+        extendViewport.update(((width+7)/16)*16, ((height+7)/16)*16); //updates size of window for viewport when things get resized, rounds up to the nearest tilewidth
         camera.update();
-
-        renderer.setView(camera);
     }
 
     @Override
@@ -225,10 +198,43 @@ public class Play implements Screen {
         renderer.dispose();
         player.getTexture().dispose();
         font.dispose();
+        counterBoxTexture.dispose();
         burgerIconTexture.dispose();
-        bookIconTexture.dispose();
-        gameIconTexture.dispose();
-
+        studyIconTexture.dispose();
+        playIconTexture.dispose();
+        verticalBarTexture.dispose();
     }
+
+    private void lockCameraInTiledmaplayer(OrthographicCamera cam, TiledMapTileLayer layer){
+        //get variables needed to find edges of map!
+        int mapPixelOffsetY =(int) layer.getOffsetY();
+        int mapPixelOffsetX =(int) layer.getOffsetX();
+        int mapPixelWidth = layer.getWidth() * layer.getTileWidth() + mapPixelOffsetX;
+        int mapPixelHeight = layer.getHeight() * layer.getTileHeight() + mapPixelOffsetY;
+        //if the camera viewport is large enough to see outside the map on both sides at once, there is no useful way to lock it. this shouldn't happen
+        if (cam.viewportWidth>mapPixelWidth || cam.viewportHeight>mapPixelHeight){
+            return;
+        }
+
+        //check if camera would show out of bounds, lock it in bounds if it would
+        if ((cam.position.x- (cam.viewportWidth/2)< mapPixelOffsetX))//is the camera too far left.
+        {
+            cam.position.x = mapPixelOffsetX + cam.viewportWidth/2;
+        }
+        else if ((cam.position.x+ (cam.viewportWidth/2)> mapPixelWidth))//is the camera too far right.
+        {
+            cam.position.x = mapPixelWidth - cam.viewportWidth/2;
+        }
+        if ((cam.position.y- (cam.viewportHeight/2)< mapPixelOffsetY))//is the camera too low.
+        {
+            cam.position.y = mapPixelOffsetY + cam.viewportHeight/2;
+        }
+        else if ((cam.position.y+ (cam.viewportHeight/2)> mapPixelHeight))//is the camera too high.
+        {
+            cam.position.y = mapPixelHeight - cam.viewportHeight/2;
+        }
+    }
+
+
 }
 
