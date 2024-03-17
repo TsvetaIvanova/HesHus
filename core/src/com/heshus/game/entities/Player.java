@@ -148,10 +148,6 @@ public class Player extends Sprite implements InputProcessor {
             velocity.y = 0;
         }
 
-        //energy bar test
-        if(Gdx.input.isKeyJustPressed(Input.Keys.K)){
-            DayManager.currentDay.setEnergy(DayManager.currentDay.getEnergy() - 20);
-        }
     }
 
     ////////////////////

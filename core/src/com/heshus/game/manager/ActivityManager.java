@@ -29,16 +29,16 @@ public class ActivityManager {
 
         TiledMapTileLayer.Cell cell = collisionLayer.getCell(x/collisionLayer.getTileWidth() + 1, y/collisionLayer.getTileHeight() + 1);
         if (cell != null && cell.getTile() != null) {
-            if (cell.getTile().getProperties().containsKey("eat")) {
+            if (cell.getTile().getProperties().containsKey("eat") && Gdx.input.isKeyJustPressed(Input.Keys.E)) {
                 // just added for testing
                 // System.out.println("Eating activity detected.");
                 //DayManager.incrementDay();
                 performEatingActivity();
-            } else if (cell.getTile().getProperties().containsKey("study")) {
+            } else if (cell.getTile().getProperties().containsKey("study") && Gdx.input.isKeyJustPressed(Input.Keys.E)) {
                 performStudyingActivity();
-            } else if (cell.getTile().getProperties().containsKey("recreation")) {
+            } else if (cell.getTile().getProperties().containsKey("recreation") && Gdx.input.isKeyJustPressed(Input.Keys.E)) {
                 performRecreationalActivity();
-            } else if (cell.getTile().getProperties().containsKey("sleep")) {
+            } else if (cell.getTile().getProperties().containsKey("sleep") && Gdx.input.isKeyJustPressed(Input.Keys.E)) {
                 performSleepingActivity();
             }
         }

@@ -32,11 +32,13 @@ public class Play implements Screen {
     private Sprite energyBar;
     private Texture energyBarTexture;
     private ExtendViewport extendViewport;
+
     private Texture counterBoxTexture;
     private Texture burgerIconTexture, studyIconTexture, playIconTexture;
     private Sprite burgerIconSprite, studyIconSprite, playIconSprite;
     private Texture verticalBarTexture;
     private Sprite verticalBarSprite;
+
 
     public Play(HesHusGame game) {
         this.game = game;
