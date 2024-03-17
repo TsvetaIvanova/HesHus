@@ -11,6 +11,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.heshus.game.entities.Player;
@@ -36,7 +37,6 @@ public class Play implements Screen {
     private Sprite energyBar;
     private Texture energyBarTexture;
     private ExtendViewport extendViewport;
-    private boolean isPaused;
     private PauseMenu pauseMenu;
     public Play(HesHusGame game) {
         this.game = game;
@@ -83,16 +83,17 @@ public class Play implements Screen {
                 renderer.getBatch().setColor(Color.YELLOW);
                 renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth / 2) + 5, (camera.position.y - camera.viewportHeight / 2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() / 100), 40);
                 renderer.getBatch().setColor(Color.WHITE);
+                renderer.getBatch().end();
+
                 break;
 
             case (GAME_PAUSED): {
                 //Pause menu
+                renderer.getBatch().end();
                 pauseMenu.draw();
                 break;
             }
-        }
-        renderer.getBatch().end();
-    }
+        }}
     private void update(){
         //Detect if game should be paused or not
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)||Gdx.input.isKeyJustPressed(Input.Keys.P)){
@@ -106,10 +107,12 @@ public class Play implements Screen {
         //logic/physics - anything that moves
         switch (state){
             case (GAME_RUNNING):
+                Gdx.input.setInputProcessor(player);
                 player.update(Gdx.graphics.getDeltaTime());
                 break;
             case (GAME_PAUSED):
                 player.update(0);
+                player.setVelocity(new Vector2(0,0));
                 pauseMenu.update(camera);
                 break;
         }
@@ -152,7 +155,6 @@ public class Play implements Screen {
         energyBar = new Sprite(energyBarTexture);
 
         // Other initializations as needed...
-        isPaused = false;
         pauseMenu = new PauseMenu(extendViewport, camera);
 
         state = GAME_RUNNING;
