@@ -19,30 +19,30 @@ public class Day {
         this.dayNumber += 1;
     }
 
-    public void incrementEatScore() { this.eatScore++; }
+    public void incrementEatScore() { DayManager.overallEatScore++; }
 
     public void incrementStudyScore()
     {
-        this.studyScore++;
+        DayManager.overallStudyScore++;
     }
 
     public void incrementRecreationalScore()
     {
-        this.recreationalScore++;
+        DayManager.overallRecreationalScore++;
     }
 
-    public int getStudyScore(){
-        return this.studyScore;
-    }
-    public int getEatScore(){
-        return this.eatScore;
-    }
-    public int getRecreationalScore(){
-        return this.recreationalScore;
-    }
+//    public int getStudyScore(){
+//        return this.studyScore;
+//    }
+//    public int getEatScore(){
+//        return this.eatScore;
+//    }
+//    public int getRecreationalScore(){
+//        return this.recreationalScore;
+//    }
 
     public void resetTime() {
-        this.time = 480;
+        this.time = 8;
     }
 
     public void resetEnergy() {
@@ -77,3 +77,4 @@ public class Day {
 
     public void setTime(float time) { this.time = time; }
 }
+
