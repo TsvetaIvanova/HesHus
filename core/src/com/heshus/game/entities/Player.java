@@ -29,7 +29,6 @@ public class Player extends Sprite implements InputProcessor {
     }
 
     public void draw(Batch spritebatch) {
-        update(Gdx.graphics.getDeltaTime());
         super.draw(spritebatch);
     }
 
@@ -223,6 +222,13 @@ public class Player extends Sprite implements InputProcessor {
     @Override
     public boolean scrolled(float a, float b) {
         return false;
+    }
+    public Vector2 getVelocity() {
+        return velocity;
+    }
+
+    public void setVelocity(Vector2 velocity) {
+        this.velocity = velocity;
     }
 
 }

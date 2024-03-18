@@ -2,6 +2,7 @@ package com.heshus.game.engine;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -11,16 +12,20 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.heshus.game.entities.Player;
 import com.heshus.game.manager.ActivityManager;
 import com.heshus.game.manager.DayManager;
-
+import com.heshus.game.screens.states.PauseMenu;
 
 public class Play implements Screen {
-
+    public static final int GAME_RUNNING = 0;
+    public static final int GAME_PAUSED = 1;
+    public static final int GAME_OVER = 2;
+    public static int state;
     private final HesHusGame game;
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
@@ -32,6 +37,7 @@ public class Play implements Screen {
     private Sprite energyBar;
     private Texture energyBarTexture;
     private ExtendViewport extendViewport;
+    private PauseMenu pauseMenu;
 
     private Texture counterBoxTexture;
     private Texture burgerIconTexture, studyIconTexture, playIconTexture;
@@ -46,60 +52,80 @@ public class Play implements Screen {
     }
     @Override
     public void render(float delta) {
+        update();
+        draw();
+
+    }
+
+    private void draw(){
         ScreenUtils.clear(0,0,0,1);
+        //CAMERA
         int cameraSmoothness = 4; //higher looks smoother! makes it take longer for camera to reach player pos
         camera.position.set(((player.getX() + player.getWidth() / 2)+(camera.position.x *(cameraSmoothness-1)))/cameraSmoothness, ((player.getY() + player.getHeight() / 2)+(camera.position.y *(cameraSmoothness-1)))/cameraSmoothness, 0);
-        lockCameraInTiledmaplayer(camera,(TiledMapTileLayer) map.getLayers().get(1)); //locks camera position so it cannot show out of bounds
+        lockCameraInTiledMapLayer(camera,(TiledMapTileLayer) map.getLayers().get(1)); //locks camera position so it cannot show out of bounds
         camera.position.set(Math.round(camera.position.x) ,Math.round(camera.position.y),0);//This is needed to stop black lines between tiles. I think something to do with the tilemaprenderer and floats causes this
         camera.viewportWidth = Math.round(camera.viewportWidth);
         camera.viewportHeight = Math.round(camera.viewportHeight);
         camera.update();
 
+        //Tilemap
         renderer.setView(camera);
         renderer.render(); //takes a layers[] argument if we want to specifically render certain layers
         renderer.getBatch().begin();
+        //Player
         player.draw(renderer.getBatch());
 
-        activityManager.checkActivity();
+        switch (state) {
+            case(GAME_RUNNING):
+                //HUD
+                //Drawing energy bar
+                renderer.getBatch().setColor(Color.GRAY);
+                renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth/2) + 3, (camera.position.y - camera.viewportHeight/2) + 3, 204, 44);
+                renderer.getBatch().setColor(Color.YELLOW);
+                renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
+                renderer.getBatch().setColor(Color.WHITE);
 
-        //Drawing energy bar
-        renderer.getBatch().setColor(Color.GRAY);
-        renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth/2) + 3, (camera.position.y - camera.viewportHeight/2) + 3, 204, 44);
-        renderer.getBatch().setColor(Color.YELLOW);
-        renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
-        renderer.getBatch().setColor(Color.WHITE);
+                ///////////////////////////////////////////////////////////////////////////
+                // The Counter and Counter Icons                                         //
+                // Upper-left corner position for the counter box set and will not move //
+                float counterBoxX = camera.position.x - camera.viewportWidth / 2;
+                float counterBoxY = (camera.position.y + camera.viewportHeight / 2) - counterBoxTexture.getHeight();
 
-         ///////////////////////////////////////////////////////////////////////////
-        // The Counter and Counter Icons                                         //
-        // Upper-left corner position for the counter box set and will not move //
-        float counterBoxX = camera.position.x - camera.viewportWidth / 2;
-        float counterBoxY = (camera.position.y + camera.viewportHeight / 2) - counterBoxTexture.getHeight();
+                renderer.getBatch().draw(counterBoxTexture, counterBoxX, counterBoxY);
 
-        renderer.getBatch().draw(counterBoxTexture, counterBoxX, counterBoxY);
+                float iconSize = 20;
+                float iconSpacingX = 2;
+                float iconSpacingY = 8;
+                float verticalBarStartX = counterBoxX + iconSpacingX + 24;
+                float verticalBarStartY = counterBoxY + counterBoxTexture.getHeight() - iconSpacingY - iconSize - iconSpacingY + 13;
 
-        float iconSize = 20;
-        float iconSpacingX = 2;
-        float iconSpacingY = 8;
-        float verticalBarStartX = counterBoxX + iconSpacingX + 24;
-        float verticalBarStartY = counterBoxY + counterBoxTexture.getHeight() - iconSpacingY - iconSize - iconSpacingY + 13;
+                // setting up the font size and colour
+                font.getData().setScale(1f);
+                font.setColor(Color.BLACK);
 
-        // setting up the font size and colour
-        font.getData().setScale(1f);
-        font.setColor(Color.BLACK);
+                // Defining the Y position for each row
+                float firstRowY = counterBoxY + counterBoxTexture.getHeight() - iconSpacingY - iconSize - 20;
+                float secondRowY = firstRowY - iconSize - iconSpacingY;
+                float thirdRowY = secondRowY - iconSize - iconSpacingY;
 
-        // Defining the Y position for each row
-        float firstRowY = counterBoxY + counterBoxTexture.getHeight() - iconSpacingY - iconSize - 20;
-        float secondRowY = firstRowY - iconSize - iconSpacingY;
-        float thirdRowY = secondRowY - iconSize - iconSpacingY;
+                font.draw(renderer.getBatch(), String.valueOf(DayManager.overallEatScore), counterBoxX + 43, firstRowY+18);
+                font.draw(renderer.getBatch(), String.valueOf(DayManager.overallStudyScore), counterBoxX + 43, secondRowY+27);
+                font.draw(renderer.getBatch(), String.valueOf(DayManager.overallRecreationalScore), counterBoxX + 43, thirdRowY+36);
 
-        font.draw(renderer.getBatch(), String.valueOf(DayManager.overallEatScore), counterBoxX + 43, firstRowY+18);
-        font.draw(renderer.getBatch(), String.valueOf(DayManager.overallStudyScore), counterBoxX + 43, secondRowY+27);
-        font.draw(renderer.getBatch(), String.valueOf(DayManager.overallRecreationalScore), counterBoxX + 43, thirdRowY+36);
+                // Draw the Day icon in the first row
+                for (int i = 0; i < DayManager.currentDay.getDayNumber(); i++) {
+                    renderer.getBatch().draw(verticalBarSprite, verticalBarStartX+15 + (5 + iconSpacingX) * i, verticalBarStartY, 5, 20);
+                }
+                renderer.getBatch().end();
+                break;
 
-        // Draw the Day icon in the first row
-        for (int i = 0; i < DayManager.currentDay.getDayNumber(); i++) {
-            renderer.getBatch().draw(verticalBarSprite, verticalBarStartX+15 + (5 + iconSpacingX) * i, verticalBarStartY, 5, 20);
-        }
+            case (GAME_PAUSED): 
+                //Pause menu
+                renderer.getBatch().end();
+                pauseMenu.draw();
+                break;
+                }
+                
 //        // Draw Eat icons in the second row
 //        for (int i = 0; i < DayManager.currentDay.getEatScore(); i++) {
 //            renderer.getBatch().draw(burgerIconSprite, counterBoxX + 20 + (iconSize + iconSpacingX) * i, firstRowY+7, iconSize, iconSize);
@@ -112,10 +138,33 @@ public class Play implements Screen {
 //        for (int i = 0; i < DayManager.currentDay.getRecreationalScore(); i++) {
 //            renderer.getBatch().draw(playIconSprite, counterBoxX + 20 + 30 + (iconSize + iconSpacingX) * i, thirdRowY + 15, iconSize, iconSize );
 //        }
+        
 
-        renderer.getBatch().end();
 
-
+    }
+    private void update(){
+        //Detect if game should be paused or not
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)||Gdx.input.isKeyJustPressed(Input.Keys.P)){
+            if (state!=GAME_PAUSED) {
+                state = GAME_PAUSED;
+            }
+            else{
+                state = GAME_RUNNING;
+            }
+        }
+        //logic/physics - anything that moves
+        switch (state){
+            case (GAME_RUNNING):
+                Gdx.input.setInputProcessor(player);
+                player.update(Gdx.graphics.getDeltaTime());
+                break;
+            case (GAME_PAUSED):
+                player.update(0);
+                player.setVelocity(new Vector2(0,0));
+                pauseMenu.update(camera);
+                break;
+        }
+        activityManager.checkActivity();
     }
 
     @Override
@@ -151,23 +200,28 @@ public class Play implements Screen {
         energyBarTexture = new Texture("WhiteSquare.png");
         energyBar = new Sprite(energyBarTexture);
 
+        //setup menu
+        pauseMenu = new PauseMenu(extendViewport, camera);
+
+        //set state
+        state = GAME_RUNNING;
         // Set up the counter and counter components
         counterBoxTexture = new Texture("counter-box.png");
 
         burgerIconTexture = new Texture("burgerDouble.png");
         studyIconTexture = new Texture("study.png");
         playIconTexture = new Texture("game.png");
-
+       
         burgerIconSprite = new Sprite(burgerIconTexture);
         studyIconSprite = new Sprite(studyIconTexture);
         playIconSprite = new Sprite(playIconTexture);
-
+       
         verticalBarTexture = new Texture("vertical-bar.png");
         verticalBarSprite = new Sprite(verticalBarTexture);
+        
+        // Other initializations as needed...
 
     }
-
-
     @Override
     public void hide() {
         dispose();
@@ -207,7 +261,7 @@ public class Play implements Screen {
         verticalBarTexture.dispose();
     }
 
-    private void lockCameraInTiledmaplayer(OrthographicCamera cam, TiledMapTileLayer layer){
+    private void lockCameraInTiledMapLayer(OrthographicCamera cam, TiledMapTileLayer layer){
         //get variables needed to find edges of map!
         int mapPixelOffsetY =(int) layer.getOffsetY();
         int mapPixelOffsetX =(int) layer.getOffsetX();
