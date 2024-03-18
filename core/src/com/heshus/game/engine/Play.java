@@ -51,6 +51,8 @@ public class Play implements Screen {
     private Texture verticalBarTexture;
     private Sprite verticalBarSprite;
 
+    private float bubbleTimer, bubblePeriod = 3;
+
 
     public Play(HesHusGame game) {
         this.game = game;
@@ -94,12 +96,21 @@ public class Play implements Screen {
 
                 //Draw activity text
                 if(!activityManager.getText().isEmpty()){
-                font.getData().setScale(1f);
-                GlyphLayout layout = new GlyphLayout();
-                layout.setText(font, activityManager.getText());
-                renderer.getBatch().draw(textBubble, activityManager.getTextPosition().x - 2, activityManager.getTextPosition().y, layout.width + 4, 50);
-                activityManager.drawTextBubble((SpriteBatch) renderer.getBatch(), font);
-                font.getData().setScale(2f);
+                    //logic for drawing bubble
+                    font.getData().setScale(1f);
+                    GlyphLayout layout = new GlyphLayout();
+                    layout.setText(font, activityManager.getText());
+                    renderer.getBatch().draw(textBubble, activityManager.getTextPosition().x - 2, activityManager.getTextPosition().y, layout.width + 4, 50);
+                    activityManager.drawTextBubble((SpriteBatch) renderer.getBatch(), font);
+                    font.getData().setScale(2f);
+                    //changes timer
+                    bubbleTimer += Gdx.graphics.getDeltaTime();
+                    //removes bubble after timer ends
+                    if(bubbleTimer > bubblePeriod){
+                        bubbleTimer -= bubblePeriod;
+                        activityManager.setText("", 0, 0);
+                    }
+
                 }
 
                 ///////////////////////////////////////////////////////////////////////////
