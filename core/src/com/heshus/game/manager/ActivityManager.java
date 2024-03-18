@@ -20,6 +20,8 @@ public class ActivityManager {
     private String activityText = "";
     private Vector2 textPosition = new Vector2();
 
+    GlyphLayout layout = new GlyphLayout();
+
 
     public ActivityManager(TiledMapTileLayer collisionLayer) {
         this.collisionLayer = collisionLayer;
@@ -56,52 +58,65 @@ public class ActivityManager {
 
     // incrementing overall.. for now will adjust later
     private void performEatingActivity(TiledMapTileLayer.Cell cell) {
-        decrementEnergy();
-        incrementTime(2);
-        DayManager.currentDay.incrementEatScore();
-        // added just for testing
-        //DayManager.incrementDay();
-        GlyphLayout layout = new GlyphLayout();
-        String holdText = "You feel refreshed";
-        layout.setText(Play.getFont(), holdText);
-        setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/2), Math.round(player.getY() / 16) * 16);
-
+        if(!(DayManager.currentDay.getEnergy() <= 0) && !(DayManager.currentDay.getTime() >= 24)) {
+            decrementEnergy();
+            incrementTime(2);
+            DayManager.currentDay.incrementEatScore();
+            // added just for testing
+            //DayManager.incrementDay();
+            String holdText = "You feel refreshed";
+            layout.setText(Play.getFont(), holdText);
+            setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width / 2), Math.round(player.getY() / 16) * 16);
+        }
+        else{
+            noEnergyOrSleep();
+        }
     }
 
     // incrementing overall.. for now will adjust later
     private void performStudyingActivity(TiledMapTileLayer.Cell cell) {
-        decrementEnergy();
-        incrementTime(4);
+        if(!(DayManager.currentDay.getEnergy() <= 0) && !(DayManager.currentDay.getTime() >= 24)) {
+            decrementEnergy();
+            incrementTime(4);
 
-        DayManager.currentDay.incrementStudyScore();
-        // added just for testing
-        //DayManager.incrementDay();
-        GlyphLayout layout = new GlyphLayout();
-        String holdText = "You feel smarter";
-        layout.setText(Play.getFont(), holdText);
-        setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/2), Math.round(player.getY() / 16) * 16);
-
+            DayManager.currentDay.incrementStudyScore();
+            // added just for testing
+            //DayManager.incrementDay();
+            String holdText = "You feel smarter";
+            layout.setText(Play.getFont(), holdText);
+            setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width / 2), Math.round(player.getY() / 16) * 16);
+        }
+        else{
+            noEnergyOrSleep();
+        }
     }
 
     // incrementing overallRecreationalScore for now will adjust later
     private void performRecreationalActivity(TiledMapTileLayer.Cell cell) {
-        decrementEnergy();
-        incrementTime(3);
+        if(!(DayManager.currentDay.getEnergy() <= 0) && !(DayManager.currentDay.getTime() >= 24)){
 
+            decrementEnergy();
+            incrementTime(3);
 
-        DayManager.currentDay.incrementRecreationalScore();
-        // added just for testing
-        //DayManager.incrementDay();
-        GlyphLayout layout = new GlyphLayout();
-        String holdText = "You have recreationed";
-        layout.setText(Play.getFont(), holdText);
-        setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/2), Math.round(player.getY() / 16) * 16);
+            DayManager.currentDay.incrementRecreationalScore();
+            // added just for testing
+            //DayManager.incrementDay();
+            String holdText = "You have recreationed";
+            layout.setText(Play.getFont(), holdText);
+            setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/2), Math.round(player.getY() / 16) * 16);
+        }
+        else{
+            noEnergyOrSleep();
+        }
+
     }
 
     private void performSleepingActivity() {
         // decided to define day over with reaching 840 time
         if (DayManager.currentDay.getTime() >= 24 || DayManager.currentDay.getEnergy() <= 0) {
-
+            String holdText = "You feel well rested";
+            layout.setText(Play.getFont(), holdText);
+            setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/2), Math.round(player.getY() / 16) * 16);
 
             // if the game is not over the avatar will move to the next day and reset their energy
             if (!DayManager.gameOver) {
@@ -133,7 +148,6 @@ public class ActivityManager {
         float newTime = DayManager.currentDay.getTime() + setTime;
         if (newTime >= 24) {
             //"You need to sleep" we display a message to the player, move to next day
-            performSleepingActivity();
         } else {
             DayManager.currentDay.setTime(newTime);
         }
@@ -163,4 +177,13 @@ public class ActivityManager {
         font.draw(batch, activityText, textPosition.x, textPosition.y + 37);
         font.setColor(new Color(Color.WHITE));
     }
+
+    //method for sleep bubble
+
+    public void noEnergyOrSleep(){
+        String holdText = "You should get some sleep";
+        layout.setText(Play.getFont(), holdText);
+        setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/2), Math.round(player.getY() / 16) * 16);
+    }
+
 }

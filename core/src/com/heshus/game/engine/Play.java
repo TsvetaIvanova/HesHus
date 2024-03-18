@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.heshus.game.entities.Player;
 import com.heshus.game.manager.ActivityManager;
+import com.heshus.game.manager.Day;
 import com.heshus.game.manager.DayManager;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 
@@ -111,7 +112,9 @@ public class Play implements Screen {
                         activityManager.setText("", 0, 0);
                     }
 
+
                 }
+
 
                 ///////////////////////////////////////////////////////////////////////////
                 // The Counter and Counter Icons                                         //
