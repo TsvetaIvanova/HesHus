@@ -1,9 +1,6 @@
 package com.heshus.game.engine;
 
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -15,16 +12,19 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.heshus.game.entities.Player;
 import com.heshus.game.manager.ActivityManager;
 import com.heshus.game.manager.DayManager;
 import com.heshus.game.screens.states.PauseMenu;
+import com.heshus.game.screens.states.SettingsMenu;
+
+import static com.heshus.game.engine.HesHusGame.settings;
 
 public class Play implements Screen {
     public static final int GAME_RUNNING = 0;
     public static final int GAME_PAUSED = 1;
-    public static final int GAME_OVER = 2;
+    public static final int GAME_SETTINGS = 2;
+    public static final int GAME_OVER = 3;
     public static int state;
     private final HesHusGame game;
     private TiledMap map;
@@ -38,17 +38,15 @@ public class Play implements Screen {
     private Texture energyBarTexture;
     private ExtendViewport extendViewport;
     private PauseMenu pauseMenu;
-
     private Texture counterBoxTexture;
     private Texture burgerIconTexture, studyIconTexture, playIconTexture;
     private Sprite burgerIconSprite, studyIconSprite, playIconSprite;
     private Texture verticalBarTexture;
     private Sprite verticalBarSprite;
-
+    private SettingsMenu settingsMenu;
 
     public Play(HesHusGame game) {
         this.game = game;
-
     }
     @Override
     public void render(float delta) {
@@ -163,6 +161,10 @@ public class Play implements Screen {
                 player.setVelocity(new Vector2(0,0));
                 pauseMenu.update(camera);
                 break;
+            case (GAME_SETTINGS):
+                player.update(0);
+                player.setVelocity(new Vector2(0,0));
+                settingsMenu.update();
         }
         activityManager.checkActivity();
     }
@@ -173,6 +175,7 @@ public class Play implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 450);
         extendViewport = new ExtendViewport(camera.viewportWidth, camera.viewportHeight, camera);
+
         // Load the map and set up the renderer
         map = new TmxMapLoader().load("testmap.tmx");
         collisionLayer = (TiledMapTileLayer) map.getLayers().get(0);
@@ -193,16 +196,15 @@ public class Play implements Screen {
 
         // Set up the font
         font = new BitmapFont();
-
         font.getData().setScale(2);
 
         // Set up texture for energy bar
         energyBarTexture = new Texture("WhiteSquare.png");
         energyBar = new Sprite(energyBarTexture);
 
-        //setup menu
+        //setup menus
         pauseMenu = new PauseMenu(extendViewport, camera);
-
+        settingsMenu = new SettingsMenu();
         //set state
         state = GAME_RUNNING;
         // Set up the counter and counter components
