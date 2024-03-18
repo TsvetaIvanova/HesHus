@@ -76,10 +76,12 @@ public class Play implements Screen {
 
         //Draw activity text
         if(!activityManager.getText().isEmpty()){
+            font.getData().setScale(1f);
             GlyphLayout layout = new GlyphLayout();
             layout.setText(font, activityManager.getText());
-            renderer.getBatch().draw(textBubble, activityManager.getTextPosition().x - 2, activityManager.getTextPosition().y, layout.width + 4, 64);
+            renderer.getBatch().draw(textBubble, activityManager.getTextPosition().x - 2, activityManager.getTextPosition().y, layout.width + 4, 50);
             activityManager.drawTextBubble((SpriteBatch) renderer.getBatch(), font);
+            font.getData().setScale(2f);
         }
 
         renderer.getBatch().end();

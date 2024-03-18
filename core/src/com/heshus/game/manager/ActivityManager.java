@@ -64,7 +64,7 @@ public class ActivityManager {
         GlyphLayout layout = new GlyphLayout();
         String holdText = "You feel refreshed";
         layout.setText(Play.getFont(), holdText);
-        setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/2), Math.round(player.getY() / 16) * 16);
+        setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/4), Math.round(player.getY() / 16) * 16);
     }
 
     // incrementing overall.. for now will adjust later
@@ -75,9 +75,9 @@ public class ActivityManager {
         // added just for testing
         //DayManager.incrementDay();
         GlyphLayout layout = new GlyphLayout();
-        String holdText = "test for studying";
+        String holdText = "You feel smarter";
         layout.setText(Play.getFont(), holdText);
-        setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/2), Math.round(player.getY() / 16) * 16);
+        setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/4), Math.round(player.getY() / 16) * 16);
     }
 
     // incrementing overallRecreationalScore for now will adjust later
@@ -88,9 +88,9 @@ public class ActivityManager {
         // added just for testing
         //DayManager.incrementDay();
         GlyphLayout layout = new GlyphLayout();
-        String holdText = "test for recreational";
+        String holdText = "You have recreationed";
         layout.setText(Play.getFont(), holdText);
-        setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/2), Math.round(player.getY() / 16) * 16);
+        setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/4), Math.round(player.getY() / 16) * 16);
     }
 
     private void performSleepingActivity() {
@@ -138,6 +138,8 @@ public class ActivityManager {
         this.player = player;
     }
 
+    //Methods for text bubble
+
     public void setText(String text, float x, float y){
         activityText = text;
         textPosition.set(x, y + 40);
@@ -153,7 +155,7 @@ public class ActivityManager {
 
     public void drawTextBubble(SpriteBatch batch, BitmapFont font){
         font.setColor(new Color(Color.BLACK));
-        font.draw(batch, activityText, textPosition.x, textPosition.y + 50);
+        font.draw(batch, activityText, textPosition.x, textPosition.y + 37);
         font.setColor(new Color(Color.WHITE));
     }
 }
