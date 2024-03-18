@@ -78,12 +78,6 @@ public class Play implements Screen {
         switch (state) {
             case(GAME_RUNNING):
                 //HUD
-                // Just for testing of counter
-               // font.draw(renderer.getBatch(), "Eat: " + DayManager.currentDay.getEatScore(), 100, Gdx.graphics.getHeight() + 100);
-                //font.draw(renderer.getBatch(), "Study: " + DayManager.currentDay.getStudyScore(), 100, Gdx.graphics.getHeight() + 70);
-                //String dayCounter = "Day: " + DayManager.currentDay.getDayNumber() + " of 7 days";
-                //font.draw(renderer.getBatch(), dayCounter, 100, Gdx.graphics.getHeight() + 40);
-                //font.draw(renderer.getBatch(), "Recreational Activity: " + DayManager.currentDay.getRecreationalScore(), 100, Gdx.graphics.getHeight() + 10);
                 //Drawing energy bar
                 renderer.getBatch().setColor(Color.GRAY);
                 renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth/2) + 3, (camera.position.y - camera.viewportHeight/2) + 3, 204, 44);
@@ -124,6 +118,7 @@ public class Play implements Screen {
                 }
                 renderer.getBatch().end();
                 break;
+
             case (GAME_PAUSED): 
                 //Pause menu
                 renderer.getBatch().end();

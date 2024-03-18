@@ -32,10 +32,13 @@ public class PauseMenu{
     private Table areYouSure;
     private BitmapFont font;
     public PauseMenu(ExtendViewport viewport, Camera camera) {
+        //set up font
         font = new BitmapFont(Gdx.files.internal("assets/Fonts/monogram/pixel.fnt"), false);
         font.getData().setScale(1.5F);
         font.setColor(Color.BLACK);
 
+        //BUTTONS
+        //Setup textures and variables
         buttonTexture = new Texture("assets/UI/button_up.png");
         buttonTextureRegion = new TextureRegion(buttonTexture, buttonTexture.getWidth(), buttonTexture.getHeight());
         buttonTextureRegionDrawable =new TextureRegionDrawable(buttonTextureRegion);
@@ -45,6 +48,7 @@ public class PauseMenu{
         buttonHeight = (int) (buttonTexture.getHeight()*buttonScale);
         buttonWidth = (int) (buttonTexture.getWidth()*buttonScale);
 
+        //Resume button:
         resumeButton = new TextButton("RESUME!!", textButtonStyle); //Set the button up
         resumeButton.padBottom(10);
         resumeButton.addListener(new InputListener() {
@@ -54,6 +58,7 @@ public class PauseMenu{
              }
         });
 
+        //Settings button:
         settingsButton = new TextButton("SETTINGS", textButtonStyle); //Set the button up
         settingsButton.padBottom(10);
         settingsButton.addListener(new InputListener() {
@@ -63,6 +68,7 @@ public class PauseMenu{
             }
         });
 
+        //Quit button:
         quitButton = new TextButton("QUIT :(", textButtonStyle); //Set the button up
         quitButton.padBottom(10);
         quitButton.addListener(new InputListener() {
@@ -72,6 +78,7 @@ public class PauseMenu{
             }
         });
 
+        //Table to store buttons
         table = new Table();
         table.add(resumeButton).width(buttonWidth).height(buttonHeight).padBottom((float) buttonHeight /5);
         table.row();
@@ -80,7 +87,7 @@ public class PauseMenu{
         table.add(quitButton).width(buttonWidth).height(buttonHeight).padBottom((float) buttonHeight /5);
 
         stage = new Stage(viewport);
-        stage.addActor(table); //Add the button to the stage to perform rendering and take input.
+        stage.addActor(table); //Add the table to the stage to perform rendering and take input.
     }
     public void draw(){
         stage.draw();
