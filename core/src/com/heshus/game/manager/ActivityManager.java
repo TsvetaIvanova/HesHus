@@ -29,16 +29,16 @@ public class ActivityManager {
 
         TiledMapTileLayer.Cell cell = collisionLayer.getCell(x/collisionLayer.getTileWidth() + 1, y/collisionLayer.getTileHeight() + 1);
         if (cell != null && cell.getTile() != null) {
-            if (cell.getTile().getProperties().containsKey("eat")) {
+            if (cell.getTile().getProperties().containsKey("eat") && Gdx.input.isKeyJustPressed(Input.Keys.E)) {
                 // just added for testing
                 // System.out.println("Eating activity detected.");
                 //DayManager.incrementDay();
                 performEatingActivity();
-            } else if (cell.getTile().getProperties().containsKey("study")) {
+            } else if (cell.getTile().getProperties().containsKey("study") && Gdx.input.isKeyJustPressed(Input.Keys.E)) {
                 performStudyingActivity();
-            } else if (cell.getTile().getProperties().containsKey("recreation")) {
+            } else if (cell.getTile().getProperties().containsKey("recreation") && Gdx.input.isKeyJustPressed(Input.Keys.E)) {
                 performRecreationalActivity();
-            } else if (cell.getTile().getProperties().containsKey("sleep")) {
+            } else if (cell.getTile().getProperties().containsKey("sleep") && Gdx.input.isKeyJustPressed(Input.Keys.E)) {
                 performSleepingActivity();
             }
         }
@@ -48,39 +48,40 @@ public class ActivityManager {
     // incrementing overall.. for now will adjust later
     private void performEatingActivity() {
         decrementEnergy();
-        incrementTime();
+        incrementTime(2);
         DayManager.currentDay.incrementEatScore();
-        // added just for testing
-        //DayManager.incrementDay();
 
     }
 
     // incrementing overall.. for now will adjust later
     private void performStudyingActivity() {
         decrementEnergy();
-        incrementTime();
+        incrementTime(4);
+
         DayManager.currentDay.incrementStudyScore();
-        // added just for testing
-        //DayManager.incrementDay();
+
     }
 
     // incrementing overallRecreationalScore for now will adjust later
     private void performRecreationalActivity() {
         decrementEnergy();
-        incrementTime();
+        incrementTime(3);
+
+
         DayManager.currentDay.incrementRecreationalScore();
-        // added just for testing
-        //DayManager.incrementDay();
     }
 
     private void performSleepingActivity() {
         // decided to define day over with reaching 840 time
-        if (DayManager.currentDay.getTime() >= 840 || DayManager.currentDay.getEnergy() <= 0) {
+        if (DayManager.currentDay.getTime() >= 24 || DayManager.currentDay.getEnergy() <= 0) {
 
 
             // if the game is not over the avatar will move to the next day and reset their energy
             if (!DayManager.gameOver) {
                 DayManager.incrementDay();
+//                DayManager.currentDay.resetEatScore();
+////              DayManager.currentDay.resetStudyScore();
+////              DayManager.currentDay.resetRecreationalScore();
                 //resetForNewDay();
             }
         }
@@ -104,9 +105,9 @@ public class ActivityManager {
         DayManager.currentDay.setEnergy(Math.max(0, DayManager.currentDay.getEnergy() - 10));
     }
 
-    private void incrementTime() {
-        float newTime = DayManager.currentDay.getTime() + (float) 60;
-        if (newTime >= 840) {
+    private void incrementTime(int setTime) {
+        float newTime = DayManager.currentDay.getTime() + setTime;
+        if (newTime >= 24) {
             //"You need to sleep" we display a message to the player, move to next day
             performSleepingActivity();
             //Change these coordinates
