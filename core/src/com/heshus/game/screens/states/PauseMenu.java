@@ -33,13 +33,13 @@ public class PauseMenu{
     private BitmapFont font;
     public PauseMenu(ExtendViewport viewport, Camera camera) {
         //set up font
-        font = new BitmapFont(Gdx.files.internal("assets/Fonts/monogram/pixel.fnt"), false);
+        font = new BitmapFont(Gdx.files.internal("Fonts/monogram/pixel.fnt"), false);
         font.getData().setScale(1.5F);
         font.setColor(Color.BLACK);
 
         //BUTTONS
         //Setup textures and variables
-        buttonTexture = new Texture("assets/UI/button_up.png");
+        buttonTexture = new Texture("UI/button_up.png");
         buttonTextureRegion = new TextureRegion(buttonTexture, buttonTexture.getWidth(), buttonTexture.getHeight());
         buttonTextureRegionDrawable =new TextureRegionDrawable(buttonTextureRegion);
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle(buttonTextureRegionDrawable, buttonTextureRegionDrawable, buttonTextureRegionDrawable, font );
