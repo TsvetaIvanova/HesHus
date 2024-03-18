@@ -42,8 +42,6 @@ public class Play implements Screen {
 
     private Sprite blankTexture, textBubble;
     private Texture TblankTexture, textBubbleTexture;
-    private Sprite energyBar;
-    private Texture energyBarTexture;
     private ExtendViewport extendViewport;
     private PauseMenu pauseMenu;
 
@@ -84,28 +82,14 @@ public class Play implements Screen {
         player.draw(renderer.getBatch());
 
 
-        activityManager.checkActivity();
-        // Just for testing of counter
-        font.draw(renderer.getBatch(), "Eat: " + DayManager.currentDay.getEatScore(), 100, Gdx.graphics.getHeight() + 100);
-        font.draw(renderer.getBatch(), "Study: " + DayManager.currentDay.getStudyScore(), 100, Gdx.graphics.getHeight() + 70);
-        String dayCounter = "Day: " + DayManager.currentDay.getDayNumber() + " of 7 days";
-        font.draw(renderer.getBatch(), dayCounter, 100, Gdx.graphics.getHeight() + 40);
-        font.draw(renderer.getBatch(), "Recreational Activity: " + DayManager.currentDay.getRecreationalScore(), 100, Gdx.graphics.getHeight() + 10);
-
-        //Drawing energy bar
-        renderer.getBatch().setColor(Color.GRAY);
-        renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 3, (camera.position.y - camera.viewportHeight/2) + 3, 204, 44);
-        renderer.getBatch().setColor(Color.YELLOW);
-        renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
-        renderer.getBatch().setColor(Color.WHITE);
         switch (state) {
             case(GAME_RUNNING):
                 //HUD
                 //Drawing energy bar
                 renderer.getBatch().setColor(Color.GRAY);
-                renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth/2) + 3, (camera.position.y - camera.viewportHeight/2) + 3, 204, 44);
+                renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 3, (camera.position.y - camera.viewportHeight/2) + 3, 204, 44);
                 renderer.getBatch().setColor(Color.YELLOW);
-                renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
+                renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
                 renderer.getBatch().setColor(Color.WHITE);
 
                 //Draw activity text
@@ -118,7 +102,6 @@ public class Play implements Screen {
                 font.getData().setScale(2f);
                 }
 
-                renderer.getBatch().end();
                 ///////////////////////////////////////////////////////////////////////////
                 // The Counter and Counter Icons                                         //
                 // Upper-left corner position for the counter box set and will not move //

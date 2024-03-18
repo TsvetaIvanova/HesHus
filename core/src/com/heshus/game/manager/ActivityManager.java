@@ -64,7 +64,7 @@ public class ActivityManager {
         GlyphLayout layout = new GlyphLayout();
         String holdText = "You feel refreshed";
         layout.setText(Play.getFont(), holdText);
-        setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/4), Math.round(player.getY() / 16) * 16);
+        setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/2), Math.round(player.getY() / 16) * 16);
 
     }
 
@@ -79,7 +79,7 @@ public class ActivityManager {
         GlyphLayout layout = new GlyphLayout();
         String holdText = "You feel smarter";
         layout.setText(Play.getFont(), holdText);
-        setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/4), Math.round(player.getY() / 16) * 16);
+        setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/2), Math.round(player.getY() / 16) * 16);
 
     }
 
@@ -95,7 +95,7 @@ public class ActivityManager {
         GlyphLayout layout = new GlyphLayout();
         String holdText = "You have recreationed";
         layout.setText(Play.getFont(), holdText);
-        setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/4), Math.round(player.getY() / 16) * 16);
+        setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/2), Math.round(player.getY() / 16) * 16);
     }
 
     private void performSleepingActivity() {
