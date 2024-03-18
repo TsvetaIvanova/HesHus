@@ -1,15 +1,24 @@
 package com.heshus.game.manager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
+import com.heshus.game.engine.HesHusGame;
+import com.heshus.game.engine.Play;
 import com.heshus.game.entities.Player;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 
 public class ActivityManager {
 
     private final TiledMapTileLayer collisionLayer;
     private Player player;
+
+    private String activityText = "";
+    private Vector2 textPosition = new Vector2();
 
 
     public ActivityManager(TiledMapTileLayer collisionLayer) {
@@ -33,11 +42,11 @@ public class ActivityManager {
                 // just added for testing
                 // System.out.println("Eating activity detected.");
                 //DayManager.incrementDay();
-                performEatingActivity();
+                performEatingActivity(cell);
             } else if (cell.getTile().getProperties().containsKey("study") && Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                performStudyingActivity();
+                performStudyingActivity(cell);
             } else if (cell.getTile().getProperties().containsKey("recreation") && Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                performRecreationalActivity();
+                performRecreationalActivity(cell);
             } else if (cell.getTile().getProperties().containsKey("sleep") && Gdx.input.isKeyJustPressed(Input.Keys.E)) {
                 performSleepingActivity();
             }
@@ -46,29 +55,47 @@ public class ActivityManager {
 
 
     // incrementing overall.. for now will adjust later
-    private void performEatingActivity() {
+    private void performEatingActivity(TiledMapTileLayer.Cell cell) {
         decrementEnergy();
         incrementTime(2);
         DayManager.currentDay.incrementEatScore();
+        // added just for testing
+        //DayManager.incrementDay();
+        GlyphLayout layout = new GlyphLayout();
+        String holdText = "You feel refreshed";
+        layout.setText(Play.getFont(), holdText);
+        setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/4), Math.round(player.getY() / 16) * 16);
 
     }
 
     // incrementing overall.. for now will adjust later
-    private void performStudyingActivity() {
+    private void performStudyingActivity(TiledMapTileLayer.Cell cell) {
         decrementEnergy();
         incrementTime(4);
 
         DayManager.currentDay.incrementStudyScore();
+        // added just for testing
+        //DayManager.incrementDay();
+        GlyphLayout layout = new GlyphLayout();
+        String holdText = "You feel smarter";
+        layout.setText(Play.getFont(), holdText);
+        setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/4), Math.round(player.getY() / 16) * 16);
 
     }
 
     // incrementing overallRecreationalScore for now will adjust later
-    private void performRecreationalActivity() {
+    private void performRecreationalActivity(TiledMapTileLayer.Cell cell) {
         decrementEnergy();
         incrementTime(3);
 
 
         DayManager.currentDay.incrementRecreationalScore();
+        // added just for testing
+        //DayManager.incrementDay();
+        GlyphLayout layout = new GlyphLayout();
+        String holdText = "You have recreationed";
+        layout.setText(Play.getFont(), holdText);
+        setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/4), Math.round(player.getY() / 16) * 16);
     }
 
     private void performSleepingActivity() {
@@ -79,9 +106,6 @@ public class ActivityManager {
             // if the game is not over the avatar will move to the next day and reset their energy
             if (!DayManager.gameOver) {
                 DayManager.incrementDay();
-//                DayManager.currentDay.resetEatScore();
-////              DayManager.currentDay.resetStudyScore();
-////              DayManager.currentDay.resetRecreationalScore();
                 //resetForNewDay();
             }
         }
@@ -110,8 +134,6 @@ public class ActivityManager {
         if (newTime >= 24) {
             //"You need to sleep" we display a message to the player, move to next day
             performSleepingActivity();
-            //Change these coordinates
-            player.setPosition(648,224);
         } else {
             DayManager.currentDay.setTime(newTime);
         }
@@ -119,5 +141,26 @@ public class ActivityManager {
 
     public void setPlayer(Player player) {
         this.player = player;
+    }
+
+    //Methods for text bubble
+
+    public void setText(String text, float x, float y){
+        activityText = text;
+        textPosition.set(x, y + 40);
+    }
+
+    public String getText(){
+        return activityText;
+    }
+
+    public Vector2 getTextPosition() {
+        return textPosition;
+    }
+
+    public void drawTextBubble(SpriteBatch batch, BitmapFont font){
+        font.setColor(new Color(Color.BLACK));
+        font.draw(batch, activityText, textPosition.x, textPosition.y + 37);
+        font.setColor(new Color(Color.WHITE));
     }
 }

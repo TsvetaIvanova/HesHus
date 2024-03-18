@@ -19,6 +19,10 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.heshus.game.entities.Player;
 import com.heshus.game.manager.ActivityManager;
 import com.heshus.game.manager.DayManager;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+
+import java.awt.*;
+
 import com.heshus.game.screens.states.PauseMenu;
 
 public class Play implements Screen {
@@ -31,9 +35,13 @@ public class Play implements Screen {
     private OrthogonalTiledMapRenderer renderer;
     private OrthographicCamera camera;
     private Player player;
-    private BitmapFont font;
+    private static BitmapFont font;
     private TiledMapTileLayer collisionLayer;
     private ActivityManager activityManager;
+    // private Game game;
+
+    private Sprite blankTexture, textBubble;
+    private Texture TblankTexture, textBubbleTexture;
     private Sprite energyBar;
     private Texture energyBarTexture;
     private ExtendViewport extendViewport;
@@ -75,6 +83,21 @@ public class Play implements Screen {
         //Player
         player.draw(renderer.getBatch());
 
+
+        activityManager.checkActivity();
+        // Just for testing of counter
+        font.draw(renderer.getBatch(), "Eat: " + DayManager.currentDay.getEatScore(), 100, Gdx.graphics.getHeight() + 100);
+        font.draw(renderer.getBatch(), "Study: " + DayManager.currentDay.getStudyScore(), 100, Gdx.graphics.getHeight() + 70);
+        String dayCounter = "Day: " + DayManager.currentDay.getDayNumber() + " of 7 days";
+        font.draw(renderer.getBatch(), dayCounter, 100, Gdx.graphics.getHeight() + 40);
+        font.draw(renderer.getBatch(), "Recreational Activity: " + DayManager.currentDay.getRecreationalScore(), 100, Gdx.graphics.getHeight() + 10);
+
+        //Drawing energy bar
+        renderer.getBatch().setColor(Color.GRAY);
+        renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 3, (camera.position.y - camera.viewportHeight/2) + 3, 204, 44);
+        renderer.getBatch().setColor(Color.YELLOW);
+        renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
+        renderer.getBatch().setColor(Color.WHITE);
         switch (state) {
             case(GAME_RUNNING):
                 //HUD
@@ -85,6 +108,17 @@ public class Play implements Screen {
                 renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
                 renderer.getBatch().setColor(Color.WHITE);
 
+                //Draw activity text
+                if(!activityManager.getText().isEmpty()){
+                font.getData().setScale(1f);
+                GlyphLayout layout = new GlyphLayout();
+                layout.setText(font, activityManager.getText());
+                renderer.getBatch().draw(textBubble, activityManager.getTextPosition().x - 2, activityManager.getTextPosition().y, layout.width + 4, 50);
+                activityManager.drawTextBubble((SpriteBatch) renderer.getBatch(), font);
+                font.getData().setScale(2f);
+                }
+
+                renderer.getBatch().end();
                 ///////////////////////////////////////////////////////////////////////////
                 // The Counter and Counter Icons                                         //
                 // Upper-left corner position for the counter box set and will not move //
@@ -119,13 +153,13 @@ public class Play implements Screen {
                 renderer.getBatch().end();
                 break;
 
-            case (GAME_PAUSED): 
+            case (GAME_PAUSED):
                 //Pause menu
                 renderer.getBatch().end();
                 pauseMenu.draw();
                 break;
                 }
-                
+
 //        // Draw Eat icons in the second row
 //        for (int i = 0; i < DayManager.currentDay.getEatScore(); i++) {
 //            renderer.getBatch().draw(burgerIconSprite, counterBoxX + 20 + (iconSize + iconSpacingX) * i, firstRowY+7, iconSize, iconSize);
@@ -138,7 +172,7 @@ public class Play implements Screen {
 //        for (int i = 0; i < DayManager.currentDay.getRecreationalScore(); i++) {
 //            renderer.getBatch().draw(playIconSprite, counterBoxX + 20 + 30 + (iconSize + iconSpacingX) * i, thirdRowY + 15, iconSize, iconSize );
 //        }
-        
+
 
 
     }
@@ -197,8 +231,12 @@ public class Play implements Screen {
         font.getData().setScale(2);
 
         // Set up texture for energy bar
-        energyBarTexture = new Texture("WhiteSquare.png");
-        energyBar = new Sprite(energyBarTexture);
+        TblankTexture = new Texture("WhiteSquare.png");
+        blankTexture = new Sprite(TblankTexture);
+
+        // Set up text bubble
+        textBubbleTexture = new Texture("textBubble.png");
+        textBubble = new Sprite(textBubbleTexture);
 
         //setup menu
         pauseMenu = new PauseMenu(extendViewport, camera);
@@ -211,14 +249,14 @@ public class Play implements Screen {
         burgerIconTexture = new Texture("burgerDouble.png");
         studyIconTexture = new Texture("study.png");
         playIconTexture = new Texture("game.png");
-       
+
         burgerIconSprite = new Sprite(burgerIconTexture);
         studyIconSprite = new Sprite(studyIconTexture);
         playIconSprite = new Sprite(playIconTexture);
-       
+
         verticalBarTexture = new Texture("vertical-bar.png");
         verticalBarSprite = new Sprite(verticalBarTexture);
-        
+
         // Other initializations as needed...
 
     }
@@ -291,6 +329,9 @@ public class Play implements Screen {
         }
     }
 
+    public static BitmapFont getFont(){
+        return font;
+    }
 
 }
 
