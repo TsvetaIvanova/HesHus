@@ -20,10 +20,10 @@ import com.heshus.game.manager.DayManager;
 import com.heshus.game.screens.states.PauseMenu;
 
 public class Play implements Screen {
-    static final int GAME_RUNNING = 0;
-    static final int GAME_PAUSED = 1;
-    static final int GAME_OVER = 2;
-    int state;
+    public static final int GAME_RUNNING = 0;
+    public static final int GAME_PAUSED = 1;
+    public static final int GAME_OVER = 2;
+    public static int state;
     private final HesHusGame game;
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
@@ -154,10 +154,14 @@ public class Play implements Screen {
         energyBarTexture = new Texture("WhiteSquare.png");
         energyBar = new Sprite(energyBarTexture);
 
-        // Other initializations as needed...
+        //setup menu
         pauseMenu = new PauseMenu(extendViewport, camera);
 
+        //set state
         state = GAME_RUNNING;
+
+        // Other initializations as needed...
+
     }
 
 
@@ -221,6 +225,7 @@ public class Play implements Screen {
         renderer.dispose();
         player.getTexture().dispose();
         font.dispose();
+        pauseMenu.dispose();
     }
 
     private void lockCameraInTiledMapLayer(OrthographicCamera cam, TiledMapTileLayer layer){
