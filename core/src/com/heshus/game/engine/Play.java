@@ -1,6 +1,10 @@
 package com.heshus.game.engine;
 
-import com.badlogic.gdx.*;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -12,9 +16,16 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.heshus.game.entities.Player;
 import com.heshus.game.manager.ActivityManager;
+import com.heshus.game.manager.Day;
 import com.heshus.game.manager.DayManager;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.audio.Sound;
+
+import java.awt.*;
+
 import com.heshus.game.screens.states.PauseMenu;
 import com.heshus.game.screens.states.SettingsMenu;
 
@@ -32,22 +43,45 @@ public class Play implements Screen {
     private OrthogonalTiledMapRenderer renderer;
     private OrthographicCamera camera;
     private Player player;
-    private BitmapFont font;
+    private static BitmapFont font;
     private TiledMapTileLayer collisionLayer;
     private ActivityManager activityManager;
-    private Sprite energyBar;
-    private Texture energyBarTexture;
+    // private Game game;
+
+    private Sprite blankTexture, textBubble;
+    private Texture TblankTexture, textBubbleTexture;
     private ExtendViewport extendViewport;
     private PauseMenu pauseMenu;
+
     private Texture counterBoxTexture;
     private Texture burgerIconTexture, studyIconTexture, playIconTexture;
     private Sprite burgerIconSprite, studyIconSprite, playIconSprite;
     private Texture verticalBarTexture;
     private Sprite verticalBarSprite;
-    private SettingsMenu settingsMenu;
+
+    private float bubbleTimer, bubblePeriod = 3;
+
+    // Walking sounds
+    private Sound walkingSound1;
+    private Sound walkingSound2;
+    private Sound walkingSound3;
+    private Sound walkingSound4;
+    private int currentWalkingSoundIndex = 0;
+    private boolean isWalking = false;
+
+    private float walkingSoundTimer = 0;
+
+    // 1/4th of a second delay between sounds, because our avatar is running everywhere
+    private final float WALKING_SOUND_DELAY = 0.25f;
+    private Music backgroundMusic;
+
+
+
+
 
     public Play(HesHusGame game) {
         this.game = game;
+
     }
     @Override
     public void render(float delta) {
@@ -62,10 +96,12 @@ public class Play implements Screen {
         int cameraSmoothness = 4; //higher looks smoother! makes it take longer for camera to reach player pos
         camera.position.set(((player.getX() + player.getWidth() / 2)+(camera.position.x *(cameraSmoothness-1)))/cameraSmoothness, ((player.getY() + player.getHeight() / 2)+(camera.position.y *(cameraSmoothness-1)))/cameraSmoothness, 0);
         lockCameraInTiledMapLayer(camera,(TiledMapTileLayer) map.getLayers().get(1)); //locks camera position so it cannot show out of bounds
-        camera.position.set(Math.round(camera.position.x) ,Math.round(camera.position.y),0);//This is needed to stop occasional black lines between tiles. Makes camera movement slightly jagged/stuttery looking, padding the tilemap instead would fix this.
+        camera.position.set(Math.round(camera.position.x) ,Math.round(camera.position.y),0);//This is needed to stop black lines between tiles. I think something to do with the tilemaprenderer and floats causes this
+        camera.viewportWidth = Math.round(camera.viewportWidth);
+        camera.viewportHeight = Math.round(camera.viewportHeight);
         camera.update();
 
-        //Tilemap:
+        //Tilemap
         renderer.setView(camera);
         renderer.render(); //takes a layers[] argument if we want to specifically render certain layers
         renderer.getBatch().begin();
@@ -74,13 +110,35 @@ public class Play implements Screen {
 
         switch (state) {
             case(GAME_RUNNING):
+                activityManager.checkActivity();
                 //HUD
                 //Drawing energy bar
                 renderer.getBatch().setColor(Color.GRAY);
-                renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth/2) + 3, (camera.position.y - camera.viewportHeight/2) + 3, 204, 44);
+                renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 3, (camera.position.y - camera.viewportHeight/2) + 3, 204, 44);
                 renderer.getBatch().setColor(Color.YELLOW);
-                renderer.getBatch().draw(energyBar, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
+                renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
                 renderer.getBatch().setColor(Color.WHITE);
+
+                //Draw activity text
+                if(!activityManager.getText().isEmpty()){
+                    //logic for drawing bubble
+                    font.getData().setScale(1f);
+                    GlyphLayout layout = new GlyphLayout();
+                    layout.setText(font, activityManager.getText());
+                    renderer.getBatch().draw(textBubble, activityManager.getTextPosition().x - 2, activityManager.getTextPosition().y, layout.width + 4, 50);
+                    activityManager.drawTextBubble((SpriteBatch) renderer.getBatch(), font);
+                    font.getData().setScale(2f);
+                    //changes timer
+                    bubbleTimer += Gdx.graphics.getDeltaTime();
+                    //removes bubble after timer ends
+                    if(bubbleTimer > bubblePeriod){
+                        bubbleTimer -= bubblePeriod;
+                        activityManager.setText("", 0, 0);
+                    }
+
+
+                }
+
 
                 ///////////////////////////////////////////////////////////////////////////
                 // The Counter and Counter Icons                                         //
@@ -121,12 +179,7 @@ public class Play implements Screen {
                 renderer.getBatch().end();
                 pauseMenu.draw();
                 break;
-            case (GAME_SETTINGS):
-                //Settings menu
-                renderer.getBatch().end();
-                settingsMenu.update();
                 }
-
                 
 //        // Draw Eat icons in the second row
 //        for (int i = 0; i < DayManager.currentDay.getEatScore(); i++) {
@@ -166,19 +219,28 @@ public class Play implements Screen {
                 pauseMenu.update(camera);
                 break;
         }
-        activityManager.checkActivity();
+
+        // check walking is happening
+        if (Math.abs(player.getVelocity().x) > 0 || Math.abs(player.getVelocity().y) > 0) {
+            if (!isWalking) {
+                isWalking = true;
+                currentWalkingSoundIndex = 0;
+                walkingSoundTimer = WALKING_SOUND_DELAY;
+            }
+        } else {
+            isWalking = false;
+        }
+
+
+        playWalkingSound(Gdx.graphics.getDeltaTime());
     }
 
     @Override
     public void show() {
-        //set state
-        state = GAME_RUNNING;
-
         // Initialize the camera
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 450);
         extendViewport = new ExtendViewport(camera.viewportWidth, camera.viewportHeight, camera);
-
         // Load the map and set up the renderer
         map = new TmxMapLoader().load("testmap.tmx");
         collisionLayer = (TiledMapTileLayer) map.getLayers().get(0);
@@ -195,20 +257,26 @@ public class Play implements Screen {
 
         // Set up the activity manager
         activityManager = new ActivityManager(collisionLayer);
-        activityManager.setPlayer(player); // Ensure you have a setPlayer method in ActivityManager
+        activityManager.setPlayer(player);
 
         // Set up the font
         font = new BitmapFont();
+
         font.getData().setScale(2);
 
         // Set up texture for energy bar
-        energyBarTexture = new Texture("WhiteSquare.png");
-        energyBar = new Sprite(energyBarTexture);
+        TblankTexture = new Texture("WhiteSquare.png");
+        blankTexture = new Sprite(TblankTexture);
 
-        //setup menus
+        // Set up text bubble
+        textBubbleTexture = new Texture("textBubble.png");
+        textBubble = new Sprite(textBubbleTexture);
+
+        //setup menu
         pauseMenu = new PauseMenu(extendViewport, camera);
-        settingsMenu = new SettingsMenu(GAME_PAUSED, camera, extendViewport, 2);
 
+        //set state
+        state = GAME_RUNNING;
         // Set up the counter and counter components
         counterBoxTexture = new Texture("counter-box.png");
 
@@ -222,8 +290,17 @@ public class Play implements Screen {
        
         verticalBarTexture = new Texture("vertical-bar.png");
         verticalBarSprite = new Sprite(verticalBarTexture);
-        
-        // Other initializations as needed...
+
+        walkingSound1 = Gdx.audio.newSound(Gdx.files.internal("tile1.mp3"));
+        walkingSound2 = Gdx.audio.newSound(Gdx.files.internal("tile2.mp3"));
+        walkingSound3 = Gdx.audio.newSound(Gdx.files.internal("tile3.mp3"));
+        walkingSound4 = Gdx.audio.newSound(Gdx.files.internal("tile4.mp3"));
+
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("background-music.mp3"));
+        backgroundMusic.setLooping(true);
+        backgroundMusic.setVolume(0.5f);
+        backgroundMusic.play();
+
 
     }
     @Override
@@ -233,9 +310,7 @@ public class Play implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        //extendViewport.update(((width+7)/16)*16, ((height+7)/16)*16); //updates size of window for viewport when things get resized, rounds up to the nearest tilewidth
         extendViewport.update(width,height);
-        //camera.update();
     }
 
     @Override
@@ -264,7 +339,46 @@ public class Play implements Screen {
         studyIconTexture.dispose();
         playIconTexture.dispose();
         verticalBarTexture.dispose();
+        walkingSound1.dispose();
+        walkingSound2.dispose();
+        walkingSound3.dispose();
+        walkingSound4.dispose();
+
+        if (backgroundMusic != null) {
+            backgroundMusic.dispose();
+        }
     }
+
+    private void playWalkingSound(float delta) {
+        if (!isWalking || walkingSoundTimer < WALKING_SOUND_DELAY) {
+            walkingSoundTimer += delta;
+            return;
+        }
+
+
+        walkingSoundTimer = 0;
+
+        Sound soundToPlay = null;
+        switch (currentWalkingSoundIndex) {
+            case 0:
+                soundToPlay = walkingSound1;
+                break;
+            case 1:
+                soundToPlay = walkingSound2;
+                break;
+            case 2:
+                soundToPlay = walkingSound3;
+                break;
+            case 3:
+                soundToPlay = walkingSound4;
+                break;
+        }
+        if (soundToPlay != null) {
+            soundToPlay.play(1.0f);
+            currentWalkingSoundIndex = (currentWalkingSoundIndex + 1) % 4;
+        }
+    }
+
 
     private void lockCameraInTiledMapLayer(OrthographicCamera cam, TiledMapTileLayer layer){
         //get variables needed to find edges of map!
@@ -296,6 +410,9 @@ public class Play implements Screen {
         }
     }
 
+    public static BitmapFont getFont(){
+        return font;
+    }
 
 }
 
