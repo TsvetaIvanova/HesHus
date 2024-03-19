@@ -170,8 +170,6 @@ public class MainMenuScreen implements Screen {
             }
             camera.position.x = (int) camera.position.x;
             camera.position.y = (int) camera.position.y;
-            camera.viewportWidth = Math.round(camera.viewportWidth);
-            camera.viewportHeight = Math.round(camera.viewportHeight);
             camera.update();
     }
 
