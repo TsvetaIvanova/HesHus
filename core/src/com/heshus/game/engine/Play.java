@@ -222,12 +222,12 @@ public class Play implements Screen {
         camera.setToOrtho(false, 800, 450);
         extendViewport = new ExtendViewport(camera.viewportWidth, camera.viewportHeight, camera);
         // Load the map and set up the renderer
-        map = new TmxMapLoader().load("testmap.tmx");
+        map = new TmxMapLoader().load("Map Related/testmap.tmx");
         collisionLayer = (TiledMapTileLayer) map.getLayers().get(0);
         renderer = new OrthogonalTiledMapRenderer(map, 1 / 1f);
 
         // Set up the player
-        Texture playerTexture = new Texture("player.png");
+        Texture playerTexture = new Texture("Icons/player.png");
         Sprite playerSprite = new Sprite(playerTexture);
         player = new Player(playerSprite, collisionLayer);
         float startX = 30 * collisionLayer.getTileWidth();
@@ -243,11 +243,11 @@ public class Play implements Screen {
         font.getData().setScale(2);
 
         // Set up texture for energy bar
-        TblankTexture = new Texture("WhiteSquare.png");
+        TblankTexture = new Texture("Icons/WhiteSquare.png");
         blankTexture = new Sprite(TblankTexture);
 
         // Set up text bubble
-        textBubbleTexture = new Texture("textBubble.png");
+        textBubbleTexture = new Texture("Icons/textBubble.png");
         textBubble = new Sprite(textBubbleTexture);
 
         //setup menu
@@ -256,34 +256,34 @@ public class Play implements Screen {
         //set state
         state = GAME_RUNNING;
         // Set up the counter and counter components
-        counterBoxTexture = new Texture("counter-box.png");
+        counterBoxTexture = new Texture("Icons/counter-box.png");
 
-        burgerIconTexture = new Texture("burgerDouble.png");
-        studyIconTexture = new Texture("study.png");
-        playIconTexture = new Texture("game.png");
+        burgerIconTexture = new Texture("Icons/burgerDouble.png");
+        studyIconTexture = new Texture("Icons/study.png");
+        playIconTexture = new Texture("Icons/game.png");
 
         burgerIconSprite = new Sprite(burgerIconTexture);
         studyIconSprite = new Sprite(studyIconTexture);
         playIconSprite = new Sprite(playIconTexture);
 
-        verticalBarTexture = new Texture("vertical-bar.png");
+        verticalBarTexture = new Texture("Icons/vertical-bar.png");
         verticalBarSprite = new Sprite(verticalBarTexture);
 
-        walkingSound1 = Gdx.audio.newSound(Gdx.files.internal("tile1.mp3"));
-        walkingSound2 = Gdx.audio.newSound(Gdx.files.internal("tile2.mp3"));
-        walkingSound3 = Gdx.audio.newSound(Gdx.files.internal("tile3.mp3"));
-        walkingSound4 = Gdx.audio.newSound(Gdx.files.internal("tile4.mp3"));
+        walkingSound1 = Gdx.audio.newSound(Gdx.files.internal("Sounds/tile1.mp3"));
+        walkingSound2 = Gdx.audio.newSound(Gdx.files.internal("Sounds/tile2.mp3"));
+        walkingSound3 = Gdx.audio.newSound(Gdx.files.internal("Sounds/tile3.mp3"));
+        walkingSound4 = Gdx.audio.newSound(Gdx.files.internal("Sounds/tile4.mp3"));
 
-        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("background-music.mp3"));
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Sounds/background-music.mp3"));
         backgroundMusic.setLooping(true);
         backgroundMusic.setVolume(0.5f);
         backgroundMusic.play();
 
         // Prepare textures for buttons
-        increaseVolumeTexture = new Texture(Gdx.files.internal("increase-volume.png"));
-        lowerVolumeTexture = new Texture(Gdx.files.internal("lower-volume.png"));
-        volumeOffTexture = new Texture(Gdx.files.internal("volume-off.png"));
-        volumeOnTexture = new Texture(Gdx.files.internal("volume-on.png"));
+        increaseVolumeTexture = new Texture(Gdx.files.internal("Icons/increase-volume.png"));
+        lowerVolumeTexture = new Texture(Gdx.files.internal("Icons/lower-volume.png"));
+        volumeOffTexture = new Texture(Gdx.files.internal("Icons/volume-off.png"));
+        volumeOnTexture = new Texture(Gdx.files.internal("Icons/volume-on.png"));
 
         // Initialize the stage
         stage = new Stage(new ScreenViewport(), renderer.getBatch());
