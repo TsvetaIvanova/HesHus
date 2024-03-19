@@ -1,9 +1,5 @@
 package com.heshus.game.engine;
-
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -14,20 +10,26 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.heshus.game.entities.Player;
 import com.heshus.game.manager.ActivityManager;
 import com.heshus.game.manager.Day;
 import com.heshus.game.manager.DayManager;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.audio.Sound;
-
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
+import static com.badlogic.gdx.scenes.scene2d.ui.Table.Debug.table;
+import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle;
 import java.awt.*;
-
 import com.heshus.game.screens.states.PauseMenu;
-
 public class Play implements Screen {
     public static final int GAME_RUNNING = 0;
     public static final int GAME_PAUSED = 1;
@@ -41,47 +43,43 @@ public class Play implements Screen {
     private static BitmapFont font;
     private TiledMapTileLayer collisionLayer;
     private ActivityManager activityManager;
-    // private Game game;
-
     private Sprite blankTexture, textBubble;
     private Texture TblankTexture, textBubbleTexture;
     private ExtendViewport extendViewport;
     private PauseMenu pauseMenu;
-
     private Texture counterBoxTexture;
     private Texture burgerIconTexture, studyIconTexture, playIconTexture;
     private Sprite burgerIconSprite, studyIconSprite, playIconSprite;
     private Texture verticalBarTexture;
     private Sprite verticalBarSprite;
-
     private float bubbleTimer, bubblePeriod = 3;
-
-    // Walking sounds
     private Sound walkingSound1;
     private Sound walkingSound2;
     private Sound walkingSound3;
     private Sound walkingSound4;
     private int currentWalkingSoundIndex = 0;
     private boolean isWalking = false;
-
     private float walkingSoundTimer = 0;
-
     // 1/4th of a second delay between sounds, because our avatar is running everywhere
     private final float WALKING_SOUND_DELAY = 0.25f;
     private Music backgroundMusic;
-
-
-
-
+    private Texture increaseVolumeTexture;
+    private Texture lowerVolumeTexture;
+    private Texture volumeOffTexture;
+    private Texture volumeOnTexture;
+    private Stage stage;
 
     public Play(HesHusGame game) {
         this.game = game;
 
     }
+
     @Override
     public void render(float delta) {
         update();
         draw();
+        stage.act(delta);
+        stage.draw();
 
     }
 
@@ -106,7 +104,6 @@ public class Play implements Screen {
 
         switch (state) {
             case(GAME_RUNNING):
-                activityManager.checkActivity();
                 //HUD
                 //Drawing energy bar
                 renderer.getBatch().setColor(Color.GRAY);
@@ -177,21 +174,7 @@ public class Play implements Screen {
                 break;
                 }
 
-//        // Draw Eat icons in the second row
-//        for (int i = 0; i < DayManager.currentDay.getEatScore(); i++) {
-//            renderer.getBatch().draw(burgerIconSprite, counterBoxX + 20 + (iconSize + iconSpacingX) * i, firstRowY+7, iconSize, iconSize);
-//        }
-//        // Draw Study icons in the third row
-//        for (int i = 0; i < DayManager.currentDay.getStudyScore(); i++) {
-//            renderer.getBatch().draw(studyIconSprite, counterBoxX + 10 + 20 + (iconSize + iconSpacingX) * i, secondRowY + 10, iconSize, iconSize);
-//        }
-//        // Draw Recreation icons in the fourth row
-//        for (int i = 0; i < DayManager.currentDay.getRecreationalScore(); i++) {
-//            renderer.getBatch().draw(playIconSprite, counterBoxX + 20 + 30 + (iconSize + iconSpacingX) * i, thirdRowY + 15, iconSize, iconSize );
-//        }
-
-
-
+        stage.draw();
     }
     private void update(){
         //Detect if game should be paused or not
@@ -206,7 +189,6 @@ public class Play implements Screen {
         //logic/physics - anything that moves
         switch (state){
             case (GAME_RUNNING):
-                Gdx.input.setInputProcessor(player);
                 player.update(Gdx.graphics.getDeltaTime());
                 break;
             case (GAME_PAUSED):
@@ -215,6 +197,7 @@ public class Play implements Screen {
                 pauseMenu.update(camera);
                 break;
         }
+        activityManager.checkActivity();
 
         // check walking is happening
         if (Math.abs(player.getVelocity().x) > 0 || Math.abs(player.getVelocity().y) > 0) {
@@ -227,8 +210,9 @@ public class Play implements Screen {
             isWalking = false;
         }
 
-
         playWalkingSound(Gdx.graphics.getDeltaTime());
+        stage.act(Gdx.graphics.getDeltaTime());
+
     }
 
     @Override
@@ -249,7 +233,6 @@ public class Play implements Screen {
         float startX = 30 * collisionLayer.getTileWidth();
         float startY = (collisionLayer.getHeight() - 26) * collisionLayer.getTileHeight();
         player.setPosition(startX, startY);
-        Gdx.input.setInputProcessor(player);
 
         // Set up the activity manager
         activityManager = new ActivityManager(collisionLayer);
@@ -257,7 +240,6 @@ public class Play implements Screen {
 
         // Set up the font
         font = new BitmapFont();
-
         font.getData().setScale(2);
 
         // Set up texture for energy bar
@@ -297,6 +279,80 @@ public class Play implements Screen {
         backgroundMusic.setVolume(0.5f);
         backgroundMusic.play();
 
+        // Prepare textures for buttons
+        increaseVolumeTexture = new Texture(Gdx.files.internal("increase-volume.png"));
+        lowerVolumeTexture = new Texture(Gdx.files.internal("lower-volume.png"));
+        volumeOffTexture = new Texture(Gdx.files.internal("volume-off.png"));
+        volumeOnTexture = new Texture(Gdx.files.internal("volume-on.png"));
+
+        // Initialize the stage
+        stage = new Stage(new ScreenViewport(), renderer.getBatch());
+        InputMultiplexer inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer.addProcessor(stage);
+        inputMultiplexer.addProcessor(player);
+        Gdx.input.setInputProcessor(inputMultiplexer);
+
+        // Create and set up buttons
+        ButtonStyle increaseVolumeStyle = new ButtonStyle();
+        increaseVolumeStyle.up = new TextureRegionDrawable(new TextureRegion(increaseVolumeTexture));
+        Button increaseVolumeButton = new Button(increaseVolumeStyle);
+        increaseVolumeButton.setPosition(800, 520); // Example position
+
+        increaseVolumeButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                float volume = backgroundMusic.getVolume();
+                volume = Math.min(volume + 0.1f, 1.0f);
+                backgroundMusic.setVolume(volume);
+            }
+        });
+
+        ButtonStyle lowerVolumeStyle = new ButtonStyle();
+        lowerVolumeStyle.up = new TextureRegionDrawable(new TextureRegion(lowerVolumeTexture));
+        Button lowerVolumeButton = new Button(lowerVolumeStyle);
+        lowerVolumeButton.setPosition(850, 520); // Example position
+        lowerVolumeButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                float volume = backgroundMusic.getVolume();
+                volume = Math.max(volume - 0.1f, 0.0f);
+                backgroundMusic.setVolume(volume);
+            }
+        });
+
+        ButtonStyle volumeOffStyle = new ButtonStyle();
+        volumeOffStyle.up = new TextureRegionDrawable(new TextureRegion(volumeOffTexture));
+        Button volumeOffButton = new Button(volumeOffStyle);
+        volumeOffButton.setPosition(900, 520); // Example position
+        volumeOffButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (backgroundMusic.isPlaying()) {
+                    backgroundMusic.pause();
+                } else {
+                    backgroundMusic.play();
+                }
+            }
+        });
+
+        // Play the music if it is not already playing
+        ButtonStyle volumeOnStyle = new ButtonStyle();
+        volumeOnStyle.up = new TextureRegionDrawable(new TextureRegion(volumeOnTexture));
+        Button volumeOnButton = new Button(volumeOnStyle);
+        volumeOnButton.setPosition(950, 520); // Example position
+        volumeOnButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (!backgroundMusic.isPlaying()) {
+                    backgroundMusic.play();
+                }
+            }
+        });
+
+        stage.addActor(increaseVolumeButton);
+        stage.addActor(lowerVolumeButton);
+        stage.addActor(volumeOffButton);
+        stage.addActor(volumeOnButton);
 
     }
     @Override
@@ -306,7 +362,8 @@ public class Play implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        extendViewport.update(((width+7)/16)*16, ((height+7)/16)*16); //updates size of window for viewport when things get resized, rounds up to the nearest tilewidth
+        //updates size of window for viewport when things get resized, rounds up to the nearest tilewidth
+        extendViewport.update(((width+7)/16)*16, ((height+7)/16)*16);
         camera.update();
     }
 
@@ -340,19 +397,28 @@ public class Play implements Screen {
         walkingSound2.dispose();
         walkingSound3.dispose();
         walkingSound4.dispose();
-
         if (backgroundMusic != null) {
             backgroundMusic.dispose();
         }
-    }
+        stage.dispose();
+        increaseVolumeTexture.dispose();
+        lowerVolumeTexture.dispose();
+        volumeOffTexture.dispose();
+        volumeOnTexture.dispose();
+        TblankTexture.dispose();
+        textBubbleTexture.dispose();
+        backgroundMusic.dispose();
+        increaseVolumeTexture.dispose();
+        volumeOffTexture.dispose();
+        volumeOnTexture.dispose();
+        lowerVolumeTexture.dispose();
 
+    }
     private void playWalkingSound(float delta) {
         if (!isWalking || walkingSoundTimer < WALKING_SOUND_DELAY) {
             walkingSoundTimer += delta;
             return;
         }
-
-
         walkingSoundTimer = 0;
 
         Sound soundToPlay = null;
@@ -375,7 +441,6 @@ public class Play implements Screen {
             currentWalkingSoundIndex = (currentWalkingSoundIndex + 1) % 4;
         }
     }
-
 
     private void lockCameraInTiledMapLayer(OrthographicCamera cam, TiledMapTileLayer layer){
         //get variables needed to find edges of map!
