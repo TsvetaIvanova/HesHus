@@ -30,10 +30,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle;
 import java.awt.*;
 import com.heshus.game.screens.states.PauseMenu;
+
+
+import com.heshus.game.screens.states.SettingsMenu;
+
+import static com.heshus.game.engine.HesHusGame.settings;
+
+
 public class Play implements Screen {
     public static final int GAME_RUNNING = 0;
     public static final int GAME_PAUSED = 1;
-    public static final int GAME_OVER = 2;
+    public static final int GAME_SETTINGS = 2;
+    public static final int GAME_OVER = 3;
+    public static final int GAME_MAINMENU =4;
     public static int state;
     private final HesHusGame game;
     private TiledMap map;
@@ -46,7 +55,13 @@ public class Play implements Screen {
     private Sprite blankTexture, textBubble;
     private Texture TblankTexture, textBubbleTexture;
     private ExtendViewport extendViewport;
+
     private PauseMenu pauseMenu;
+
+
+    private SettingsMenu settingsMenu;
+
+
     private Texture counterBoxTexture;
     private Texture burgerIconTexture, studyIconTexture, playIconTexture;
     private Sprite burgerIconSprite, studyIconSprite, playIconSprite;
@@ -63,6 +78,7 @@ public class Play implements Screen {
     // 1/4th of a second delay between sounds, because our avatar is running everywhere
     private final float WALKING_SOUND_DELAY = 0.25f;
     private Music backgroundMusic;
+
     private Texture increaseVolumeTexture;
     private Texture lowerVolumeTexture;
     private Texture volumeOffTexture;
@@ -70,7 +86,14 @@ public class Play implements Screen {
     private Stage stage;
 
     public Play(HesHusGame game) {
+
+
+    private Texture playerTexture;
+
+    public Play(HesHusGame game, Texture playerSpriteSelection) {
+
         this.game = game;
+        this.playerTexture = playerSpriteSelection;
 
     }
 
@@ -166,12 +189,17 @@ public class Play implements Screen {
                 }
                 renderer.getBatch().end();
                 break;
-
-            case (GAME_PAUSED):
-                //Pause menu
-                renderer.getBatch().end();
-                pauseMenu.draw();
-                break;
+                case (GAME_PAUSED):
+                    //Pause menu
+                    renderer.getBatch().end();
+                    pauseMenu.update(camera);
+                    pauseMenu.draw();
+                    break;
+                case (GAME_SETTINGS):
+                    //Settings menu
+                    renderer.getBatch().end();
+                    settingsMenu.update();
+                    break;
                 }
 
         stage.draw();
@@ -191,6 +219,7 @@ public class Play implements Screen {
             case (GAME_RUNNING):
                 player.update(Gdx.graphics.getDeltaTime());
                 break;
+            case (GAME_SETTINGS)://we do the same settings or paused
             case (GAME_PAUSED):
                 player.update(0);
                 player.setVelocity(new Vector2(0,0));
@@ -227,7 +256,12 @@ public class Play implements Screen {
         renderer = new OrthogonalTiledMapRenderer(map, 1 / 1f);
 
         // Set up the player
+
         Texture playerTexture = new Texture("Icons/player.png");
+
+        //int playerSpriteNumber = 5;
+        //Texture playerTexture = new Texture("player-" + Integer.toString(playerSpriteNumber) + ".png");
+
         Sprite playerSprite = new Sprite(playerTexture);
         player = new Player(playerSprite, collisionLayer);
         float startX = 30 * collisionLayer.getTileWidth();
@@ -252,7 +286,7 @@ public class Play implements Screen {
 
         //setup menu
         pauseMenu = new PauseMenu(extendViewport, camera);
-
+        settingsMenu = new SettingsMenu(GAME_PAUSED,camera,extendViewport,2);
         //set state
         state = GAME_RUNNING;
         // Set up the counter and counter components
@@ -362,9 +396,13 @@ public class Play implements Screen {
 
     @Override
     public void resize(int width, int height) {
+
         //updates size of window for viewport when things get resized, rounds up to the nearest tilewidth
         extendViewport.update(((width+7)/16)*16, ((height+7)/16)*16);
         camera.update();
+
+        extendViewport.update(width,height);
+
     }
 
     @Override
@@ -397,6 +435,12 @@ public class Play implements Screen {
         walkingSound2.dispose();
         walkingSound3.dispose();
         walkingSound4.dispose();
+
+
+        settingsMenu.dispose();
+        pauseMenu.dispose();
+
+
         if (backgroundMusic != null) {
             backgroundMusic.dispose();
         }

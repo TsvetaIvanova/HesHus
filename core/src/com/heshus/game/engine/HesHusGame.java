@@ -1,10 +1,7 @@
 package com.heshus.game.engine;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -33,23 +30,24 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.heshus.game.entities.Player;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.heshus.game.screens.states.MainMenuScreen;
 
 public class HesHusGame extends Game {
-
 	// we can use the HesHusGame as a central game class for our screens/states
-
 	public SpriteBatch batch;
 	public BitmapFont font;
-
+	public static Preferences settings;
 	public void create() {
 		batch = new SpriteBatch();
 		font = new BitmapFont(); // use libGDX's default Arial font
+		setDefaultPreferences();
+		System.out.println(settings.getInteger("screenWidth"));
+		Gdx.graphics.setWindowedMode(settings.getInteger("windowWidth"), settings.getInteger("windowHeight"));
 		this.setScreen(new MainMenuScreen(this));
+
 	}
 
 	public void render() {
@@ -60,9 +58,17 @@ public class HesHusGame extends Game {
 		batch.dispose();
 		font.dispose();
 	}
+	public void setDefaultPreferences(){
+		settings = Gdx.app.getPreferences("userSettings");
+		settings.putString("name", "bucket");
+		settings.putBoolean("soundOn", true);
+		settings.putInteger("windowWidth", 1280);
+		settings.putInteger("windowHeight",720);
+		settings.putBoolean("isFullScreen", false);
+		settings.flush();
+	}
 
 }
-
 
 
 //	@Override

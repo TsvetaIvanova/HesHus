@@ -16,8 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
-import static com.heshus.game.engine.Play.GAME_RUNNING;
-import static com.heshus.game.engine.Play.state;
+import static com.heshus.game.engine.Play.*;
 
 public class PauseMenu{
     private Stage stage;
@@ -77,6 +76,7 @@ public class PauseMenu{
         settingsButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
+
                 return true;
             }
             @Override
@@ -84,6 +84,10 @@ public class PauseMenu{
                 super.touchUp(event, x, y, pointer, button); // Call the superclass method
                 clickSound.play();
                 Gdx.app.exit();
+
+
+                state = GAME_SETTINGS;
+                return false;
 
             }
         });
