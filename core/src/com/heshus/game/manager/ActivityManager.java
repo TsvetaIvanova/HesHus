@@ -59,7 +59,7 @@ public class ActivityManager {
     // incrementing overall.. for now will adjust later
     private void performEatingActivity(TiledMapTileLayer.Cell cell) {
         if(!(DayManager.currentDay.getEnergy() <= 0) && !(DayManager.currentDay.getTime() >= 24)) {
-            decrementEnergy();
+            decrementEnergy(10);
             incrementTime(2);
             DayManager.currentDay.incrementEatScore();
             // added just for testing
@@ -76,7 +76,7 @@ public class ActivityManager {
     // incrementing overall.. for now will adjust later
     private void performStudyingActivity(TiledMapTileLayer.Cell cell) {
         if(!(DayManager.currentDay.getEnergy() <= 0) && !(DayManager.currentDay.getTime() >= 24)) {
-            decrementEnergy();
+            decrementEnergy(20);
             incrementTime(4);
 
             DayManager.currentDay.incrementStudyScore();
@@ -95,7 +95,7 @@ public class ActivityManager {
     private void performRecreationalActivity(TiledMapTileLayer.Cell cell) {
         if(!(DayManager.currentDay.getEnergy() <= 0) && !(DayManager.currentDay.getTime() >= 24)){
 
-            decrementEnergy();
+            decrementEnergy(20);
             incrementTime(3);
 
             DayManager.currentDay.incrementRecreationalScore();
@@ -140,8 +140,8 @@ public class ActivityManager {
 
 
 
-    private void decrementEnergy() {
-        DayManager.currentDay.setEnergy(Math.max(0, DayManager.currentDay.getEnergy() - 10));
+    private void decrementEnergy(int energy) {
+        DayManager.currentDay.setEnergy(Math.max(0, DayManager.currentDay.getEnergy() - energy));
     }
 
     private void incrementTime(int setTime) {

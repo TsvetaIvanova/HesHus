@@ -18,7 +18,7 @@ public class DayManager {
             //Reset variables for a new "day"
             currentDay.resetTime();
             currentDay.resetEnergy();
-           currentDay.resetEatScore();
+            currentDay.resetEatScore();
             currentDay.resetStudyScore();
             currentDay.resetRecreationalScore();
         }

@@ -26,6 +26,7 @@ import com.badlogic.gdx.audio.Sound;
 
 import java.awt.*;
 
+import com.heshus.game.screens.states.GameOverScreen;
 import com.heshus.game.screens.states.PauseMenu;
 import com.heshus.game.screens.states.SettingsMenu;
 
@@ -48,7 +49,7 @@ public class Play implements Screen {
     private ActivityManager activityManager;
     // private Game game;
 
-    private Sprite blankTexture, textBubble;
+    private Sprite blankTexture, textBubble, dimTexture;
     private Texture TblankTexture, textBubbleTexture;
     private ExtendViewport extendViewport;
 
@@ -141,6 +142,9 @@ public class Play implements Screen {
 
                 }
 
+                //Dims screen when energy lost
+                dimTexture.setAlpha((float)0.4 + DayManager.currentDay.getEnergy());
+                dimTexture.draw(renderer.getBatch());
 
                 ///////////////////////////////////////////////////////////////////////////
                 // The Counter and Counter Icons                                         //
@@ -173,6 +177,7 @@ public class Play implements Screen {
                 for (int i = 0; i < DayManager.currentDay.getDayNumber(); i++) {
                     renderer.getBatch().draw(verticalBarSprite, verticalBarStartX+15 + (5 + iconSpacingX) * i, verticalBarStartY, 5, 20);
                 }
+
                 renderer.getBatch().end();
                 break;
                 case (GAME_PAUSED):
@@ -200,8 +205,6 @@ public class Play implements Screen {
 //        for (int i = 0; i < DayManager.currentDay.getRecreationalScore(); i++) {
 //            renderer.getBatch().draw(playIconSprite, counterBoxX + 20 + 30 + (iconSize + iconSpacingX) * i, thirdRowY + 15, iconSize, iconSize );
 //        }
-
-
 
     }
     private void update(){
@@ -239,6 +242,9 @@ public class Play implements Screen {
             isWalking = false;
         }
 
+        if(DayManager.gameOver){
+            game.setScreen(new GameOverScreen(game));
+        }
 
         playWalkingSound(Gdx.graphics.getDeltaTime());
     }
@@ -310,7 +316,9 @@ public class Play implements Screen {
         backgroundMusic.setVolume(0.5f);
         backgroundMusic.play();
 
-
+        dimTexture = new Sprite(blankTexture);
+        dimTexture.setColor(Color.BLACK);
+        dimTexture.setSize(collisionLayer.getWidth() * 16, collisionLayer.getHeight() * 16);
     }
     @Override
     public void hide() {
@@ -340,7 +348,6 @@ public class Play implements Screen {
         //BUT we can just call AssetManager.dispose() and it will for sure dispose all our assets correctly
 
         map.dispose();
-        renderer.dispose();
         player.getTexture().dispose();
         font.dispose();
         counterBoxTexture.dispose();
