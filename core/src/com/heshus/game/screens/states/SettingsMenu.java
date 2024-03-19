@@ -15,7 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import java.util.ArrayList;
-import java.util.Vector;
 
 import static com.heshus.game.engine.HesHusGame.settings;
 import static com.heshus.game.engine.Play.state;
@@ -31,36 +30,35 @@ public class SettingsMenu {
     private CheckBox fullScreenCheckbox;
     private ArrayList<Vector2> supportedResolutions;
     private int resolutionSelectIndex;
-    public SettingsMenu(int returnState, Camera camera, ExtendViewport viewport) {
+    private TextButton.TextButtonStyle textButtonStyle;
+    private CheckBox.CheckBoxStyle checkBoxStyle;
+    private TextButton.TextButtonStyle squareButtonStyle; 
+    public SettingsMenu(int returnState, Camera camera, ExtendViewport viewport, float scale) {
         this.returnState = returnState;
         this.viewport = viewport;
         this.camera = camera;
 
-        //set up font
+        //for resolution support
+        supportedResolutions = new ArrayList<Vector2>();
+        supportedResolutions.add(new Vector2(1024,576));
+        supportedResolutions.add(new Vector2(1280,720));
+        supportedResolutions.add(new Vector2(1600, 900));
+        supportedResolutions.add(new Vector2(1920, 1080));
+        resolutionSelectIndex = supportedResolutions.indexOf(new Vector2(settings.getInteger("windowWidth"),settings.getInteger("windowHeight")));
+        
+        //Set up font
         font = new BitmapFont(Gdx.files.internal("Fonts/monogram/pixel.fnt"), false);
-        font.getData().setScale(.5F);
+        font.getData().setScale(.5F*scale);
         font.setColor(Color.BLACK);
-
-        //Setup button styles
-        Texture buttonTexture = new Texture("UI/button_up.png");
-        TextureRegion buttonTextureRegion = new TextureRegion(buttonTexture, buttonTexture.getWidth(), buttonTexture.getHeight());
-        TextureRegionDrawable buttonTextureRegionDrawable =new TextureRegionDrawable(buttonTextureRegion);
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle(buttonTextureRegionDrawable, buttonTextureRegionDrawable, buttonTextureRegionDrawable, font );
-        TextButton.TextButtonStyle squareButton = new TextButton.TextButtonStyle(buttonTextureRegionDrawable, buttonTextureRegionDrawable, buttonTextureRegionDrawable, font );
-        CheckBox.CheckBoxStyle checkBoxStyle = getCheckBoxStyle();
-
-        //Return button:
-        returnButton = new TextButton("Return", textButtonStyle); //Set the button up
-        returnButton.padBottom(6);
-        returnButton.addListener(new InputListener() {
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                state = returnState;
-                return false;
-            }
-        });
+        ///////////////////////////////////////////////////////////////////////////////////////
+        //BUTTONS//
+        //set styles//
+        buttonStyles();
+        //set buttons!
 
         //Apply button
         applyButton = new TextButton("Apply", textButtonStyle);
+        applyButton.setTransform(true);
         applyButton.padBottom(6);
         applyButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -70,51 +68,98 @@ public class SettingsMenu {
             }
         });
 
-        //Checkbox for fullscreen
-        fullScreenCheckbox = new CheckBox("Fullscreen", checkBoxStyle);
-        fullScreenCheckbox.setChecked(settings.getBoolean("isFullScreen"));
-        fullScreenCheckbox.addListener(new InputListener() {
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                fullScreenCheckbox.setChecked(!fullScreenCheckbox.isChecked());
+
+
+        //Buttons for resolution. We have a left and right button that increment an index through an array of supported variables.
+        Table resolutionTable = new Table();
+        String resolution = Integer.toString(settings.getInteger("windowWidth")) +" X "+ Integer.toString(settings.getInteger("windowHeight"));//set button text to current resolution
+        TextButton resolutionButton = new TextButton(resolution, squareButtonStyle);
+        TextButton leftButton = new TextButton("<",textButtonStyle);
+        leftButton.addListener(new InputListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if (resolutionSelectIndex>0) {//makes sure not out of range
+                    resolutionSelectIndex--;
+                    resolutionButton.setText(Integer.toString((int) supportedResolutions.get(resolutionSelectIndex).x) +" X "+ Integer.toString((int) supportedResolutions.get(resolutionSelectIndex).y));//horrific line, just updates text on resolution button
+                }
+                return false;
             }
         });
 
-        //Buttons for resolution
-        TextButton leftButton = new TextButton("<",squareButton);
-        TextButton rightButton = new TextButton(">",squareButton);
-        String resolution = Integer.toString(settings.getInteger("windowWidth")) +" X "+ Integer.toString(settings.getInteger("windowHeight"));
-        TextButton resolutionButton = new TextButton(resolution, squareButton);
-        table = new Table();
+        TextButton rightButton = new TextButton(">",textButtonStyle);
+        rightButton.addListener(new InputListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if (resolutionSelectIndex+1<supportedResolutions.size()){// makes sure it's not out of index
+                        resolutionSelectIndex++;
+                        resolutionButton.setText(Integer.toString((int) supportedResolutions.get(resolutionSelectIndex).x) +" X "+ Integer.toString((int) supportedResolutions.get(resolutionSelectIndex).y));//horrific line, just updates text on resolution button
+                }
+                return false;
+            }
+        });
 
+        //Checkbox for fullscreen
+        fullScreenCheckbox = new CheckBox("Fullscreen", checkBoxStyle);
+        fullScreenCheckbox.setChecked(settings.getBoolean("isFullScreen"));
+        fullScreenCheckbox.setTransform(true);
+        fullScreenCheckbox.addListener(new InputListener() {
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                fullScreenCheckbox.setChecked(!fullScreenCheckbox.isChecked());
+                table.getCells().get(3).getActor().setVisible(fullScreenCheckbox.isChecked());//
+            }
+        });
+        //small single row table for resolution buttons (so we can have different column sizes from rest of table)
+        resolutionTable.add(leftButton).width(leftButton.getWidth()*scale/3).height(leftButton.getHeight()*scale).padRight(2*scale);
+        resolutionTable.add(resolutionButton).width(resolutionButton.getWidth()*2).height(resolutionButton.getHeight()*scale).padRight(2*scale);
+        resolutionTable.add(rightButton).width(leftButton.getWidth()*scale/3).height(rightButton.getHeight()*scale).padLeft(2*scale);
 
+        //Return button:
+        returnButton = new TextButton("Return", textButtonStyle); //Set the button up
+        returnButton.padBottom(6);
+        returnButton.setTransform(true);
+        returnButton.addListener(new InputListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                //reset buttons
+                resolutionSelectIndex = supportedResolutions.indexOf(new Vector2(settings.getInteger("windowWidth"),settings.getInteger("windowHeight")));
+                fullScreenCheckbox.setChecked(settings.getBoolean("isFullScreen"));
+                resolutionButton.setText(Integer.toString((int) supportedResolutions.get(resolutionSelectIndex).x) +" X "+ Integer.toString((int) supportedResolutions.get(resolutionSelectIndex).y));//horrific line, just updates text on resolution button
+                state = returnState;
+                return false;
+            }
+        });
         //Table combining it all! phew...
-        table.add(returnButton);
+        table = new Table();
+        table.add(returnButton).width(returnButton.getWidth()*scale).height(returnButton.getHeight()*scale).padBottom(3*scale);
         table.row();
+        table.add(fullScreenCheckbox).width(fullScreenCheckbox.getWidth()*scale).height(fullScreenCheckbox.getHeight()*scale).padLeft(10*scale).padBottom(3*scale);
         table.row();
-        table.add(fullScreenCheckbox);
+        table.add(resolutionTable).padBottom(3*scale);
         table.row();
-        table.add(leftButton);
-        table.add(resolutionButton);
-        table.add(rightButton);
-        table.row();
-        table.add(applyButton);
+        table.add(applyButton).width(applyButton.getWidth()*scale).height(applyButton.getHeight()*scale).padBottom(3*scale);
         stage = new Stage(viewport);
         stage.addActor(table);
     }
 
-    private CheckBox.CheckBoxStyle getCheckBoxStyle() {
-        //Just setting up checkboxes, would have maybe been better setting up a Skin
-        Texture uncheckedBoxTex = new Texture("UI/unchecked.png");
+
+    private void buttonStyles(){
+        //Set basic text button style (the blue one)
+        Texture buttonTexture = new Texture("UI/button_up.png");
+        TextureRegion buttonTextureRegion = new TextureRegion(buttonTexture, buttonTexture.getWidth(), buttonTexture.getHeight());
+        TextureRegionDrawable buttonTextureRegionDrawable =new TextureRegionDrawable(buttonTextureRegion);
+        textButtonStyle = new TextButton.TextButtonStyle(buttonTextureRegionDrawable, buttonTextureRegionDrawable, buttonTextureRegionDrawable, font );
+
+        //Set up a checkboxstyle, unchecked and checked
+        Texture uncheckedBoxTex = new Texture("UI/unchecked.png");//first the drawable of unchecked
         TextureRegion uncheckedBoxTextureRegion = new TextureRegion(uncheckedBoxTex, uncheckedBoxTex.getWidth(), uncheckedBoxTex.getHeight());
         TextureRegionDrawable uncheckedBoxTextureRegionDrawable =new TextureRegionDrawable(uncheckedBoxTextureRegion);
-
-        Texture checkedBoxTex = new Texture("UI/checked.png");
+        Texture checkedBoxTex = new Texture("UI/checked.png");//then checked
         TextureRegion checkedBoxTextureRegion = new TextureRegion(checkedBoxTex, checkedBoxTex.getWidth(), checkedBoxTex.getHeight());
         TextureRegionDrawable checkedBoxTextureRegionDrawable =new TextureRegionDrawable(checkedBoxTextureRegion);
+        checkBoxStyle = new CheckBox.CheckBoxStyle(uncheckedBoxTextureRegionDrawable, checkedBoxTextureRegionDrawable, font, Color.BLACK );
 
-        return new CheckBox.CheckBoxStyle(uncheckedBoxTextureRegionDrawable, checkedBoxTextureRegionDrawable, font, Color.BLACK );
+        //Throw in a cheeky square button //oppa button style
+        squareButtonStyle = new TextButton.TextButtonStyle(uncheckedBoxTextureRegionDrawable, uncheckedBoxTextureRegionDrawable, uncheckedBoxTextureRegionDrawable, font );
+
+        //add more styles here
     }
-
     private void applySettings() {//
         settings.putBoolean ("isFullScreen",fullScreenCheckbox.isChecked());
         settings.putInteger("windowWidth", (int) supportedResolutions.get(resolutionSelectIndex).x);
@@ -127,7 +172,7 @@ public class SettingsMenu {
         else{
             Gdx.graphics.setWindowedMode(width, height);
         }
-        settings.flush();
+        settings.flush();//this has to be called for the changes to happen!
     }
 
     public void update() {
@@ -137,5 +182,8 @@ public class SettingsMenu {
 
     }
 
+    public void dispose(){
+        stage.dispose();
+    }
 
 }

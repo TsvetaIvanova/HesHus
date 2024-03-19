@@ -207,7 +207,7 @@ public class Play implements Screen {
 
         //setup menus
         pauseMenu = new PauseMenu(extendViewport, camera);
-        settingsMenu = new SettingsMenu(GAME_PAUSED, camera, extendViewport);
+        settingsMenu = new SettingsMenu(GAME_PAUSED, camera, extendViewport, 2);
 
         // Set up the counter and counter components
         counterBoxTexture = new Texture("counter-box.png");

@@ -83,7 +83,6 @@ public class MainMenuScreen implements Screen {
         //Settings button:
         settingsButton = new TextButton("SETTINGS", textButtonStyle); //Set the button up
         settingsButton.padBottom(7);//center text in graphic
-        settingsButton.setTransform(true);
         settingsButton.setScale(1F);
         settingsButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -120,7 +119,7 @@ public class MainMenuScreen implements Screen {
         stage = new Stage(extendViewport);
         stage.addActor(mainTable);
 
-        settingsMenu = new SettingsMenu(state, camera, extendViewport);
+        settingsMenu = new SettingsMenu(state, camera, extendViewport, 1);
     }
 
     /**
@@ -181,7 +180,6 @@ public class MainMenuScreen implements Screen {
     @Override
     public void resize(int width, int height) {
         extendViewport.update(width,height); //updates size of window for viewport when things get resized, rounds up to the nearest tilewidth
-        System.out.println(width);
         camera.update();
     }
 
