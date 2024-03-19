@@ -168,8 +168,8 @@ public class MainMenuScreen implements Screen {
             if(camera.position.x+xSpeed + camera.viewportWidth/2>= mapPixelWidth ||camera.position.x+xSpeed- camera.viewportWidth/2<=0 ){
                 xSpeed*=-1;
             }
-            camera.position.x = (int) camera.position.x;
-            camera.position.y = (int) camera.position.y;
+            //camera.position.x = Math.round(camera.position.x);
+            //camera.position.y = Math.round(camera.position.y);
             camera.update();
     }
 
