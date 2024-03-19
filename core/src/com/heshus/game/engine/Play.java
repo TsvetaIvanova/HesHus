@@ -63,6 +63,7 @@ public class Play implements Screen {
 
     private float bubbleTimer, bubblePeriod = 3;
 
+    // Walking sounds
     private Sound walkingSound1;
     private Sound walkingSound2;
     private Sound walkingSound3;
@@ -75,11 +76,6 @@ public class Play implements Screen {
     // 1/4th of a second delay between sounds, because our avatar is running everywhere
     private final float WALKING_SOUND_DELAY = 0.25f;
     private Music backgroundMusic;
-    private Texture increaseVolumeTexture;
-    private Texture lowerVolumeTexture;
-    private Texture volumeOffTexture;
-    private Texture volumeOnTexture;
-    private Stage stage;
 
     private Texture playerTexture;
 
@@ -92,9 +88,6 @@ public class Play implements Screen {
     public void render(float delta) {
         update();
         draw();
-        stage.act(delta);
-        stage.draw();
-
 
     }
 
@@ -195,7 +188,19 @@ public class Play implements Screen {
                     break;
                 }
 
-                stage.draw();
+//        // Draw Eat icons in the second row
+//        for (int i = 0; i < DayManager.currentDay.getEatScore(); i++) {
+//            renderer.getBatch().draw(burgerIconSprite, counterBoxX + 20 + (iconSize + iconSpacingX) * i, firstRowY+7, iconSize, iconSize);
+//        }
+//        // Draw Study icons in the third row
+//        for (int i = 0; i < DayManager.currentDay.getStudyScore(); i++) {
+//            renderer.getBatch().draw(studyIconSprite, counterBoxX + 10 + 20 + (iconSize + iconSpacingX) * i, secondRowY + 10, iconSize, iconSize);
+//        }
+//        // Draw Recreation icons in the fourth row
+//        for (int i = 0; i < DayManager.currentDay.getRecreationalScore(); i++) {
+//            renderer.getBatch().draw(playIconSprite, counterBoxX + 20 + 30 + (iconSize + iconSpacingX) * i, thirdRowY + 15, iconSize, iconSize );
+//        }
+
 
 
     }
@@ -212,7 +217,7 @@ public class Play implements Screen {
         //logic/physics - anything that moves
         switch (state){
             case (GAME_RUNNING):
-                //Gdx.input.setInputProcessor(player);
+                Gdx.input.setInputProcessor(player);
                 player.update(Gdx.graphics.getDeltaTime());
                 break;
             case (GAME_SETTINGS)://we do the same settings or paused
@@ -236,7 +241,6 @@ public class Play implements Screen {
 
 
         playWalkingSound(Gdx.graphics.getDeltaTime());
-        stage.act(Gdx.graphics.getDeltaTime());
     }
 
     @Override
@@ -258,7 +262,7 @@ public class Play implements Screen {
         float startX = 30 * collisionLayer.getTileWidth();
         float startY = (collisionLayer.getHeight() - 26) * collisionLayer.getTileHeight();
         player.setPosition(startX, startY);
-        //Gdx.input.setInputProcessor(player);
+        Gdx.input.setInputProcessor(player);
 
         // Set up the activity manager
         activityManager = new ActivityManager(collisionLayer);
@@ -266,6 +270,7 @@ public class Play implements Screen {
 
         // Set up the font
         font = new BitmapFont();
+
         font.getData().setScale(2);
 
         // Set up texture for energy bar
@@ -282,96 +287,28 @@ public class Play implements Screen {
         //set state
         state = GAME_RUNNING;
         // Set up the counter and counter components
-        counterBoxTexture = new Texture("Icons/counter-box.png");
+        counterBoxTexture = new Texture("counter-box.png");
 
-        verticalBarTexture = new Texture("Icons/vertical-bar.png");
+        burgerIconTexture = new Texture("burgerDouble.png");
+        studyIconTexture = new Texture("study.png");
+        playIconTexture = new Texture("game.png");
+
+        burgerIconSprite = new Sprite(burgerIconTexture);
+        studyIconSprite = new Sprite(studyIconTexture);
+        playIconSprite = new Sprite(playIconTexture);
+
+        verticalBarTexture = new Texture("vertical-bar.png");
         verticalBarSprite = new Sprite(verticalBarTexture);
 
-        walkingSound1 = Gdx.audio.newSound(Gdx.files.internal("Sounds/tile1.mp3"));
-        walkingSound2 = Gdx.audio.newSound(Gdx.files.internal("Sounds/tile2.mp3"));
-        walkingSound3 = Gdx.audio.newSound(Gdx.files.internal("Sounds/tile3.mp3"));
-        walkingSound4 = Gdx.audio.newSound(Gdx.files.internal("Sounds/tile4.mp3"));
+        walkingSound1 = Gdx.audio.newSound(Gdx.files.internal("tile1.mp3"));
+        walkingSound2 = Gdx.audio.newSound(Gdx.files.internal("tile2.mp3"));
+        walkingSound3 = Gdx.audio.newSound(Gdx.files.internal("tile3.mp3"));
+        walkingSound4 = Gdx.audio.newSound(Gdx.files.internal("tile4.mp3"));
 
-        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Sounds/background-music.mp3"));
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("background-music.mp3"));
         backgroundMusic.setLooping(true);
         backgroundMusic.setVolume(0.5f);
         backgroundMusic.play();
-
-        // Prepare textures for buttons
-        increaseVolumeTexture = new Texture(Gdx.files.internal("Icons/increase-volume.png"));
-        lowerVolumeTexture = new Texture(Gdx.files.internal("Icons/lower-volume.png"));
-        volumeOffTexture = new Texture(Gdx.files.internal("Icons/volume-off.png"));
-        volumeOnTexture = new Texture(Gdx.files.internal("Icons/volume-on.png"));
-
-        // Initialize the stage
-        stage = new Stage(new ScreenViewport(), renderer.getBatch());
-        InputMultiplexer inputMultiplexer = new InputMultiplexer();
-        inputMultiplexer.addProcessor(stage);
-        inputMultiplexer.addProcessor(player);
-        Gdx.input.setInputProcessor(inputMultiplexer);
-
-        // Create and set up buttons
-        ButtonStyle increaseVolumeStyle = new ButtonStyle();
-        increaseVolumeStyle.up = new TextureRegionDrawable(new TextureRegion(increaseVolumeTexture));
-        Button increaseVolumeButton = new Button(increaseVolumeStyle);
-        increaseVolumeButton.setPosition(800, 520); // Example position
-
-        increaseVolumeButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                float volume = backgroundMusic.getVolume();
-                volume = Math.min(volume + 0.1f, 1.0f);
-                backgroundMusic.setVolume(volume);
-            }
-        });
-
-        ButtonStyle lowerVolumeStyle = new ButtonStyle();
-        lowerVolumeStyle.up = new TextureRegionDrawable(new TextureRegion(lowerVolumeTexture));
-        Button lowerVolumeButton = new Button(lowerVolumeStyle);
-        lowerVolumeButton.setPosition(850, 520); // Example position
-        lowerVolumeButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                float volume = backgroundMusic.getVolume();
-                volume = Math.max(volume - 0.1f, 0.0f);
-                backgroundMusic.setVolume(volume);
-            }
-        });
-
-        ButtonStyle volumeOffStyle = new ButtonStyle();
-        volumeOffStyle.up = new TextureRegionDrawable(new TextureRegion(volumeOffTexture));
-        Button volumeOffButton = new Button(volumeOffStyle);
-        volumeOffButton.setPosition(900, 520); // Example position
-        volumeOffButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                if (backgroundMusic.isPlaying()) {
-                    backgroundMusic.pause();
-                } else {
-                    backgroundMusic.play();
-                }
-            }
-        });
-
-        // Play the music if it is not already playing
-        ButtonStyle volumeOnStyle = new ButtonStyle();
-        volumeOnStyle.up = new TextureRegionDrawable(new TextureRegion(volumeOnTexture));
-        Button volumeOnButton = new Button(volumeOnStyle);
-        volumeOnButton.setPosition(950, 520); // Example position
-        volumeOnButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                if (!backgroundMusic.isPlaying()) {
-                    backgroundMusic.play();
-                }
-            }
-        });
-
-        stage.addActor(increaseVolumeButton);
-        stage.addActor(lowerVolumeButton);
-        stage.addActor(volumeOffButton);
-        stage.addActor(volumeOnButton);
-
 
 
     }
@@ -421,18 +358,6 @@ public class Play implements Screen {
         if (backgroundMusic != null) {
             backgroundMusic.dispose();
         }
-        stage.dispose();
-        increaseVolumeTexture.dispose();
-        lowerVolumeTexture.dispose();
-        volumeOffTexture.dispose();
-        volumeOnTexture.dispose();
-        TblankTexture.dispose();
-        textBubbleTexture.dispose();
-        backgroundMusic.dispose();
-        increaseVolumeTexture.dispose();
-        volumeOffTexture.dispose();
-        volumeOnTexture.dispose();
-        lowerVolumeTexture.dispose();
     }
 
     private void playWalkingSound(float delta) {
