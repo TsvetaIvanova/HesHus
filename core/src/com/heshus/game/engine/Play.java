@@ -27,11 +27,16 @@ import com.badlogic.gdx.audio.Sound;
 import java.awt.*;
 
 import com.heshus.game.screens.states.PauseMenu;
+import com.heshus.game.screens.states.SettingsMenu;
+
+import static com.heshus.game.engine.HesHusGame.settings;
 
 public class Play implements Screen {
     public static final int GAME_RUNNING = 0;
     public static final int GAME_PAUSED = 1;
-    public static final int GAME_OVER = 2;
+    public static final int GAME_SETTINGS = 2;
+    public static final int GAME_OVER = 3;
+    public static final int GAME_MAINMENU =4;
     public static int state;
     private final HesHusGame game;
     private TiledMap map;
@@ -46,7 +51,9 @@ public class Play implements Screen {
     private Sprite blankTexture, textBubble;
     private Texture TblankTexture, textBubbleTexture;
     private ExtendViewport extendViewport;
+
     private PauseMenu pauseMenu;
+    private SettingsMenu settingsMenu;
 
     private Texture counterBoxTexture;
     private Texture burgerIconTexture, studyIconTexture, playIconTexture;
@@ -71,7 +78,6 @@ public class Play implements Screen {
     private Music backgroundMusic;
 
     private Texture playerTexture;
-
 
     public Play(HesHusGame game, Texture playerSpriteSelection) {
         this.game = game;
@@ -169,12 +175,17 @@ public class Play implements Screen {
                 }
                 renderer.getBatch().end();
                 break;
-
-            case (GAME_PAUSED):
-                //Pause menu
-                renderer.getBatch().end();
-                pauseMenu.draw();
-                break;
+                case (GAME_PAUSED):
+                    //Pause menu
+                    renderer.getBatch().end();
+                    pauseMenu.update(camera);
+                    pauseMenu.draw();
+                    break;
+                case (GAME_SETTINGS):
+                    //Settings menu
+                    renderer.getBatch().end();
+                    settingsMenu.update();
+                    break;
                 }
 
 //        // Draw Eat icons in the second row
@@ -209,6 +220,7 @@ public class Play implements Screen {
                 Gdx.input.setInputProcessor(player);
                 player.update(Gdx.graphics.getDeltaTime());
                 break;
+            case (GAME_SETTINGS)://we do the same settings or paused
             case (GAME_PAUSED):
                 player.update(0);
                 player.setVelocity(new Vector2(0,0));
@@ -271,7 +283,7 @@ public class Play implements Screen {
 
         //setup menu
         pauseMenu = new PauseMenu(extendViewport, camera);
-
+        settingsMenu = new SettingsMenu(GAME_PAUSED,camera,extendViewport,2);
         //set state
         state = GAME_RUNNING;
         // Set up the counter and counter components
@@ -307,8 +319,7 @@ public class Play implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        extendViewport.update(((width+7)/16)*16, ((height+7)/16)*16); //updates size of window for viewport when things get resized, rounds up to the nearest tilewidth
-        camera.update();
+        extendViewport.update(width,height);
     }
 
     @Override
@@ -341,6 +352,8 @@ public class Play implements Screen {
         walkingSound2.dispose();
         walkingSound3.dispose();
         walkingSound4.dispose();
+        settingsMenu.dispose();
+        pauseMenu.dispose();
 
         if (backgroundMusic != null) {
             backgroundMusic.dispose();
