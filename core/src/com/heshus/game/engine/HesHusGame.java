@@ -55,9 +55,16 @@ public class HesHusGame extends Game {
 		batch.dispose();
 		font.dispose();
 	}
+	public void setDefaultPreferences(){
+		settings.putString("name", "bucket");
+		settings.putBoolean("soundOn", true);
+		settings.putInteger("screenWidth", 1020);
+		settings.putInteger("screenHeight",574);
+		settings.putBoolean("fullScreen", true);
+
+	}
 
 }
-
 
 
 //	@Override

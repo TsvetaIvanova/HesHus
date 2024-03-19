@@ -24,6 +24,8 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.heshus.game.engine.HesHusGame;
 import com.heshus.game.engine.Play;
 
+import static com.heshus.game.engine.Play.*;
+
 public class MainMenuScreen implements Screen {
 
     final HesHusGame game;
@@ -39,10 +41,12 @@ public class MainMenuScreen implements Screen {
     TextButton newButton;
     private Stage stage;
     private Table mainTable;
+    private SettingsMenu settingsMenu;
     int xSpeed;
     int ySpeed;
     public MainMenuScreen(final HesHusGame game) {
         this.game = game;
+        state = GAME_MAINMENU;
         //Map for background initialisation
         map = new TmxMapLoader().load("testmap.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, 1 / 1f);
@@ -83,7 +87,7 @@ public class MainMenuScreen implements Screen {
         settingsButton.setScale(1F);
         settingsButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                Gdx.app.exit();
+                state = GAME_SETTINGS;
                 return false;
             }
         });
@@ -115,6 +119,8 @@ public class MainMenuScreen implements Screen {
         mainTable.setFillParent(true);
         stage = new Stage(extendViewport);
         stage.addActor(mainTable);
+
+        settingsMenu = new SettingsMenu(state, camera, extendViewport);
     }
 
     /**
@@ -139,15 +145,20 @@ public class MainMenuScreen implements Screen {
             //tilemap
             renderer.setView(camera);
             renderer.render();
-
-            //text
-            game.batch.begin();
-            font.draw(game.batch, "Welcome to HeslingtonHustle!!! ", camera.position.x- camera.viewportWidth/2, camera.position.y+ camera.viewportHeight/2);
-            //buttons
-            mainTable.setPosition(camera.position.x- camera.viewportWidth/2,camera.position.y- camera.viewportHeight/2);
-            stage.draw();
-            game.batch.end();
-
+            switch (state) {
+                case (GAME_MAINMENU):
+                    //text
+                    game.batch.begin();
+                    font.draw(game.batch, "Welcome to HeslingtonHustle!!! ", camera.position.x - camera.viewportWidth / 2, camera.position.y + camera.viewportHeight / 2);
+                    //buttons
+                    mainTable.setPosition(camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2);
+                    stage.draw();
+                    game.batch.end();
+                    break;
+                case(GAME_SETTINGS):
+                    settingsMenu.update();
+                    break;
+            }
             //moving camera (if the map has a yOffSet or xOffSet i think it will break)
             camera.position.x+=xSpeed;
             camera.position.y+=ySpeed;

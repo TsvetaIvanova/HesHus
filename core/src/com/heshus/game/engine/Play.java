@@ -25,6 +25,7 @@ public class Play implements Screen {
     public static final int GAME_PAUSED = 1;
     public static final int GAME_SETTINGS = 2;
     public static final int GAME_OVER = 3;
+    public static final int GAME_MAINMENU =4;
     public static int state;
     private final HesHusGame game;
     private TiledMap map;
@@ -122,7 +123,12 @@ public class Play implements Screen {
                 renderer.getBatch().end();
                 pauseMenu.draw();
                 break;
+            case (GAME_SETTINGS):
+                //Settings menu
+                renderer.getBatch().end();
+                settingsMenu.update();
                 }
+
                 
 //        // Draw Eat icons in the second row
 //        for (int i = 0; i < DayManager.currentDay.getEatScore(); i++) {
@@ -161,16 +167,15 @@ public class Play implements Screen {
                 player.setVelocity(new Vector2(0,0));
                 pauseMenu.update(camera);
                 break;
-            case (GAME_SETTINGS):
-                player.update(0);
-                player.setVelocity(new Vector2(0,0));
-                settingsMenu.update();
         }
         activityManager.checkActivity();
     }
 
     @Override
     public void show() {
+        //set state
+        state = GAME_RUNNING;
+
         // Initialize the camera
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 450);
@@ -204,9 +209,8 @@ public class Play implements Screen {
 
         //setup menus
         pauseMenu = new PauseMenu(extendViewport, camera);
-        settingsMenu = new SettingsMenu();
-        //set state
-        state = GAME_RUNNING;
+        settingsMenu = new SettingsMenu(state, camera, extendViewport);
+
         // Set up the counter and counter components
         counterBoxTexture = new Texture("counter-box.png");
 

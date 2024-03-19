@@ -14,8 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
-import static com.heshus.game.engine.Play.GAME_RUNNING;
-import static com.heshus.game.engine.Play.state;
+import static com.heshus.game.engine.Play.*;
 
 public class PauseMenu{
     private Stage stage;
@@ -63,7 +62,7 @@ public class PauseMenu{
         settingsButton.padBottom(10);
         settingsButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                Gdx.app.exit();
+                state = GAME_SETTINGS;
                 return false;
             }
         });
