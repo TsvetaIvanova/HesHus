@@ -106,6 +106,7 @@ public class Play implements Screen {
 
         switch (state) {
             case(GAME_RUNNING):
+                activityManager.checkActivity();
                 //HUD
                 //Drawing energy bar
                 renderer.getBatch().setColor(Color.GRAY);
@@ -214,7 +215,6 @@ public class Play implements Screen {
                 pauseMenu.update(camera);
                 break;
         }
-        activityManager.checkActivity();
 
         // check walking is happening
         if (Math.abs(player.getVelocity().x) > 0 || Math.abs(player.getVelocity().y) > 0) {
