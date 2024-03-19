@@ -43,6 +43,9 @@ public class HesHusGame extends Game {
 	public void create() {
 		batch = new SpriteBatch();
 		font = new BitmapFont(); // use libGDX's default Arial font
+		setDefaultPreferences();
+		System.out.println(settings.getInteger("screenWidth"));
+		Gdx.graphics.setWindowedMode(settings.getInteger("windowWidth"), settings.getInteger("windowHeight"));
 		this.setScreen(new MainMenuScreen(this));
 
 	}
@@ -56,12 +59,13 @@ public class HesHusGame extends Game {
 		font.dispose();
 	}
 	public void setDefaultPreferences(){
+		settings = Gdx.app.getPreferences("userSettings");
 		settings.putString("name", "bucket");
 		settings.putBoolean("soundOn", true);
-		settings.putInteger("screenWidth", 1020);
-		settings.putInteger("screenHeight",574);
-		settings.putBoolean("fullScreen", true);
-
+		settings.putInteger("windowWidth", 1280);
+		settings.putInteger("windowHeight",720);
+		settings.putBoolean("isFullScreen", false);
+		settings.flush();
 	}
 
 }

@@ -55,7 +55,7 @@ public class MainMenuScreen implements Screen {
         mapPixelHeight = layer.getHeight() * layer.getTileHeight();
         //Camera initialisation
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 400, 240);
+        camera.setToOrtho(false, 400, 225); //must be same ratio as screen.
         camera.position.x=0;
         camera.position.y=0;
         xSpeed=1;//we will move camera by these each frame
@@ -168,6 +168,8 @@ public class MainMenuScreen implements Screen {
             if(camera.position.x+xSpeed + camera.viewportWidth/2>= mapPixelWidth ||camera.position.x+xSpeed- camera.viewportWidth/2<=0 ){
                 xSpeed*=-1;
             }
+            camera.position.x = (int) camera.position.x;
+            camera.position.y = (int) camera.position.y;
             camera.viewportWidth = Math.round(camera.viewportWidth);
             camera.viewportHeight = Math.round(camera.viewportHeight);
             camera.update();
@@ -180,7 +182,9 @@ public class MainMenuScreen implements Screen {
      */
     @Override
     public void resize(int width, int height) {
-        extendViewport.update(width,height);
+        extendViewport.update(width,height); //updates size of window for viewport when things get resized, rounds up to the nearest tilewidth
+        System.out.println(width);
+        camera.update();
     }
 
     /**

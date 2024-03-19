@@ -209,7 +209,7 @@ public class Play implements Screen {
 
         //setup menus
         pauseMenu = new PauseMenu(extendViewport, camera);
-        settingsMenu = new SettingsMenu(state, camera, extendViewport);
+        settingsMenu = new SettingsMenu(GAME_PAUSED, camera, extendViewport);
 
         // Set up the counter and counter components
         counterBoxTexture = new Texture("counter-box.png");
@@ -235,7 +235,8 @@ public class Play implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        extendViewport.update(((width+7)/16)*16, ((height+7)/16)*16); //updates size of window for viewport when things get resized, rounds up to the nearest tilewidth
+        //extendViewport.update(((width+7)/16)*16, ((height+7)/16)*16); //updates size of window for viewport when things get resized, rounds up to the nearest tilewidth
+        extendViewport.update(width,height);
         camera.update();
     }
 
