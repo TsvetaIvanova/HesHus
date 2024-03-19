@@ -40,7 +40,7 @@ public class PauseMenu{
         font.getData().setScale(1.5F);
         font.setColor(Color.BLACK);
 
-        clickSound = Gdx.audio.newSound(Gdx.files.internal("switch2.ogg"));
+        clickSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/switch2.ogg"));
 
         //BUTTONS
         //Setup textures and variables
