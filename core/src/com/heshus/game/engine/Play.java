@@ -43,7 +43,7 @@ public class Play implements Screen {
     private ActivityManager activityManager;
     // private Game game;
 
-    private Sprite blankTexture, textBubble;
+    private Sprite blankTexture, textBubble, dimTexture;
     private Texture TblankTexture, textBubbleTexture;
     private ExtendViewport extendViewport;
     private PauseMenu pauseMenu;
@@ -135,6 +135,9 @@ public class Play implements Screen {
 
                 }
 
+                //Dims screen when energy lost
+                dimTexture.setAlpha((float)0.4 + DayManager.currentDay.getEnergy());
+                dimTexture.draw(renderer.getBatch());
 
                 ///////////////////////////////////////////////////////////////////////////
                 // The Counter and Counter Icons                                         //
@@ -167,6 +170,7 @@ public class Play implements Screen {
                 for (int i = 0; i < DayManager.currentDay.getDayNumber(); i++) {
                     renderer.getBatch().draw(verticalBarSprite, verticalBarStartX+15 + (5 + iconSpacingX) * i, verticalBarStartY, 5, 20);
                 }
+
                 renderer.getBatch().end();
                 break;
 
@@ -189,8 +193,6 @@ public class Play implements Screen {
 //        for (int i = 0; i < DayManager.currentDay.getRecreationalScore(); i++) {
 //            renderer.getBatch().draw(playIconSprite, counterBoxX + 20 + 30 + (iconSize + iconSpacingX) * i, thirdRowY + 15, iconSize, iconSize );
 //        }
-
-
 
     }
     private void update(){
@@ -297,7 +299,9 @@ public class Play implements Screen {
         backgroundMusic.setVolume(0.5f);
         backgroundMusic.play();
 
-
+        dimTexture = new Sprite(blankTexture);
+        dimTexture.setColor(Color.BLACK);
+        dimTexture.setSize(collisionLayer.getWidth() * 16, collisionLayer.getHeight() * 16);
     }
     @Override
     public void hide() {
