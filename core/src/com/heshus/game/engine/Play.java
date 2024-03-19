@@ -336,7 +336,6 @@ public class Play implements Screen {
         //BUT we can just call AssetManager.dispose() and it will for sure dispose all our assets correctly
 
         map.dispose();
-        renderer.dispose();
         player.getTexture().dispose();
         font.dispose();
         counterBoxTexture.dispose();

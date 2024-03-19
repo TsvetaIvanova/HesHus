@@ -15,6 +15,8 @@ public class MainMenuScreen implements Screen {
 
     OrthographicCamera camera;
 
+    float timeElapsed;
+
     public MainMenuScreen(final HesHusGame game) {
         this.game = game;
 
@@ -38,20 +40,22 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void render(float delta) {
-            ScreenUtils.clear(0, 0.2f, 0, 1);
+        timeElapsed += delta;
 
-            camera.update();
-            game.batch.setProjectionMatrix(camera.combined);
+        ScreenUtils.clear(0, 0.2f, 0, 1);
 
-            game.batch.begin();
-            game.font.draw(game.batch, "Welcome to HeslingtonHustle!!! ", 100, 150);
-            game.font.draw(game.batch, "Tap anywhere to begin!", 100, 100);
-            game.batch.end();
+        camera.update();
+        game.batch.setProjectionMatrix(camera.combined);
 
-            if (Gdx.input.isTouched()) {
-                game.setScreen(new Play(game));
-                dispose();
-            }
+        game.batch.begin();
+        game.font.draw(game.batch, "Welcome to HeslingtonHustle!!! ", 100, 150);
+        game.font.draw(game.batch, "Tap anywhere to begin!", 100, 100);
+        game.batch.end();
+
+        if (Gdx.input.isTouched() && timeElapsed > 0.5) {
+            game.setScreen(new Play(game));
+            dispose();
+        }
 
 
 
@@ -96,7 +100,6 @@ public class MainMenuScreen implements Screen {
      */
     @Override
     public void dispose() {
-
     }
 
 
