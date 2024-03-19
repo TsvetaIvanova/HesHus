@@ -51,7 +51,9 @@ public class Play implements Screen {
     private Sprite blankTexture, textBubble;
     private Texture TblankTexture, textBubbleTexture;
     private ExtendViewport extendViewport;
+
     private PauseMenu pauseMenu;
+    private SettingsMenu settingsMenu;
 
     private Texture counterBoxTexture;
     private Texture burgerIconTexture, studyIconTexture, playIconTexture;
@@ -74,11 +76,12 @@ public class Play implements Screen {
     // 1/4th of a second delay between sounds, because our avatar is running everywhere
     private final float WALKING_SOUND_DELAY = 0.25f;
     private Music backgroundMusic;
-    private SettingsMenu settingsMenu;
 
+    private Texture playerTexture;
 
-    public Play(HesHusGame game) {
+    public Play(HesHusGame game, Texture playerSpriteSelection) {
         this.game = game;
+        this.playerTexture = playerSpriteSelection;
 
     }
     @Override
@@ -105,6 +108,7 @@ public class Play implements Screen {
         renderer.getBatch().begin();
         //Player
         player.draw(renderer.getBatch());
+
 
         switch (state) {
             case(GAME_RUNNING):
@@ -183,7 +187,7 @@ public class Play implements Screen {
                     settingsMenu.update();
                     break;
                 }
-                
+
 //        // Draw Eat icons in the second row
 //        for (int i = 0; i < DayManager.currentDay.getEatScore(); i++) {
 //            renderer.getBatch().draw(burgerIconSprite, counterBoxX + 20 + (iconSize + iconSpacingX) * i, firstRowY+7, iconSize, iconSize);
@@ -196,7 +200,7 @@ public class Play implements Screen {
 //        for (int i = 0; i < DayManager.currentDay.getRecreationalScore(); i++) {
 //            renderer.getBatch().draw(playIconSprite, counterBoxX + 20 + 30 + (iconSize + iconSpacingX) * i, thirdRowY + 15, iconSize, iconSize );
 //        }
-        
+
 
 
     }
@@ -251,7 +255,8 @@ public class Play implements Screen {
         renderer = new OrthogonalTiledMapRenderer(map, 1 / 1f);
 
         // Set up the player
-        Texture playerTexture = new Texture("player.png");
+        //int playerSpriteNumber = 5;
+        //Texture playerTexture = new Texture("player-" + Integer.toString(playerSpriteNumber) + ".png");
         Sprite playerSprite = new Sprite(playerTexture);
         player = new Player(playerSprite, collisionLayer);
         float startX = 30 * collisionLayer.getTileWidth();
@@ -287,11 +292,11 @@ public class Play implements Screen {
         burgerIconTexture = new Texture("burgerDouble.png");
         studyIconTexture = new Texture("study.png");
         playIconTexture = new Texture("game.png");
-       
+
         burgerIconSprite = new Sprite(burgerIconTexture);
         studyIconSprite = new Sprite(studyIconTexture);
         playIconSprite = new Sprite(playIconTexture);
-       
+
         verticalBarTexture = new Texture("vertical-bar.png");
         verticalBarSprite = new Sprite(verticalBarTexture);
 

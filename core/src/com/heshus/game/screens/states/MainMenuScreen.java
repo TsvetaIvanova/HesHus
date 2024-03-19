@@ -21,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.heshus.game.editor.CustomiseSprite;
 import com.heshus.game.engine.HesHusGame;
 import com.heshus.game.engine.Play;
 
@@ -104,7 +105,7 @@ public class MainMenuScreen implements Screen {
         newButton.padBottom(6);
         newButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                game.setScreen(new Play(game));
+                game.setScreen(new CustomiseSprite(game, camera));
                 dispose();
                 return false;
             }
