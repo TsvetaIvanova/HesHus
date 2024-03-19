@@ -3,11 +3,9 @@ package com.heshus.game.editor;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.heshus.game.engine.HesHusGame;
 import com.heshus.game.engine.Play;
-
 import java.util.ArrayList;
 
 public class CustomiseSprite implements Screen {
@@ -16,6 +14,7 @@ public class CustomiseSprite implements Screen {
     OrthographicCamera camera;
 
     boolean validPlayer = false;
+
     //this is the default sprite selected
     //importantly, this number points to an ARRAY INDEX, not the number in the name of the .png file
     //so for player-1 to player-6 it ranges from 0 TO 5 not 1 to 6
@@ -76,11 +75,11 @@ public class CustomiseSprite implements Screen {
 
             ScreenUtils.clear(0.2f, 0f, 0, 1);
             game.batch.begin();
-            game.font.draw(game.batch, "CHOOSE A PLAYER ", 100, 150);
-            game.font.draw(game.batch, "Tap anywhere to begin!", 100, 100);
-            game.batch.draw(leftarrowTexture, 10, 10);
-            game.batch.draw(rightarrowTexture, 200, 10);
-            game.batch.draw(textureList.get(playerSelection), 100, 100, 128, 128);
+            game.font.draw(game.batch, "CHOOSE A PLAYER", 100, 150);
+            game.font.draw(game.batch, "Press ENTER to start", 100, 100);
+            game.batch.draw(leftarrowTexture, 200, 200);
+            game.batch.draw(rightarrowTexture, 500, 200);
+            game.batch.draw(textureList.get(playerSelection), 320, 220, 128, 128);
             game.batch.end();
 
 
