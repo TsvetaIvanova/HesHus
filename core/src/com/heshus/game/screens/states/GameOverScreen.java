@@ -5,6 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.heshus.game.engine.HesHusGame;
+import com.heshus.game.manager.DayManager;
 
 public class GameOverScreen implements Screen {
 
@@ -34,7 +35,7 @@ public class GameOverScreen implements Screen {
         game.batch.end();
 
         if (Gdx.input.isTouched()) {
-
+            DayManager.gameOver = false;
             game.setScreen(new MainMenuScreen(game));
             dispose();
         }

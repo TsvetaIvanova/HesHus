@@ -26,6 +26,7 @@ import com.badlogic.gdx.audio.Sound;
 
 import java.awt.*;
 
+import com.heshus.game.screens.states.GameOverScreen;
 import com.heshus.game.screens.states.PauseMenu;
 
 public class Play implements Screen {
@@ -229,6 +230,9 @@ public class Play implements Screen {
             isWalking = false;
         }
 
+        if(DayManager.gameOver){
+            game.setScreen(new GameOverScreen(game));
+        }
 
         playWalkingSound(Gdx.graphics.getDeltaTime());
     }
