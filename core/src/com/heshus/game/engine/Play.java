@@ -70,12 +70,12 @@ public class Play implements Screen {
     private final float WALKING_SOUND_DELAY = 0.25f;
     private Music backgroundMusic;
 
+    private Texture playerTexture;
 
 
-
-
-    public Play(HesHusGame game) {
+    public Play(HesHusGame game, Texture playerSpriteSelection) {
         this.game = game;
+        this.playerTexture = playerSpriteSelection;
 
     }
     @Override
@@ -243,7 +243,8 @@ public class Play implements Screen {
         renderer = new OrthogonalTiledMapRenderer(map, 1 / 1f);
 
         // Set up the player
-        Texture playerTexture = new Texture("player.png");
+        //int playerSpriteNumber = 5;
+        //Texture playerTexture = new Texture("player-" + Integer.toString(playerSpriteNumber) + ".png");
         Sprite playerSprite = new Sprite(playerTexture);
         player = new Player(playerSprite, collisionLayer);
         float startX = 30 * collisionLayer.getTileWidth();

@@ -6,13 +6,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.heshus.game.editor.CustomiseSprite;
 import com.heshus.game.engine.HesHusGame;
 import com.heshus.game.engine.Play;
 
 public class MainMenuScreen implements Screen {
 
     final HesHusGame game;
-
     OrthographicCamera camera;
 
     public MainMenuScreen(final HesHusGame game) {
@@ -49,7 +49,9 @@ public class MainMenuScreen implements Screen {
             game.batch.end();
 
             if (Gdx.input.isTouched()) {
-                game.setScreen(new Play(game));
+                //game.setScreen(new Play(game));
+                //rather than jumping straight to the game, first choose a character
+                game.setScreen(new CustomiseSprite(game, camera));
                 dispose();
             }
 
