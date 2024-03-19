@@ -66,7 +66,7 @@ public class Play implements Screen {
         camera.viewportHeight = Math.round(camera.viewportHeight);
         camera.update();
 
-        //Tilemap
+        //Tilemap:
         renderer.setView(camera);
         renderer.render(); //takes a layers[] argument if we want to specifically render certain layers
         renderer.getBatch().begin();
