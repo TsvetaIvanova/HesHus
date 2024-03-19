@@ -19,11 +19,11 @@ import java.util.ArrayList;
 import static com.heshus.game.engine.HesHusGame.settings;
 import static com.heshus.game.engine.Play.state;
 public class SettingsMenu {
-    private BitmapFont font;
-    private Stage stage;
-    private int returnState;//state to go back to once done
-    private TextButton returnButton;
-    private TextButton applyButton;
+    private final BitmapFont font;
+    private final Stage stage;
+    private final int returnState;//state to go back to once done
+    private final TextButton returnButton;
+    private final TextButton applyButton;
     private Table table;
     private Camera camera;
     private final CheckBox fullScreenCheckbox;
@@ -66,8 +66,6 @@ public class SettingsMenu {
                 return false;
             }
         });
-
-
 
         //Buttons for resolution. We have a left and right button that increment an index through an array of supported variables.
         resolutionTable = new Table();
@@ -178,7 +176,6 @@ public class SettingsMenu {
         Gdx.input.setInputProcessor(stage);
         table.setPosition(camera.position.x, camera.position.y);
         stage.draw();
-
     }
 
     public void dispose(){

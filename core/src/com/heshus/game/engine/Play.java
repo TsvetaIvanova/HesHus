@@ -347,6 +347,8 @@ public class Play implements Screen {
         walkingSound2.dispose();
         walkingSound3.dispose();
         walkingSound4.dispose();
+        settingsMenu.dispose();
+        pauseMenu.dispose();
 
         if (backgroundMusic != null) {
             backgroundMusic.dispose();
