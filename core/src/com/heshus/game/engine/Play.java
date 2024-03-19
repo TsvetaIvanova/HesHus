@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -21,6 +22,7 @@ import com.heshus.game.manager.ActivityManager;
 import com.heshus.game.manager.Day;
 import com.heshus.game.manager.DayManager;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.audio.Sound;
 
 import java.awt.*;
 
@@ -53,6 +55,23 @@ public class Play implements Screen {
     private Sprite verticalBarSprite;
 
     private float bubbleTimer, bubblePeriod = 3;
+
+    // Walking sounds
+    private Sound walkingSound1;
+    private Sound walkingSound2;
+    private Sound walkingSound3;
+    private Sound walkingSound4;
+    private int currentWalkingSoundIndex = 0;
+    private boolean isWalking = false;
+
+    private float walkingSoundTimer = 0;
+
+    // 1/4th of a second delay between sounds, because our avatar is running everywhere
+    private final float WALKING_SOUND_DELAY = 0.25f;
+    private Music backgroundMusic;
+
+
+
 
 
     public Play(HesHusGame game) {
@@ -196,6 +215,20 @@ public class Play implements Screen {
                 break;
         }
         activityManager.checkActivity();
+
+        // check walking is happening
+        if (Math.abs(player.getVelocity().x) > 0 || Math.abs(player.getVelocity().y) > 0) {
+            if (!isWalking) {
+                isWalking = true;
+                currentWalkingSoundIndex = 0;
+                walkingSoundTimer = WALKING_SOUND_DELAY;
+            }
+        } else {
+            isWalking = false;
+        }
+
+
+        playWalkingSound(Gdx.graphics.getDeltaTime());
     }
 
     @Override
@@ -220,7 +253,7 @@ public class Play implements Screen {
 
         // Set up the activity manager
         activityManager = new ActivityManager(collisionLayer);
-        activityManager.setPlayer(player); // Ensure you have a setPlayer method in ActivityManager
+        activityManager.setPlayer(player);
 
         // Set up the font
         font = new BitmapFont();
@@ -254,7 +287,16 @@ public class Play implements Screen {
         verticalBarTexture = new Texture("vertical-bar.png");
         verticalBarSprite = new Sprite(verticalBarTexture);
 
-        // Other initializations as needed...
+        walkingSound1 = Gdx.audio.newSound(Gdx.files.internal("tile1.mp3"));
+        walkingSound2 = Gdx.audio.newSound(Gdx.files.internal("tile2.mp3"));
+        walkingSound3 = Gdx.audio.newSound(Gdx.files.internal("tile3.mp3"));
+        walkingSound4 = Gdx.audio.newSound(Gdx.files.internal("tile4.mp3"));
+
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("background-music.mp3"));
+        backgroundMusic.setLooping(true);
+        backgroundMusic.setVolume(0.5f);
+        backgroundMusic.play();
+
 
     }
     @Override
@@ -294,7 +336,46 @@ public class Play implements Screen {
         studyIconTexture.dispose();
         playIconTexture.dispose();
         verticalBarTexture.dispose();
+        walkingSound1.dispose();
+        walkingSound2.dispose();
+        walkingSound3.dispose();
+        walkingSound4.dispose();
+
+        if (backgroundMusic != null) {
+            backgroundMusic.dispose();
+        }
     }
+
+    private void playWalkingSound(float delta) {
+        if (!isWalking || walkingSoundTimer < WALKING_SOUND_DELAY) {
+            walkingSoundTimer += delta;
+            return;
+        }
+
+
+        walkingSoundTimer = 0;
+
+        Sound soundToPlay = null;
+        switch (currentWalkingSoundIndex) {
+            case 0:
+                soundToPlay = walkingSound1;
+                break;
+            case 1:
+                soundToPlay = walkingSound2;
+                break;
+            case 2:
+                soundToPlay = walkingSound3;
+                break;
+            case 3:
+                soundToPlay = walkingSound4;
+                break;
+        }
+        if (soundToPlay != null) {
+            soundToPlay.play(1.0f);
+            currentWalkingSoundIndex = (currentWalkingSoundIndex + 1) % 4;
+        }
+    }
+
 
     private void lockCameraInTiledMapLayer(OrthographicCamera cam, TiledMapTileLayer layer){
         //get variables needed to find edges of map!
