@@ -26,25 +26,24 @@ public class SettingsMenu {
     private TextButton applyButton;
     private Table table;
     private Camera camera;
-    private ExtendViewport viewport;
-    private CheckBox fullScreenCheckbox;
-    private ArrayList<Vector2> supportedResolutions;
+    private final CheckBox fullScreenCheckbox;
+    private final ArrayList<Vector2> supportedResolutions;
     private int resolutionSelectIndex;
     private TextButton.TextButtonStyle textButtonStyle;
     private CheckBox.CheckBoxStyle checkBoxStyle;
-    private TextButton.TextButtonStyle squareButtonStyle; 
+    private TextButton.TextButtonStyle squareButtonStyle;
+    private Table resolutionTable;
     public SettingsMenu(int returnState, Camera camera, ExtendViewport viewport, float scale) {
         this.returnState = returnState;
-        this.viewport = viewport;
         this.camera = camera;
 
         //for resolution support
-        supportedResolutions = new ArrayList<Vector2>();
+        supportedResolutions = new ArrayList<>();
         supportedResolutions.add(new Vector2(1024,576));
         supportedResolutions.add(new Vector2(1280,720));
         supportedResolutions.add(new Vector2(1600, 900));
         supportedResolutions.add(new Vector2(1920, 1080));
-        resolutionSelectIndex = supportedResolutions.indexOf(new Vector2(settings.getInteger("windowWidth"),settings.getInteger("windowHeight")));
+        resolutionSelectIndex = supportedResolutions.indexOf(new Vector2(settings.getInteger("windowWidth"),settings.getInteger("windowHeight")));//gets index of arraylist matching current resolution
         
         //Set up font
         font = new BitmapFont(Gdx.files.internal("Fonts/monogram/pixel.fnt"), false);
@@ -71,15 +70,15 @@ public class SettingsMenu {
 
 
         //Buttons for resolution. We have a left and right button that increment an index through an array of supported variables.
-        Table resolutionTable = new Table();
-        String resolution = Integer.toString(settings.getInteger("windowWidth")) +" X "+ Integer.toString(settings.getInteger("windowHeight"));//set button text to current resolution
+        resolutionTable = new Table();
+        String resolution = settings.getInteger("windowWidth") +" X "+ settings.getInteger("windowHeight");//set button text to current resolution
         TextButton resolutionButton = new TextButton(resolution, squareButtonStyle);
         TextButton leftButton = new TextButton("<",textButtonStyle);
         leftButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if (resolutionSelectIndex>0) {//makes sure not out of range
+                if (resolutionSelectIndex>0) {//makes sure index not out of range
                     resolutionSelectIndex--;
-                    resolutionButton.setText(Integer.toString((int) supportedResolutions.get(resolutionSelectIndex).x) +" X "+ Integer.toString((int) supportedResolutions.get(resolutionSelectIndex).y));//horrific line, just updates text on resolution button
+                    resolutionButton.setText((int) supportedResolutions.get(resolutionSelectIndex).x +" X "+ (int) supportedResolutions.get(resolutionSelectIndex).y);//horrific line, just updates text on resolution button
                 }
                 return false;
             }
@@ -88,9 +87,9 @@ public class SettingsMenu {
         TextButton rightButton = new TextButton(">",textButtonStyle);
         rightButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if (resolutionSelectIndex+1<supportedResolutions.size()){// makes sure it's not out of index
+                if (resolutionSelectIndex+1<supportedResolutions.size()){// makes sure index not out of range
                         resolutionSelectIndex++;
-                        resolutionButton.setText(Integer.toString((int) supportedResolutions.get(resolutionSelectIndex).x) +" X "+ Integer.toString((int) supportedResolutions.get(resolutionSelectIndex).y));//horrific line, just updates text on resolution button
+                        resolutionButton.setText((int) supportedResolutions.get(resolutionSelectIndex).x +" X "+ (int) supportedResolutions.get(resolutionSelectIndex).y);//horrific line, just updates text on resolution button
                 }
                 return false;
             }
@@ -102,8 +101,7 @@ public class SettingsMenu {
         fullScreenCheckbox.setTransform(true);
         fullScreenCheckbox.addListener(new InputListener() {
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                fullScreenCheckbox.setChecked(!fullScreenCheckbox.isChecked());
-                table.getCells().get(3).getActor().setVisible(fullScreenCheckbox.isChecked());//
+                resolutionTable.setVisible(fullScreenCheckbox.isChecked());
             }
         });
         //small single row table for resolution buttons (so we can have different column sizes from rest of table)
@@ -120,7 +118,7 @@ public class SettingsMenu {
                 //reset buttons
                 resolutionSelectIndex = supportedResolutions.indexOf(new Vector2(settings.getInteger("windowWidth"),settings.getInteger("windowHeight")));
                 fullScreenCheckbox.setChecked(settings.getBoolean("isFullScreen"));
-                resolutionButton.setText(Integer.toString((int) supportedResolutions.get(resolutionSelectIndex).x) +" X "+ Integer.toString((int) supportedResolutions.get(resolutionSelectIndex).y));//horrific line, just updates text on resolution button
+                resolutionButton.setText(((int) supportedResolutions.get(resolutionSelectIndex).x) +" X "+ (int) supportedResolutions.get(resolutionSelectIndex).y);//horrific line, just updates text on resolution button
                 state = returnState;
                 return false;
             }
@@ -176,6 +174,7 @@ public class SettingsMenu {
     }
 
     public void update() {
+        resolutionTable.setVisible(!fullScreenCheckbox.isChecked());
         Gdx.input.setInputProcessor(stage);
         table.setPosition(camera.position.x, camera.position.y);
         stage.draw();

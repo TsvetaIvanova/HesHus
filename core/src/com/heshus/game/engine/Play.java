@@ -74,9 +74,7 @@ public class Play implements Screen {
     // 1/4th of a second delay between sounds, because our avatar is running everywhere
     private final float WALKING_SOUND_DELAY = 0.25f;
     private Music backgroundMusic;
-
-
-
+    private SettingsMenu settingsMenu;
 
 
     public Play(HesHusGame game) {
@@ -173,12 +171,17 @@ public class Play implements Screen {
                 }
                 renderer.getBatch().end();
                 break;
-
-            case (GAME_PAUSED): 
-                //Pause menu
-                renderer.getBatch().end();
-                pauseMenu.draw();
-                break;
+                case (GAME_PAUSED):
+                    //Pause menu
+                    renderer.getBatch().end();
+                    pauseMenu.update(camera);
+                    pauseMenu.draw();
+                    break;
+                case (GAME_SETTINGS):
+                    //Settings menu
+                    renderer.getBatch().end();
+                    settingsMenu.update();
+                    break;
                 }
                 
 //        // Draw Eat icons in the second row
@@ -213,6 +216,7 @@ public class Play implements Screen {
                 Gdx.input.setInputProcessor(player);
                 player.update(Gdx.graphics.getDeltaTime());
                 break;
+            case (GAME_SETTINGS)://we do the same settings or paused
             case (GAME_PAUSED):
                 player.update(0);
                 player.setVelocity(new Vector2(0,0));
@@ -274,7 +278,7 @@ public class Play implements Screen {
 
         //setup menu
         pauseMenu = new PauseMenu(extendViewport, camera);
-
+        settingsMenu = new SettingsMenu(GAME_PAUSED,camera,extendViewport,2);
         //set state
         state = GAME_RUNNING;
         // Set up the counter and counter components
