@@ -285,8 +285,6 @@ public class Play implements Screen {
     @Override
     public void show() {
 
-
-
         // Initialize the camera
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 450);
@@ -314,7 +312,7 @@ public class Play implements Screen {
         font = new BitmapFont();
         font.getData().setScale(2);
 
-        // Set up texture for energy bar
+        // Set up blank texture (used for energy bar)
         TblankTexture = new Texture("Icons/WhiteSquare.png");
         blankTexture = new Sprite(TblankTexture);
 
