@@ -27,6 +27,39 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.audio.Sound;
 
 import java.awt.*;
+import com.heshus.game.screens.states.GameOverScreen;
+import com.heshus.game.screens.states.PauseMenu;
+import com.heshus.game.screens.states.SettingsMenu;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import static com.heshus.game.engine.HesHusGame.settings;
+
+import com.badlogic.gdx.*;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.heshus.game.entities.Player;
+import com.heshus.game.manager.ActivityManager;
+import com.heshus.game.manager.Day;
+import com.heshus.game.manager.DayManager;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.audio.Sound;
+
+import java.awt.*;
 
 import com.heshus.game.screens.states.GameOverScreen;
 import com.heshus.game.screens.states.PauseMenu;
@@ -84,13 +117,14 @@ public class Play implements Screen {
     private Texture volumeOffTexture;
     private Texture volumeOnTexture;
     private Stage stage;
-
-    private Sprite moonSprite;
-    private Texture moonTexture;
-
     private Sound clickSound;
-
     private Texture playerTexture;
+    private Button increaseVolumeButton;
+    private Button lowerVolumeButton;
+    private Button volumeOffButton;
+    private Button volumeOnButton;
+
+
 
     public Play(HesHusGame game, Texture playerSpriteSelection) {
         this.game = game;
@@ -99,6 +133,7 @@ public class Play implements Screen {
     }
     @Override
     public void render(float delta) {
+
         update();
         draw();
         stage.act(delta);
@@ -117,6 +152,18 @@ public class Play implements Screen {
         camera.viewportHeight = Math.round(camera.viewportHeight);
         camera.update();
 
+
+        float padding = 10; // Adjust padding as needed
+        float buttonSize = 50; // The size of the buttons, adjust as needed
+        // Calculate the positions based on the updated camera position
+        float baseX = camera.position.x + camera.viewportWidth / 2 - buttonSize - padding;
+        float baseY = camera.position.y + camera.viewportHeight / 2 - buttonSize - padding;
+        // Set the position for each volume button
+        increaseVolumeButton.setPosition(baseX - 3 * buttonSize, baseY);
+        lowerVolumeButton.setPosition(baseX - 2 * buttonSize, baseY);
+        volumeOffButton.setPosition(baseX - buttonSize, baseY);
+        volumeOnButton.setPosition(baseX, baseY);
+
         //Tilemap
         renderer.setView(camera);
         renderer.render(); //takes a layers[] argument if we want to specifically render certain layers
@@ -126,18 +173,18 @@ public class Play implements Screen {
 
 
         switch (state) {
-            case(GAME_RUNNING):
+            case (GAME_RUNNING):
                 activityManager.checkActivity();
                 //HUD
                 //Drawing energy bar
                 renderer.getBatch().setColor(Color.GRAY);
-                renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 3, (camera.position.y - camera.viewportHeight/2) + 3, 204, 44);
+                renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth / 2) + 3, (camera.position.y - camera.viewportHeight / 2) + 3, 204, 44);
                 renderer.getBatch().setColor(Color.YELLOW);
-                renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
+                renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth / 2) + 5, (camera.position.y - camera.viewportHeight / 2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() / 100), 40);
                 renderer.getBatch().setColor(Color.WHITE);
 
                 //Draw activity text
-                if(!activityManager.getText().isEmpty()){
+                if (!activityManager.getText().isEmpty()) {
                     //logic for drawing bubble
                     font.getData().setScale(1f);
                     GlyphLayout layout = new GlyphLayout();
@@ -148,7 +195,7 @@ public class Play implements Screen {
                     //changes timer
                     bubbleTimer += Gdx.graphics.getDeltaTime();
                     //removes bubble after timer ends
-                    if(bubbleTimer > bubblePeriod){
+                    if (bubbleTimer > bubblePeriod) {
                         bubbleTimer -= bubblePeriod;
                         activityManager.setText("", 0, 0);
                     }
@@ -157,7 +204,7 @@ public class Play implements Screen {
                 }
 
                 //Dims screen when energy lost
-                dimTexture.setAlpha((float)0.4 + DayManager.currentDay.getEnergy());
+                dimTexture.setAlpha((float) 0.4 + DayManager.currentDay.getEnergy());
                 dimTexture.draw(renderer.getBatch());
 
                 ///////////////////////////////////////////////////////////////////////////
@@ -183,33 +230,32 @@ public class Play implements Screen {
                 float secondRowY = firstRowY - iconSize - iconSpacingY;
                 float thirdRowY = secondRowY - iconSize - iconSpacingY;
 
-                font.draw(renderer.getBatch(), String.valueOf(DayManager.overallEatScore), counterBoxX + 43, firstRowY+18);
-                font.draw(renderer.getBatch(), String.valueOf(DayManager.overallStudyScore), counterBoxX + 43, secondRowY+27);
-                font.draw(renderer.getBatch(), String.valueOf(DayManager.overallRecreationalScore), counterBoxX + 43, thirdRowY+36);
+                font.draw(renderer.getBatch(), String.valueOf(DayManager.overallEatScore), counterBoxX + 43, firstRowY + 18);
+                font.draw(renderer.getBatch(), String.valueOf(DayManager.overallStudyScore), counterBoxX + 43, secondRowY + 27);
+                font.draw(renderer.getBatch(), String.valueOf(DayManager.overallRecreationalScore), counterBoxX + 43, thirdRowY + 36);
 
                 // Draw the Day icon in the first row
                 for (int i = 0; i < DayManager.currentDay.getDayNumber(); i++) {
-                    renderer.getBatch().draw(verticalBarSprite, verticalBarStartX+15 + (5 + iconSpacingX) * i, verticalBarStartY, 5, 20);
+                    renderer.getBatch().draw(verticalBarSprite, verticalBarStartX + 15 + (5 + iconSpacingX) * i, verticalBarStartY, 5, 20);
                 }
 
                 renderer.getBatch().end();
                 break;
-                case (GAME_PAUSED):
-                    //Pause menu
-                    renderer.getBatch().end();
-                    pauseMenu.update(camera);
-                    pauseMenu.draw();
-                    break;
-                case (GAME_SETTINGS):
-                    //Settings menu
-                    renderer.getBatch().end();
-                    settingsMenu.update();
-                    break;
+            case (GAME_PAUSED):
+                //Pause menu
+                renderer.getBatch().end();
+                pauseMenu.update(camera);
+                pauseMenu.draw();
+                break;
+            case (GAME_SETTINGS):
+                //Settings menu
+                renderer.getBatch().end();
+                settingsMenu.update();
+                break;
+        }
 
-                    //stage.draw();
-                }
-
-        // Check the currentDay's energy level
+        stage.act(Gdx.graphics.getDeltaTime());
+        stage.draw();
 
     }
     private void update(){
@@ -303,12 +349,6 @@ public class Play implements Screen {
         // Set up the counter and counter components
         counterBoxTexture = new Texture("Icons/counter-box.png");
 
-        Texture moonTexture = new Texture(Gdx.files.internal("Icons/moon.png"));
-        moonSprite = new Sprite(moonTexture);
-
-
-
-
 
         verticalBarTexture = new Texture("Icons/vertical-bar.png");
         verticalBarSprite = new Sprite(verticalBarTexture);
@@ -346,11 +386,12 @@ public class Play implements Screen {
 
 
 
+
         // Create and set up buttons
         Button.ButtonStyle increaseVolumeStyle = new Button.ButtonStyle();
         increaseVolumeStyle.up = new TextureRegionDrawable(new TextureRegion(increaseVolumeTexture));
         Button increaseVolumeButton = new Button(increaseVolumeStyle);
-        increaseVolumeButton.setPosition(900, 670); // Example position
+        //increaseVolumeButton.setPosition(900, 670); // Example position
 
         increaseVolumeButton.addListener(new ClickListener() {
             @Override
@@ -365,7 +406,7 @@ public class Play implements Screen {
         Button.ButtonStyle lowerVolumeStyle = new Button.ButtonStyle();
         lowerVolumeStyle.up = new TextureRegionDrawable(new TextureRegion(lowerVolumeTexture));
         Button lowerVolumeButton = new Button(lowerVolumeStyle);
-        lowerVolumeButton.setPosition(950, 670); // Example position
+        //lowerVolumeButton.setPosition(950, 670); // Example position
         lowerVolumeButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -379,7 +420,7 @@ public class Play implements Screen {
         Button.ButtonStyle volumeOffStyle = new Button.ButtonStyle();
         volumeOffStyle.up = new TextureRegionDrawable(new TextureRegion(volumeOffTexture));
         Button volumeOffButton = new Button(volumeOffStyle);
-        volumeOffButton.setPosition(1000, 670); // Example position
+        // volumeOffButton.setPosition(1000, 670); // Example position
         volumeOffButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -396,7 +437,7 @@ public class Play implements Screen {
         Button.ButtonStyle volumeOnStyle = new Button.ButtonStyle();
         volumeOnStyle.up = new TextureRegionDrawable(new TextureRegion(volumeOnTexture));
         Button volumeOnButton = new Button(volumeOnStyle);
-        volumeOnButton.setPosition(1050, 670); // Example position
+        //volumeOnButton.setPosition(1050, 670); // Example position
         volumeOnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -470,9 +511,6 @@ public class Play implements Screen {
         volumeOffTexture.dispose();
         volumeOnTexture.dispose();
         lowerVolumeTexture.dispose();
-        if (moonTexture != null) {
-            moonTexture.dispose();
-        }
     }
 
     private void playWalkingSound(float delta) {
@@ -541,4 +579,3 @@ public class Play implements Screen {
     }
 
 }
-
