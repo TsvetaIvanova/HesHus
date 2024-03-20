@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="100" height="50" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="9">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="100" height="50" tilewidth="16" tileheight="16" infinite="0" nextlayerid="14" nextobjectid="10">
  <tileset firstgid="1" source="kenny-tilemap.tsx"/>
  <layer id="5" name="COLLISIONS" width="100" height="50">
   <data encoding="csv">
@@ -271,30 +271,16 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,193,0,0,193,0,0,193,0,0,193,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="6" name="Building Text">
-  <object id="1" x="895.5" y="145.5" width="80" height="17">
-   <text fontfamily="Fixedsys" wrap="1" halign="center">Eat</text>
-  </object>
-  <object id="2" x="895" y="145.25" width="80" height="17">
-   <text fontfamily="Fixedsys" wrap="1" color="#d1d1d1" halign="center">Eat</text>
-  </object>
-  <object id="3" x="464.068" y="322.898" width="80" height="17">
-   <text fontfamily="Fixedsys" wrap="1" halign="center">Relax</text>
-  </object>
-  <object id="4" x="463.568" y="322.648" width="80" height="17">
-   <text fontfamily="Fixedsys" wrap="1" color="#d1d1d1" halign="center">Relax</text>
-  </object>
-  <object id="5" x="160.25" y="622.989" width="80" height="17">
-   <text fontfamily="Fixedsys" wrap="1" halign="center">Sleep</text>
-  </object>
-  <object id="6" x="159.75" y="622.375" width="80" height="17">
-   <text fontfamily="Fixedsys" wrap="1" color="#d1d1d1" halign="center">Sleep</text>
-  </object>
-  <object id="7" x="1008.17" y="622.375" width="80" height="17">
-   <text fontfamily="Fixedsys" wrap="1" halign="center">Study</text>
-  </object>
-  <object id="8" x="1007.67" y="621.875" width="80" height="17">
-   <text fontfamily="Fixedsys" wrap="1" color="#d1d1d1" halign="center">Study</text>
-  </object>
- </objectgroup>
+ <imagelayer id="10" name="Eat" offsetx="911.833" offsety="143.167">
+  <image source="eat.png" width="48" height="16"/>
+ </imagelayer>
+ <imagelayer id="11" name="Sleep" offsetx="175" offsety="621.667">
+  <image source="sleep.png" width="48" height="16"/>
+ </imagelayer>
+ <imagelayer id="12" name="Study" offsetx="1024.67" offsety="622.5">
+  <image source="study.png" width="48" height="16"/>
+ </imagelayer>
+ <imagelayer id="13" name="Relax" offsetx="479" offsety="319.667">
+  <image source="relax.png" width="48" height="16"/>
+ </imagelayer>
 </map>
