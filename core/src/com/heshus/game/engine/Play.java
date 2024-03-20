@@ -52,6 +52,7 @@ public class Play implements Screen {
     private TiledMapTileLayer collisionLayer;
     private ActivityManager activityManager;
     // private Game game;
+    private float volume = 0.5f;
 
     private Sprite blankTexture, textBubble, dimTexture;
     private Texture TblankTexture, textBubbleTexture;
@@ -335,7 +336,7 @@ public class Play implements Screen {
 
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Sounds/background-music.mp3"));
         backgroundMusic.setLooping(true);
-        backgroundMusic.setVolume(0.5f);
+        backgroundMusic.setVolume(volume);
         backgroundMusic.play();
 
         dimTexture = new Sprite(blankTexture);
@@ -371,7 +372,6 @@ public class Play implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 clickSound.play();
-                float volume = backgroundMusic.getVolume();
                 volume = Math.min(volume + 0.1f, 1.0f);
                 backgroundMusic.setVolume(volume);
             }
@@ -385,7 +385,6 @@ public class Play implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 clickSound.play();
-                float volume = backgroundMusic.getVolume();
                 volume = Math.max(volume - 0.1f, 0.0f);
                 backgroundMusic.setVolume(volume);
             }
@@ -401,6 +400,7 @@ public class Play implements Screen {
                 clickSound.play();
                 if (backgroundMusic.isPlaying()) {
                     backgroundMusic.pause();
+                    volume = 0;
                 }
             }
         });
@@ -416,6 +416,7 @@ public class Play implements Screen {
                 clickSound.play();
                 if (!backgroundMusic.isPlaying()) {
                     backgroundMusic.play();
+                    volume = 1.0f;
                 }
             }
         });
@@ -510,7 +511,7 @@ public class Play implements Screen {
                 break;
         }
         if (soundToPlay != null) {
-            soundToPlay.play(1.0f);
+            soundToPlay.play(volume);
             currentWalkingSoundIndex = (currentWalkingSoundIndex + 1) % 4;
         }
     }
