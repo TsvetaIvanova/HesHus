@@ -127,8 +127,8 @@ public class Play implements Screen {
         float padding = 10; // Adjust padding as needed
         float buttonSize = 50; // The size of the buttons, adjust as needed
         // Calculate the positions based on the updated camera position
-        float baseX = Gdx.graphics.getWidth() - buttonSize - padding;
-        float baseY = Gdx.graphics.getHeight() - buttonSize - padding;
+        float baseX = camera.position.x + camera.viewportWidth / 2 - buttonSize - padding;
+        float baseY = camera.position.y + camera.viewportHeight / 2 - padding - buttonSize;
         // Set the position for each volume button
         increaseVolumeButton.setPosition(baseX - 2 * buttonSize, baseY);
         lowerVolumeButton.setPosition(baseX - 3 * buttonSize, baseY);
@@ -343,7 +343,7 @@ public class Play implements Screen {
         clickSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/switch2.ogg"));
 
 
-        stage = new Stage(new ScreenViewport(), renderer.getBatch());
+        stage = new Stage(extendViewport, renderer.getBatch());
 
         inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(stage); // Stage first to ensure UI input is prioritized
@@ -399,8 +399,6 @@ public class Play implements Screen {
                 clickSound.play();
                 if (backgroundMusic.isPlaying()) {
                     backgroundMusic.pause();
-                } else {
-                    backgroundMusic.play();
                 }
             }
         });
