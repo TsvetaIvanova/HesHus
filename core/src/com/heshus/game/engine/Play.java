@@ -91,6 +91,7 @@ public class Play implements Screen {
     private Sound clickSound;
 
     private Texture playerTexture;
+    private InputMultiplexer inputMultiplexer;
 
     public Play(HesHusGame game, Texture playerSpriteSelection) {
         this.game = game;
@@ -225,7 +226,7 @@ public class Play implements Screen {
         //logic/physics - anything that moves
         switch (state){
             case (GAME_RUNNING):
-                //Gdx.input.setInputProcessor(player);
+                Gdx.input.setInputProcessor(inputMultiplexer);
                 player.update(Gdx.graphics.getDeltaTime());
                 break;
             case (GAME_SETTINGS)://we do the same settings or paused
@@ -332,7 +333,7 @@ public class Play implements Screen {
 
         stage = new Stage(new ScreenViewport(), renderer.getBatch());
 
-        InputMultiplexer inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(stage); // Stage first to ensure UI input is prioritized
         inputMultiplexer.addProcessor(player); // Then player
         Gdx.input.setInputProcessor(inputMultiplexer);
