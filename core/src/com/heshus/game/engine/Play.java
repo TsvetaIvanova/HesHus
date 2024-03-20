@@ -36,6 +36,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import static com.heshus.game.engine.HesHusGame.settings;
 
 public class Play implements Screen {
+
     public static final int GAME_RUNNING = 0;
     public static final int GAME_PAUSED = 1;
     public static final int GAME_SETTINGS = 2;
@@ -95,8 +96,6 @@ public class Play implements Screen {
     private Button lowerVolumeButton;
     private Button volumeOffButton;
     private Button volumeOnButton;
-
-
 
     public Play(HesHusGame game, Texture playerSpriteSelection) {
         this.game = game;
@@ -158,6 +157,7 @@ public class Play implements Screen {
                 if(!activityManager.getText().isEmpty()){
                     //logic for drawing bubble
                     font.getData().setScale(1f);
+                    //Get text length
                     GlyphLayout layout = new GlyphLayout();
                     layout.setText(font, activityManager.getText());
                     renderer.getBatch().draw(textBubble, activityManager.getTextPosition().x - 2, activityManager.getTextPosition().y, layout.width + 4, 50);
@@ -186,6 +186,7 @@ public class Play implements Screen {
 
                 renderer.getBatch().draw(counterBoxTexture, counterBoxX, counterBoxY);
 
+                //Setup variables for counters
                 float iconSize = 20;
                 float iconSpacingX = 2;
                 float iconSpacingY = 8;
@@ -201,6 +202,7 @@ public class Play implements Screen {
                 float secondRowY = firstRowY - iconSize - iconSpacingY;
                 float thirdRowY = secondRowY - iconSize - iconSpacingY;
 
+                //Draw counters on top of box
                 font.draw(renderer.getBatch(), String.valueOf(DayManager.overallEatScore), counterBoxX + 43, firstRowY+18);
                 font.draw(renderer.getBatch(), String.valueOf(DayManager.overallStudyScore), counterBoxX + 43, secondRowY+27);
                 font.draw(renderer.getBatch(), String.valueOf(DayManager.overallRecreationalScore), counterBoxX + 43, thirdRowY+36);
@@ -209,7 +211,7 @@ public class Play implements Screen {
                 for (int i = 0; i < DayManager.currentDay.getDayNumber(); i++) {
                     renderer.getBatch().draw(verticalBarSprite, verticalBarStartX+15 + (5 + iconSpacingX) * i, verticalBarStartY, 5, 20);
                 }
-
+                //End of main renderer
                 renderer.getBatch().end();
                 break;
                 case (GAME_PAUSED):
@@ -546,6 +548,10 @@ public class Play implements Screen {
         }
     }
 
+    /**
+     * Get font in another class
+     * @return games value of font
+     */
     public static BitmapFont getFont(){
         return font;
     }
