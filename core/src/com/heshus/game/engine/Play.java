@@ -156,11 +156,11 @@ public class Play implements Screen {
         float padding = 10; // Adjust padding as needed
         float buttonSize = 50; // The size of the buttons, adjust as needed
         // Calculate the positions based on the updated camera position
-        float baseX = camera.position.x + camera.viewportWidth / 2 - buttonSize - padding;
-        float baseY = camera.position.y + camera.viewportHeight / 2 - buttonSize - padding;
+        float baseX = Gdx.graphics.getWidth() - buttonSize - padding;
+        float baseY = Gdx.graphics.getHeight() - buttonSize - padding;
         // Set the position for each volume button
-        increaseVolumeButton.setPosition(baseX - 3 * buttonSize, baseY);
-        lowerVolumeButton.setPosition(baseX - 2 * buttonSize, baseY);
+        increaseVolumeButton.setPosition(baseX - 2 * buttonSize, baseY);
+        lowerVolumeButton.setPosition(baseX - 3 * buttonSize, baseY);
         volumeOffButton.setPosition(baseX - buttonSize, baseY);
         volumeOnButton.setPosition(baseX, baseY);
 
@@ -390,7 +390,7 @@ public class Play implements Screen {
         // Create and set up buttons
         Button.ButtonStyle increaseVolumeStyle = new Button.ButtonStyle();
         increaseVolumeStyle.up = new TextureRegionDrawable(new TextureRegion(increaseVolumeTexture));
-        Button increaseVolumeButton = new Button(increaseVolumeStyle);
+        increaseVolumeButton = new Button(increaseVolumeStyle);
         //increaseVolumeButton.setPosition(900, 670); // Example position
 
         increaseVolumeButton.addListener(new ClickListener() {
@@ -405,7 +405,7 @@ public class Play implements Screen {
 
         Button.ButtonStyle lowerVolumeStyle = new Button.ButtonStyle();
         lowerVolumeStyle.up = new TextureRegionDrawable(new TextureRegion(lowerVolumeTexture));
-        Button lowerVolumeButton = new Button(lowerVolumeStyle);
+        lowerVolumeButton = new Button(lowerVolumeStyle);
         //lowerVolumeButton.setPosition(950, 670); // Example position
         lowerVolumeButton.addListener(new ClickListener() {
             @Override
@@ -419,7 +419,7 @@ public class Play implements Screen {
 
         Button.ButtonStyle volumeOffStyle = new Button.ButtonStyle();
         volumeOffStyle.up = new TextureRegionDrawable(new TextureRegion(volumeOffTexture));
-        Button volumeOffButton = new Button(volumeOffStyle);
+        volumeOffButton = new Button(volumeOffStyle);
         // volumeOffButton.setPosition(1000, 670); // Example position
         volumeOffButton.addListener(new ClickListener() {
             @Override
@@ -436,7 +436,7 @@ public class Play implements Screen {
         // Play the music if it is not already playing
         Button.ButtonStyle volumeOnStyle = new Button.ButtonStyle();
         volumeOnStyle.up = new TextureRegionDrawable(new TextureRegion(volumeOnTexture));
-        Button volumeOnButton = new Button(volumeOnStyle);
+        volumeOnButton = new Button(volumeOnStyle);
         //volumeOnButton.setPosition(1050, 670); // Example position
         volumeOnButton.addListener(new ClickListener() {
             @Override
