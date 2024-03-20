@@ -148,9 +148,9 @@ public class Play implements Screen {
                 //HUD
                 //Drawing energy bar
                 renderer.getBatch().setColor(Color.GRAY);
-                renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2), (camera.position.y - camera.viewportHeight/2), camera.viewportWidth, 14);
+                renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 3, (camera.position.y - camera.viewportHeight/2) + 3, 204, 44);
                 renderer.getBatch().setColor(Color.YELLOW);
-                renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2), (camera.position.y - camera.viewportHeight/2), camera.viewportWidth * ((float) DayManager.currentDay.getEnergy() /100), 12);
+                renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
                 renderer.getBatch().setColor(Color.WHITE);
 
                 //Draw activity text
