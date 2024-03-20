@@ -1,9 +1,13 @@
 package com.heshus.game.engine;
 
+
+import com.badlogic.gdx.*;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -14,6 +18,12 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
+
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -29,6 +39,7 @@ import java.awt.*;
 import com.heshus.game.screens.states.GameOverScreen;
 import com.heshus.game.screens.states.PauseMenu;
 import com.heshus.game.screens.states.SettingsMenu;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 
 import static com.heshus.game.engine.HesHusGame.settings;
 
@@ -77,6 +88,16 @@ public class Play implements Screen {
     // 1/4th of a second delay between sounds, because our avatar is running everywhere
     private final float WALKING_SOUND_DELAY = 0.25f;
     private Music backgroundMusic;
+
+
+    private Texture increaseVolumeTexture;
+    private Texture lowerVolumeTexture;
+    private Texture volumeOffTexture;
+    private Texture volumeOnTexture;
+    private Stage stage;
+    //private Texture moonTexture;
+    //private Sprite moonSprite;
+
 
     private Texture playerTexture;
 
@@ -191,20 +212,9 @@ public class Play implements Screen {
                     renderer.getBatch().end();
                     settingsMenu.update();
                     break;
-                }
 
-//        // Draw Eat icons in the second row
-//        for (int i = 0; i < DayManager.currentDay.getEatScore(); i++) {
-//            renderer.getBatch().draw(burgerIconSprite, counterBoxX + 20 + (iconSize + iconSpacingX) * i, firstRowY+7, iconSize, iconSize);
-//        }
-//        // Draw Study icons in the third row
-//        for (int i = 0; i < DayManager.currentDay.getStudyScore(); i++) {
-//            renderer.getBatch().draw(studyIconSprite, counterBoxX + 10 + 20 + (iconSize + iconSpacingX) * i, secondRowY + 10, iconSize, iconSize);
-//        }
-//        // Draw Recreation icons in the fourth row
-//        for (int i = 0; i < DayManager.currentDay.getRecreationalScore(); i++) {
-//            renderer.getBatch().draw(playIconSprite, counterBoxX + 20 + 30 + (iconSize + iconSpacingX) * i, thirdRowY + 15, iconSize, iconSize );
-//        }
+
+                }
 
     }
     private void update(){
@@ -220,7 +230,10 @@ public class Play implements Screen {
         //logic/physics - anything that moves
         switch (state){
             case (GAME_RUNNING):
-                Gdx.input.setInputProcessor(player);
+
+                //Gdx.input.setInputProcessor(player);
+
+
                 player.update(Gdx.graphics.getDeltaTime());
                 break;
             case (GAME_SETTINGS)://we do the same settings or paused
@@ -247,10 +260,16 @@ public class Play implements Screen {
         }
 
         playWalkingSound(Gdx.graphics.getDeltaTime());
+
+        stage.act(Gdx.graphics.getDeltaTime());
+
     }
 
     @Override
     public void show() {
+
+
+
         // Initialize the camera
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 450);
@@ -268,7 +287,9 @@ public class Play implements Screen {
         float startX = 30 * collisionLayer.getTileWidth();
         float startY = (collisionLayer.getHeight() - 26) * collisionLayer.getTileHeight();
         player.setPosition(startX, startY);
-        Gdx.input.setInputProcessor(player);
+
+        //Gdx.input.setInputProcessor(player);
+
 
         // Set up the activity manager
         activityManager = new ActivityManager(collisionLayer);
@@ -295,13 +316,11 @@ public class Play implements Screen {
         // Set up the counter and counter components
         counterBoxTexture = new Texture("counter-box.png");
 
-        burgerIconTexture = new Texture("burgerDouble.png");
-        studyIconTexture = new Texture("study.png");
-        playIconTexture = new Texture("game.png");
 
-        burgerIconSprite = new Sprite(burgerIconTexture);
-        studyIconSprite = new Sprite(studyIconTexture);
-        playIconSprite = new Sprite(playIconTexture);
+        //moonTexture = new Texture("moon.png");
+
+        //moonSprite = new Sprite(moonTexture);
+
 
         verticalBarTexture = new Texture("vertical-bar.png");
         verticalBarSprite = new Sprite(verticalBarTexture);
@@ -319,6 +338,88 @@ public class Play implements Screen {
         dimTexture = new Sprite(blankTexture);
         dimTexture.setColor(Color.BLACK);
         dimTexture.setSize(collisionLayer.getWidth() * 16, collisionLayer.getHeight() * 16);
+
+
+        stage = new Stage(new ScreenViewport(), renderer.getBatch());
+
+        InputMultiplexer inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer.addProcessor(stage); // Stage first to ensure UI input is prioritized
+        inputMultiplexer.addProcessor(player); // Then player
+        Gdx.input.setInputProcessor(inputMultiplexer);
+
+
+        // Prepare textures for buttons
+        increaseVolumeTexture = new Texture(Gdx.files.internal("Icons/increase-volume.png"));
+        lowerVolumeTexture = new Texture(Gdx.files.internal("Icons/lower-volume.png"));
+        volumeOffTexture = new Texture(Gdx.files.internal("Icons/volume-off.png"));
+        volumeOnTexture = new Texture(Gdx.files.internal("Icons/volume-on.png"));
+
+
+
+        // Create and set up buttons
+        Button.ButtonStyle increaseVolumeStyle = new Button.ButtonStyle();
+        increaseVolumeStyle.up = new TextureRegionDrawable(new TextureRegion(increaseVolumeTexture));
+        Button increaseVolumeButton = new Button(increaseVolumeStyle);
+        increaseVolumeButton.setPosition(900, 670); // Example position
+
+        increaseVolumeButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                float volume = backgroundMusic.getVolume();
+                volume = Math.min(volume + 0.1f, 1.0f);
+                backgroundMusic.setVolume(volume);
+            }
+        });
+
+        Button.ButtonStyle lowerVolumeStyle = new Button.ButtonStyle();
+        lowerVolumeStyle.up = new TextureRegionDrawable(new TextureRegion(lowerVolumeTexture));
+        Button lowerVolumeButton = new Button(lowerVolumeStyle);
+        lowerVolumeButton.setPosition(950, 670); // Example position
+        lowerVolumeButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                float volume = backgroundMusic.getVolume();
+                volume = Math.max(volume - 0.1f, 0.0f);
+                backgroundMusic.setVolume(volume);
+            }
+        });
+
+        Button.ButtonStyle volumeOffStyle = new Button.ButtonStyle();
+        volumeOffStyle.up = new TextureRegionDrawable(new TextureRegion(volumeOffTexture));
+        Button volumeOffButton = new Button(volumeOffStyle);
+        volumeOffButton.setPosition(1000, 670); // Example position
+        volumeOffButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (backgroundMusic.isPlaying()) {
+                    backgroundMusic.pause();
+                } else {
+                    backgroundMusic.play();
+                }
+            }
+        });
+
+        // Play the music if it is not already playing
+        Button.ButtonStyle volumeOnStyle = new Button.ButtonStyle();
+        volumeOnStyle.up = new TextureRegionDrawable(new TextureRegion(volumeOnTexture));
+        Button volumeOnButton = new Button(volumeOnStyle);
+        volumeOnButton.setPosition(1050, 670); // Example position
+        volumeOnButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (!backgroundMusic.isPlaying()) {
+                    backgroundMusic.play();
+                }
+            }
+        });
+
+        stage.addActor(increaseVolumeButton);
+        stage.addActor(lowerVolumeButton);
+        stage.addActor(volumeOffButton);
+        stage.addActor(volumeOnButton);
+
+
+
     }
     @Override
     public void hide() {
@@ -365,6 +466,20 @@ public class Play implements Screen {
         if (backgroundMusic != null) {
             backgroundMusic.dispose();
         }
+
+        stage.dispose();
+        increaseVolumeTexture.dispose();
+        lowerVolumeTexture.dispose();
+        volumeOffTexture.dispose();
+        volumeOnTexture.dispose();
+        TblankTexture.dispose();
+        textBubbleTexture.dispose();
+        backgroundMusic.dispose();
+        increaseVolumeTexture.dispose();
+        volumeOffTexture.dispose();
+        volumeOnTexture.dispose();
+        lowerVolumeTexture.dispose();
+
     }
 
     private void playWalkingSound(float delta) {
