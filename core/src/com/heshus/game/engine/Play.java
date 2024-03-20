@@ -98,6 +98,11 @@ public class Play implements Screen {
     private Button volumeOffButton;
     private Button volumeOnButton;
 
+    /**
+     * Create the Play instance
+     * @param game the game instance
+     * @param playerSpriteSelection the texture which will be used as the player sprite
+     */
     public Play(HesHusGame game, Texture playerSpriteSelection) {
         this.game = game;
         this.playerTexture = playerSpriteSelection;

@@ -17,6 +17,11 @@ public class Player extends Sprite implements InputProcessor {
 
     private TiledMapTileLayer collisionLayer;
 
+    /**
+     * Instantiate Player object
+     * @param playerSprite player sprite
+     * @param collisionLayer the layer of the Tiled map where collision information is stored
+     */
     public Player(Sprite playerSprite, TiledMapTileLayer collisionLayer) {
         //call super constructor - i.e. the constructor of the Sprite class, which takes the player sprite as an argument
         super(playerSprite);
@@ -24,14 +29,27 @@ public class Player extends Sprite implements InputProcessor {
 
     }
 
+    /**
+     * Return the layer of the tilemap where collision information is stored
+     * @return collisionLayer
+     */
     public TiledMapTileLayer getCollisionLayer() {
         return collisionLayer;
     }
 
+    /**
+     * Draw is called to draw the Player to the screen
+     * @param spritebatch the Batch of the renderer responsible for drawing the Player
+     */
     public void draw(Batch spritebatch) {
+        //call the draw method of the parent class
         super.draw(spritebatch);
     }
 
+    /**
+     * Update is called once per frame
+     * @param delta the time since last update()
+     */
     public void update(float delta) {
 
         //**********************

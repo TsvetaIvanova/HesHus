@@ -26,6 +26,11 @@ public class CustomiseSprite implements Screen {
 
     ArrayList<Texture> textureList = new ArrayList<Texture>();
 
+    /**
+     * Create the CustomiseSprite menu (screen) instance
+     * @param game The game instance
+     * @param camera The current camera object
+     */
     public CustomiseSprite(final HesHusGame game, OrthographicCamera camera) {
         this.game = game;
         this.camera = camera;
@@ -82,7 +87,7 @@ public class CustomiseSprite implements Screen {
             game.batch.draw(textureList.get(playerSelection), 320, 220, 128, 128);
             game.batch.end();
 
-
+            //press enter to confirm character selection and begin the game
             if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
                 game.setScreen(new Play(game, textureList.get(playerSelection)));
                 dispose();
