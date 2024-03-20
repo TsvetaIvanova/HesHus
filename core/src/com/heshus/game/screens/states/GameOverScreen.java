@@ -36,6 +36,7 @@ public class GameOverScreen implements Screen {
         game.font.draw(game.batch, "Tap anywhere to go to the main menu!", 100, 100);
         game.batch.end();
 
+        //Resets variables to default when a new game can be played
         if (Gdx.input.isTouched()) {
             DayManager.gameOver = false;
             game.setScreen(new MainMenuScreen(game));

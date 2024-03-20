@@ -28,7 +28,9 @@ public class ActivityManager {
     }
 
 
-    //decide activity based on the avatar's position for collision-based interactions
+    /**
+     * Checks whether and which activity is performed based on location of player
+     */
     public void checkActivity() {
         // Assuming you have a reference to the Player object named 'player'
         float avatarX = player.getX();
@@ -41,9 +43,6 @@ public class ActivityManager {
         TiledMapTileLayer.Cell cell = collisionLayer.getCell(x/collisionLayer.getTileWidth() + 1, y/collisionLayer.getTileHeight() + 1);
         if (cell != null && cell.getTile() != null) {
             if (cell.getTile().getProperties().containsKey("eat") && Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                // just added for testing
-                // System.out.println("Eating activity detected.");
-                //DayManager.incrementDay();
                 performEatingActivity(cell);
             } else if (cell.getTile().getProperties().containsKey("study") && Gdx.input.isKeyJustPressed(Input.Keys.E)) {
                 performStudyingActivity(cell);
@@ -56,7 +55,10 @@ public class ActivityManager {
     }
 
 
-    // incrementing overall.. for now will adjust later
+    /**
+     * If available, controls variables indicating eating has been performed
+     * @param cell current tile player is on
+     */
     private void performEatingActivity(TiledMapTileLayer.Cell cell) {
         if(!(DayManager.currentDay.getEnergy() <= 0) && !(DayManager.currentDay.getTime() >= 24)) {
             decrementEnergy(10);
@@ -73,15 +75,16 @@ public class ActivityManager {
         }
     }
 
-    // incrementing overall.. for now will adjust later
+    /**
+     * If available, controls variables indicating studying has been performed
+     * @param cell current tile player is on
+     */
     private void performStudyingActivity(TiledMapTileLayer.Cell cell) {
         if(!(DayManager.currentDay.getEnergy() <= 0) && !(DayManager.currentDay.getTime() >= 24)) {
             decrementEnergy(20);
             incrementTime(4);
 
             DayManager.currentDay.incrementStudyScore();
-            // added just for testing
-            //DayManager.incrementDay();
             String holdText = "You feel smarter";
             layout.setText(Play.getFont(), holdText);
             setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width / 2), Math.round(player.getY() / 16) * 16);
@@ -91,7 +94,10 @@ public class ActivityManager {
         }
     }
 
-    // incrementing overallRecreationalScore for now will adjust later
+    /**
+     * If available, controls variables indicating recreation has been performed
+     * @param cell current tile player is on
+     */
     private void performRecreationalActivity(TiledMapTileLayer.Cell cell) {
         if(!(DayManager.currentDay.getEnergy() <= 0) && !(DayManager.currentDay.getTime() >= 24)){
 
@@ -99,8 +105,6 @@ public class ActivityManager {
             incrementTime(3);
 
             DayManager.currentDay.incrementRecreationalScore();
-            // added just for testing
-            //DayManager.incrementDay();
             String holdText = "You have recreationed";
             layout.setText(Play.getFont(), holdText);
             setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/2), Math.round(player.getY() / 16) * 16);
@@ -153,33 +157,53 @@ public class ActivityManager {
         }
     }
 
+
     public void setPlayer(Player player) {
         this.player = player;
     }
 
-    //Methods for text bubble
-
+    /**
+     *
+     * @param text to be displayed
+     * @param x horizontal position of text
+     * @param y vertical position of text
+     */
     public void setText(String text, float x, float y){
         activityText = text;
         textPosition.set(x, y + 40);
     }
 
+    /**
+     * Gets the current text needing to be displayed
+     * @return text
+     */
     public String getText(){
         return activityText;
     }
 
+    /**
+     * Gets the position to display the text
+     * @return position to display text
+     */
     public Vector2 getTextPosition() {
         return textPosition;
     }
 
+    /**
+     * Draws a text bubble above current text position (usually the current cell)
+     * @param batch instance of spritebatch
+     * @param font instance of font
+     */
     public void drawTextBubble(SpriteBatch batch, BitmapFont font){
         font.setColor(new Color(Color.BLACK));
         font.draw(batch, activityText, textPosition.x, textPosition.y + 37);
         font.setColor(new Color(Color.WHITE));
     }
 
-    //method for sleep bubble
 
+    /**
+     * Manages text when no energy or time is available
+     */
     public void noEnergyOrSleep(){
         String holdText = "You should get some sleep";
         layout.setText(Play.getFont(), holdText);
