@@ -81,8 +81,7 @@ public class PauseMenu{
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button); // Call the superclass method
                 clickSound.play();
-                Gdx.app.exit();
-
+                state = GAME_SETTINGS;
             }
         });
 
