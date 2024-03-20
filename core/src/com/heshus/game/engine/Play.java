@@ -1,13 +1,6 @@
 package com.heshus.game.engine;
 
-
 import com.badlogic.gdx.*;
-
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Screen;
-
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -18,15 +11,14 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
-
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.heshus.game.entities.Player;
 import com.heshus.game.manager.ActivityManager;
 import com.heshus.game.manager.Day;
@@ -89,7 +81,6 @@ public class Play implements Screen {
     private final float WALKING_SOUND_DELAY = 0.25f;
     private Music backgroundMusic;
 
-
     private Texture increaseVolumeTexture;
     private Texture lowerVolumeTexture;
     private Texture volumeOffTexture;
@@ -97,7 +88,6 @@ public class Play implements Screen {
     private Stage stage;
     //private Texture moonTexture;
     //private Sprite moonSprite;
-
 
     private Texture playerTexture;
 
@@ -110,6 +100,8 @@ public class Play implements Screen {
     public void render(float delta) {
         update();
         draw();
+        stage.act(delta);
+        stage.draw();
 
     }
 
@@ -213,9 +205,8 @@ public class Play implements Screen {
                     settingsMenu.update();
                     break;
 
-
+                    //stage.draw();
                 }
-
     }
     private void update(){
         //Detect if game should be paused or not
@@ -230,10 +221,7 @@ public class Play implements Screen {
         //logic/physics - anything that moves
         switch (state){
             case (GAME_RUNNING):
-
                 //Gdx.input.setInputProcessor(player);
-
-
                 player.update(Gdx.graphics.getDeltaTime());
                 break;
             case (GAME_SETTINGS)://we do the same settings or paused
@@ -260,9 +248,7 @@ public class Play implements Screen {
         }
 
         playWalkingSound(Gdx.graphics.getDeltaTime());
-
         stage.act(Gdx.graphics.getDeltaTime());
-
     }
 
     @Override
@@ -287,9 +273,7 @@ public class Play implements Screen {
         float startX = 30 * collisionLayer.getTileWidth();
         float startY = (collisionLayer.getHeight() - 26) * collisionLayer.getTileHeight();
         player.setPosition(startX, startY);
-
         //Gdx.input.setInputProcessor(player);
-
 
         // Set up the activity manager
         activityManager = new ActivityManager(collisionLayer);
@@ -297,7 +281,6 @@ public class Play implements Screen {
 
         // Set up the font
         font = new BitmapFont();
-
         font.getData().setScale(2);
 
         // Set up texture for energy bar
@@ -316,8 +299,8 @@ public class Play implements Screen {
         // Set up the counter and counter components
         counterBoxTexture = new Texture("counter-box.png");
 
-
         //moonTexture = new Texture("moon.png");
+
 
         //moonSprite = new Sprite(moonTexture);
 
@@ -338,7 +321,6 @@ public class Play implements Screen {
         dimTexture = new Sprite(blankTexture);
         dimTexture.setColor(Color.BLACK);
         dimTexture.setSize(collisionLayer.getWidth() * 16, collisionLayer.getHeight() * 16);
-
 
         stage = new Stage(new ScreenViewport(), renderer.getBatch());
 
@@ -420,6 +402,7 @@ public class Play implements Screen {
 
 
 
+
     }
     @Override
     public void hide() {
@@ -466,7 +449,6 @@ public class Play implements Screen {
         if (backgroundMusic != null) {
             backgroundMusic.dispose();
         }
-
         stage.dispose();
         increaseVolumeTexture.dispose();
         lowerVolumeTexture.dispose();
@@ -479,7 +461,6 @@ public class Play implements Screen {
         volumeOffTexture.dispose();
         volumeOnTexture.dispose();
         lowerVolumeTexture.dispose();
-
     }
 
     private void playWalkingSound(float delta) {
