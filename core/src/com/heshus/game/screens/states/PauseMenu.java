@@ -31,8 +31,8 @@ public class PauseMenu{
     private int buttonHeight;
     private float buttonScale;
     private Table areYouSure;
-    private BitmapFont font;
     private Sound clickSound;
+    private BitmapFont font;
     public PauseMenu(ExtendViewport viewport, Camera camera) {
         //set up font
         font = new BitmapFont(Gdx.files.internal("Fonts/monogram/pixel.fnt"), false);
@@ -69,13 +69,11 @@ public class PauseMenu{
             }
         });
 
-
         //Settings button:
         settingsButton = new TextButton("SETTINGS", textButtonStyle); //Set the button up
         settingsButton.padBottom(10);
         settingsButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-
 
                 return true;
             }
@@ -85,12 +83,9 @@ public class PauseMenu{
                 clickSound.play();
                 Gdx.app.exit();
 
-
-                state = GAME_SETTINGS;
-                return false;
-
             }
         });
+
 
         //Quit button:
         quitButton = new TextButton("QUIT :(", textButtonStyle); //Set the button up
@@ -132,6 +127,7 @@ public class PauseMenu{
     }
     public void dispose(){
         stage.dispose();
+        buttonTexture.dispose();
         buttonTexture.dispose();
         if (clickSound != null) clickSound.dispose();
     }

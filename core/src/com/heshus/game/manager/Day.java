@@ -76,5 +76,9 @@ public class Day {
     }
 
     public void setTime(float time) { this.time = time; }
+
+    public void resetDay() {
+        this.dayNumber = 0;
+    }
 }
 

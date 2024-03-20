@@ -24,6 +24,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.heshus.game.editor.CustomiseSprite;
 import com.heshus.game.engine.HesHusGame;
 import com.heshus.game.engine.Play;
+import com.heshus.game.manager.DayManager;
 
 import static com.heshus.game.engine.Play.*;
 
@@ -197,6 +198,7 @@ public class MainMenuScreen implements Screen {
      */
     @Override
     public void resume() {
+
     }
 
     /**
