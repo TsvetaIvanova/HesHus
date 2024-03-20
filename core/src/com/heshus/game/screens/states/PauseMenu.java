@@ -82,7 +82,6 @@ public class PauseMenu{
                 super.touchUp(event, x, y, pointer, button); // Call the superclass method
                 clickSound.play();
                 state = GAME_SETTINGS;
-
             }
         });
 

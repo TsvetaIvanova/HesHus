@@ -39,7 +39,7 @@ public class GameOverScreen implements Screen {
         if (Gdx.input.isTouched()) {
             DayManager.gameOver = false;
             game.setScreen(new MainMenuScreen(game));
-            DayManager.currentDay = new Day(1, 8, 0, 100, 0, 0);
+            DayManager.currentDay = new Day(1, 8, 100);
             DayManager.overallEatScore = 0;
             DayManager.overallRecreationalScore = 0;
             DayManager.overallStudyScore = 0;
