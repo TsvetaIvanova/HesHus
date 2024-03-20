@@ -41,7 +41,7 @@ public class CustomiseSprite implements Screen {
 
         //add all player textures to the textureList
         for (int i = 0; i < totalPlayerSpriteChoices; i++) {
-            textureList.add(new Texture("player-" + Integer.toString(i+1) +".png"));
+            textureList.add(new Texture("Icons/player-" + Integer.toString(i+1) +".png"));
         }
 
     }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -20,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.heshus.game.editor.CustomiseSprite;
 import com.heshus.game.engine.HesHusGame;
@@ -46,11 +48,13 @@ public class MainMenuScreen implements Screen {
     private SettingsMenu settingsMenu;
     int xSpeed;
     int ySpeed;
+
+    private Sound clickSound;
     public MainMenuScreen(final HesHusGame game) {
         this.game = game;
         state = GAME_MAINMENU;
         //Map for background initialisation
-        map = new TmxMapLoader().load("testmap.tmx");
+        map = new TmxMapLoader().load("MapRelated/testmap.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, 1 / 1f);
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
         mapPixelWidth = layer.getWidth() * layer.getTileWidth() ; //just calculate the width and height of tilemap
@@ -96,11 +100,22 @@ public class MainMenuScreen implements Screen {
         quitButton = new TextButton("QUIT :(", textButtonStyle); //Set the button up
         quitButton.padBottom(6);
         quitButton.addListener(new InputListener() {
+            @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                Gdx.app.exit();
-                return false;
+                return true;
+            }
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                clickSound.play();
+                Timer.schedule(new Timer.Task() {
+                    @Override
+                    public void run() {
+                        Gdx.app.exit();
+                    }
+                }, 0.5f);
             }
         });
+
         //New Game button
         newButton = new TextButton("NEW GAME!!", newTextButtonStyle); //Set the button up
         newButton.padBottom(6);
@@ -130,6 +145,7 @@ public class MainMenuScreen implements Screen {
     @Override
     public void show() {
 
+        clickSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/switch2.ogg"));
     }
 
     /**

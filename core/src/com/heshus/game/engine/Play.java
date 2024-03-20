@@ -60,8 +60,6 @@ public class Play implements Screen {
     private SettingsMenu settingsMenu;
 
     private Texture counterBoxTexture;
-    private Texture burgerIconTexture, studyIconTexture, playIconTexture;
-    private Sprite burgerIconSprite, studyIconSprite, playIconSprite;
     private Texture verticalBarTexture;
     private Sprite verticalBarSprite;
 
@@ -86,8 +84,11 @@ public class Play implements Screen {
     private Texture volumeOffTexture;
     private Texture volumeOnTexture;
     private Stage stage;
-    //private Texture moonTexture;
-    //private Sprite moonSprite;
+
+    private Sprite moonSprite;
+    private Texture moonTexture;
+
+    private Sound clickSound;
 
     private Texture playerTexture;
 
@@ -207,6 +208,9 @@ public class Play implements Screen {
 
                     //stage.draw();
                 }
+
+        // Check the currentDay's energy level
+
     }
     private void update(){
         //Detect if game should be paused or not
@@ -261,13 +265,13 @@ public class Play implements Screen {
         camera.setToOrtho(false, 800, 450);
         extendViewport = new ExtendViewport(camera.viewportWidth, camera.viewportHeight, camera);
         // Load the map and set up the renderer
-        map = new TmxMapLoader().load("testmap.tmx");
+        map = new TmxMapLoader().load("MapRelated/testmap.tmx");
         collisionLayer = (TiledMapTileLayer) map.getLayers().get(0);
         renderer = new OrthogonalTiledMapRenderer(map, 1 / 1f);
 
         // Set up the player
         //int playerSpriteNumber = 5;
-        //Texture playerTexture = new Texture("player-" + Integer.toString(playerSpriteNumber) + ".png");
+        //Texture playerTexture = new Texture("Icons/player-" + Integer.toString(playerSpriteNumber) + ".png");
         Sprite playerSprite = new Sprite(playerTexture);
         player = new Player(playerSprite, collisionLayer);
         float startX = 30 * collisionLayer.getTileWidth();
@@ -284,11 +288,11 @@ public class Play implements Screen {
         font.getData().setScale(2);
 
         // Set up texture for energy bar
-        TblankTexture = new Texture("WhiteSquare.png");
+        TblankTexture = new Texture("Icons/WhiteSquare.png");
         blankTexture = new Sprite(TblankTexture);
 
         // Set up text bubble
-        textBubbleTexture = new Texture("textBubble.png");
+        textBubbleTexture = new Texture("Icons/textBubble.png");
         textBubble = new Sprite(textBubbleTexture);
 
         //setup menu
@@ -297,23 +301,24 @@ public class Play implements Screen {
         //set state
         state = GAME_RUNNING;
         // Set up the counter and counter components
-        counterBoxTexture = new Texture("counter-box.png");
+        counterBoxTexture = new Texture("Icons/counter-box.png");
 
-        //moonTexture = new Texture("moon.png");
-
-
-        //moonSprite = new Sprite(moonTexture);
+        Texture moonTexture = new Texture(Gdx.files.internal("Icons/moon.png"));
+        moonSprite = new Sprite(moonTexture);
 
 
-        verticalBarTexture = new Texture("vertical-bar.png");
+
+
+
+        verticalBarTexture = new Texture("Icons/vertical-bar.png");
         verticalBarSprite = new Sprite(verticalBarTexture);
 
-        walkingSound1 = Gdx.audio.newSound(Gdx.files.internal("tile1.mp3"));
-        walkingSound2 = Gdx.audio.newSound(Gdx.files.internal("tile2.mp3"));
-        walkingSound3 = Gdx.audio.newSound(Gdx.files.internal("tile3.mp3"));
-        walkingSound4 = Gdx.audio.newSound(Gdx.files.internal("tile4.mp3"));
+        walkingSound1 = Gdx.audio.newSound(Gdx.files.internal("Sounds/tile1.mp3"));
+        walkingSound2 = Gdx.audio.newSound(Gdx.files.internal("Sounds/tile2.mp3"));
+        walkingSound3 = Gdx.audio.newSound(Gdx.files.internal("Sounds/tile3.mp3"));
+        walkingSound4 = Gdx.audio.newSound(Gdx.files.internal("Sounds/tile4.mp3"));
 
-        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("background-music.mp3"));
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Sounds/background-music.mp3"));
         backgroundMusic.setLooping(true);
         backgroundMusic.setVolume(0.5f);
         backgroundMusic.play();
@@ -321,6 +326,9 @@ public class Play implements Screen {
         dimTexture = new Sprite(blankTexture);
         dimTexture.setColor(Color.BLACK);
         dimTexture.setSize(collisionLayer.getWidth() * 16, collisionLayer.getHeight() * 16);
+
+        clickSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/switch2.ogg"));
+
 
         stage = new Stage(new ScreenViewport(), renderer.getBatch());
 
@@ -347,6 +355,7 @@ public class Play implements Screen {
         increaseVolumeButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                clickSound.play();
                 float volume = backgroundMusic.getVolume();
                 volume = Math.min(volume + 0.1f, 1.0f);
                 backgroundMusic.setVolume(volume);
@@ -360,6 +369,7 @@ public class Play implements Screen {
         lowerVolumeButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                clickSound.play();
                 float volume = backgroundMusic.getVolume();
                 volume = Math.max(volume - 0.1f, 0.0f);
                 backgroundMusic.setVolume(volume);
@@ -373,6 +383,7 @@ public class Play implements Screen {
         volumeOffButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                clickSound.play();
                 if (backgroundMusic.isPlaying()) {
                     backgroundMusic.pause();
                 } else {
@@ -389,6 +400,7 @@ public class Play implements Screen {
         volumeOnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                clickSound.play();
                 if (!backgroundMusic.isPlaying()) {
                     backgroundMusic.play();
                 }
@@ -435,9 +447,6 @@ public class Play implements Screen {
         player.getTexture().dispose();
         font.dispose();
         counterBoxTexture.dispose();
-        burgerIconTexture.dispose();
-        studyIconTexture.dispose();
-        playIconTexture.dispose();
         verticalBarTexture.dispose();
         walkingSound1.dispose();
         walkingSound2.dispose();
@@ -461,6 +470,9 @@ public class Play implements Screen {
         volumeOffTexture.dispose();
         volumeOnTexture.dispose();
         lowerVolumeTexture.dispose();
+        if (moonTexture != null) {
+            moonTexture.dispose();
+        }
     }
 
     private void playWalkingSound(float delta) {
