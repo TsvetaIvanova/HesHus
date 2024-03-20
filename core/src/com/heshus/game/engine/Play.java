@@ -100,8 +100,8 @@ public class Play implements Screen {
     public void render(float delta) {
         update();
         draw();
-        //stage.act(delta);
-        //stage.draw();
+        stage.act(delta);
+        stage.draw();
 
     }
 
@@ -221,7 +221,7 @@ public class Play implements Screen {
         //logic/physics - anything that moves
         switch (state){
             case (GAME_RUNNING):
-                Gdx.input.setInputProcessor(player);
+                //Gdx.input.setInputProcessor(player);
                 player.update(Gdx.graphics.getDeltaTime());
                 break;
             case (GAME_SETTINGS)://we do the same settings or paused
@@ -248,11 +248,14 @@ public class Play implements Screen {
         }
 
         playWalkingSound(Gdx.graphics.getDeltaTime());
-        //stage.act(Gdx.graphics.getDeltaTime());
+        stage.act(Gdx.graphics.getDeltaTime());
     }
 
     @Override
     public void show() {
+
+
+
         // Initialize the camera
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 450);
@@ -270,7 +273,7 @@ public class Play implements Screen {
         float startX = 30 * collisionLayer.getTileWidth();
         float startY = (collisionLayer.getHeight() - 26) * collisionLayer.getTileHeight();
         player.setPosition(startX, startY);
-        Gdx.input.setInputProcessor(player);
+        //Gdx.input.setInputProcessor(player);
 
         // Set up the activity manager
         activityManager = new ActivityManager(collisionLayer);
@@ -319,80 +322,86 @@ public class Play implements Screen {
         dimTexture.setColor(Color.BLACK);
         dimTexture.setSize(collisionLayer.getWidth() * 16, collisionLayer.getHeight() * 16);
 
-//        // Prepare textures for buttons
-//        increaseVolumeTexture = new Texture(Gdx.files.internal("Icons/increase-volume.png"));
-//        lowerVolumeTexture = new Texture(Gdx.files.internal("Icons/lower-volume.png"));
-//        volumeOffTexture = new Texture(Gdx.files.internal("Icons/volume-off.png"));
-//        volumeOnTexture = new Texture(Gdx.files.internal("Icons/volume-on.png"));
-//
-//        // Initialize the stage
-//        stage = new Stage(new ScreenViewport(), renderer.getBatch());
-//        InputMultiplexer inputMultiplexer = new InputMultiplexer();
-//        inputMultiplexer.addProcessor(stage);
-//        inputMultiplexer.addProcessor(player);
-//        Gdx.input.setInputProcessor(inputMultiplexer);
-//
-//        // Create and set up buttons
-//        ButtonStyle increaseVolumeStyle = new ButtonStyle();
-//        increaseVolumeStyle.up = new TextureRegionDrawable(new TextureRegion(increaseVolumeTexture));
-//        Button increaseVolumeButton = new Button(increaseVolumeStyle);
-//        increaseVolumeButton.setPosition(800, 520); // Example position
-//
-//        increaseVolumeButton.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                float volume = backgroundMusic.getVolume();
-//                volume = Math.min(volume + 0.1f, 1.0f);
-//                backgroundMusic.setVolume(volume);
-//            }
-//        });
-//
-//        ButtonStyle lowerVolumeStyle = new ButtonStyle();
-//        lowerVolumeStyle.up = new TextureRegionDrawable(new TextureRegion(lowerVolumeTexture));
-//        Button lowerVolumeButton = new Button(lowerVolumeStyle);
-//        lowerVolumeButton.setPosition(850, 520); // Example position
-//        lowerVolumeButton.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                float volume = backgroundMusic.getVolume();
-//                volume = Math.max(volume - 0.1f, 0.0f);
-//                backgroundMusic.setVolume(volume);
-//            }
-//        });
-//
-//        ButtonStyle volumeOffStyle = new ButtonStyle();
-//        volumeOffStyle.up = new TextureRegionDrawable(new TextureRegion(volumeOffTexture));
-//        Button volumeOffButton = new Button(volumeOffStyle);
-//        volumeOffButton.setPosition(900, 520); // Example position
-//        volumeOffButton.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                if (backgroundMusic.isPlaying()) {
-//                    backgroundMusic.pause();
-//                } else {
-//                    backgroundMusic.play();
-//                }
-//            }
-//        });
-//
-//        // Play the music if it is not already playing
-//        ButtonStyle volumeOnStyle = new ButtonStyle();
-//        volumeOnStyle.up = new TextureRegionDrawable(new TextureRegion(volumeOnTexture));
-//        Button volumeOnButton = new Button(volumeOnStyle);
-//        volumeOnButton.setPosition(950, 520); // Example position
-//        volumeOnButton.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                if (!backgroundMusic.isPlaying()) {
-//                    backgroundMusic.play();
-//                }
-//            }
-//        });
-//
-//        stage.addActor(increaseVolumeButton);
-//        stage.addActor(lowerVolumeButton);
-//        stage.addActor(volumeOffButton);
-//        stage.addActor(volumeOnButton);
+        stage = new Stage(new ScreenViewport(), renderer.getBatch());
+
+        InputMultiplexer inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer.addProcessor(stage); // Stage first to ensure UI input is prioritized
+        inputMultiplexer.addProcessor(player); // Then player
+        Gdx.input.setInputProcessor(inputMultiplexer);
+
+
+        // Prepare textures for buttons
+        increaseVolumeTexture = new Texture(Gdx.files.internal("Icons/increase-volume.png"));
+        lowerVolumeTexture = new Texture(Gdx.files.internal("Icons/lower-volume.png"));
+        volumeOffTexture = new Texture(Gdx.files.internal("Icons/volume-off.png"));
+        volumeOnTexture = new Texture(Gdx.files.internal("Icons/volume-on.png"));
+
+
+
+        // Create and set up buttons
+        Button.ButtonStyle increaseVolumeStyle = new Button.ButtonStyle();
+        increaseVolumeStyle.up = new TextureRegionDrawable(new TextureRegion(increaseVolumeTexture));
+        Button increaseVolumeButton = new Button(increaseVolumeStyle);
+        increaseVolumeButton.setPosition(900, 670); // Example position
+
+        increaseVolumeButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                float volume = backgroundMusic.getVolume();
+                volume = Math.min(volume + 0.1f, 1.0f);
+                backgroundMusic.setVolume(volume);
+            }
+        });
+
+        Button.ButtonStyle lowerVolumeStyle = new Button.ButtonStyle();
+        lowerVolumeStyle.up = new TextureRegionDrawable(new TextureRegion(lowerVolumeTexture));
+        Button lowerVolumeButton = new Button(lowerVolumeStyle);
+        lowerVolumeButton.setPosition(950, 670); // Example position
+        lowerVolumeButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                float volume = backgroundMusic.getVolume();
+                volume = Math.max(volume - 0.1f, 0.0f);
+                backgroundMusic.setVolume(volume);
+            }
+        });
+
+        Button.ButtonStyle volumeOffStyle = new Button.ButtonStyle();
+        volumeOffStyle.up = new TextureRegionDrawable(new TextureRegion(volumeOffTexture));
+        Button volumeOffButton = new Button(volumeOffStyle);
+        volumeOffButton.setPosition(1000, 670); // Example position
+        volumeOffButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (backgroundMusic.isPlaying()) {
+                    backgroundMusic.pause();
+                } else {
+                    backgroundMusic.play();
+                }
+            }
+        });
+
+        // Play the music if it is not already playing
+        Button.ButtonStyle volumeOnStyle = new Button.ButtonStyle();
+        volumeOnStyle.up = new TextureRegionDrawable(new TextureRegion(volumeOnTexture));
+        Button volumeOnButton = new Button(volumeOnStyle);
+        volumeOnButton.setPosition(1050, 670); // Example position
+        volumeOnButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (!backgroundMusic.isPlaying()) {
+                    backgroundMusic.play();
+                }
+            }
+        });
+
+        stage.addActor(increaseVolumeButton);
+        stage.addActor(lowerVolumeButton);
+        stage.addActor(volumeOffButton);
+        stage.addActor(volumeOnButton);
+
+
+
 
     }
     @Override
