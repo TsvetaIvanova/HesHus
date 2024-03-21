@@ -18,6 +18,9 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import static com.heshus.game.engine.Play.*;
 
+/**
+ * Loads, draws and controls buttons to make a pause menu
+ */
 public class PauseMenu{
     private Stage stage;
     private Texture buttonTexture;
@@ -33,78 +36,43 @@ public class PauseMenu{
     private Table areYouSure;
     private Sound clickSound;
     private BitmapFont font;
+
+    /**
+     *
+     * @param viewport
+     * @param camera
+     */
     public PauseMenu(ExtendViewport viewport, Camera camera) {
         //set up font
         font = new BitmapFont(Gdx.files.internal("Fonts/monogram/pixel.fnt"), false);
         font.getData().setScale(1.5F);
         font.setColor(Color.BLACK);
-
+        //sound on click
         clickSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/switch2.ogg"));
 
         //BUTTONS
-        //Setup textures and variables
+        //set textbuttonstyle
         buttonTexture = new Texture("UI/button_up.png");
         buttonTextureRegion = new TextureRegion(buttonTexture, buttonTexture.getWidth(), buttonTexture.getHeight());
         buttonTextureRegionDrawable =new TextureRegionDrawable(buttonTextureRegion);
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle(buttonTextureRegionDrawable, buttonTextureRegionDrawable, buttonTextureRegionDrawable, font );
-
+        //set button sizes
         buttonScale = 2;
         buttonHeight = (int) (buttonTexture.getHeight()*buttonScale);
         buttonWidth = (int) (buttonTexture.getWidth()*buttonScale);
 
         //Resume button:
-        resumeButton = new TextButton("RESUME!!", textButtonStyle); //Set the button up
+        resumeButton = new TextButton("RESUME!!", textButtonStyle);
         resumeButton.padBottom(10);
-        resumeButton.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-
-                return true;
-            }
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                clickSound.play();
-                state = GAME_RUNNING;
-            }
-        });
-
         //Settings button:
-        settingsButton = new TextButton("SETTINGS", textButtonStyle); //Set the button up
+        settingsButton = new TextButton("SETTINGS", textButtonStyle);
         settingsButton.padBottom(10);
-        settingsButton.addListener(new InputListener() {
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-
-                return true;
-            }
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                super.touchUp(event, x, y, pointer, button); // Call the superclass method
-                clickSound.play();
-                state = GAME_SETTINGS;
-            }
-        });
-
-
         //Quit button:
-        quitButton = new TextButton("QUIT :(", textButtonStyle); //Set the button up
+        quitButton = new TextButton("QUIT :(", textButtonStyle);
         quitButton.padBottom(10);
-        quitButton.addListener(new InputListener() {
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
-                return true;
-            }
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                clickSound.play();
-                Timer.schedule(new Timer.Task() {
-
-                    public void run() {
-                        Gdx.app.exit();
-                    }
-                }, 0.5f); // 0.5 seconds delay
-            }
-        });
+        //sets up what heppens when buttons clicked
+        buttonsOnClickLogic();
 
         //Table to store buttons
         table = new Table();
@@ -115,15 +83,74 @@ public class PauseMenu{
         table.add(quitButton).width(buttonWidth).height(buttonHeight).padBottom((float) buttonHeight /5);
 
         stage = new Stage(viewport);
-        stage.addActor(table); //Add the table to the stage to perform rendering and take input.
+        //Add the table to the stage to perform rendering and take input.
+        stage.addActor(table);
     }
+    /**
+     * Draws everything!
+     */
     public void draw(){
         stage.draw();
     }
+
+    /**
+     * Sets up what happens when each button is clicked
+     */
+    private void buttonsOnClickLogic(){
+        resumeButton.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                clickSound.play();
+                state = GAME_RUNNING;
+            }
+        });
+
+        settingsButton.addListener(new InputListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+            //set state to GAME_SETTINGS if clicked, in Play this results in a SettingsMenu being drawn instead of PauseMenu
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                super.touchUp(event, x, y, pointer, button); // Call the superclass method
+                clickSound.play();
+                state = GAME_SETTINGS;
+            }
+        });
+
+        quitButton.addListener(new InputListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                clickSound.play();
+                //Timer to allow sound to play without getting cutoff
+                Timer.schedule(new Timer.Task() {
+
+                    public void run() {
+                        Gdx.app.exit();
+                    }
+                }, 0.5f); // 0.5 seconds delay
+            }
+        });
+    }
+    /**
+     * Grabs input, moves table to centre of screen
+     * @param camera camera to set position to
+     */
     public void update(Camera camera){
         Gdx.input.setInputProcessor(stage);
         table.setPosition(camera.position.x, camera.position.y);
     }
+
+    /**
+     * Should be called to release all resources
+     */
     public void dispose(){
         stage.dispose();
         buttonTexture.dispose();

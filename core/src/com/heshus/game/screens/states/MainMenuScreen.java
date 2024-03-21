@@ -25,11 +25,13 @@ import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.heshus.game.editor.CustomiseSprite;
 import com.heshus.game.engine.HesHusGame;
-import com.heshus.game.engine.Play;
-import com.heshus.game.manager.DayManager;
 
 import static com.heshus.game.engine.Play.*;
 
+/**
+ * Displays buttons to quit, start new game, change settings
+ * Also does zoomed in scrolling of our map :)
+ */
 public class MainMenuScreen implements Screen {
 
     final HesHusGame game;
@@ -45,11 +47,16 @@ public class MainMenuScreen implements Screen {
     TextButton newButton;
     private Stage stage;
     private Table mainTable;
+    private TextButton.TextButtonStyle textButtonStyle;
+    private TextButton.TextButtonStyle newGameTextButtonStyle;
     private SettingsMenu settingsMenu;
     int xSpeed;
     int ySpeed;
-
     private Sound clickSound;
+    /**
+    *Constructor initiates variables and sets up listeners for buttons
+    * @param game instance of central class HesHusGame
+    * */
     public MainMenuScreen(final HesHusGame game) {
         this.game = game;
         state = GAME_MAINMENU;
@@ -59,9 +66,10 @@ public class MainMenuScreen implements Screen {
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
         mapPixelWidth = layer.getWidth() * layer.getTileWidth() ; //just calculate the width and height of tilemap
         mapPixelHeight = layer.getHeight() * layer.getTileHeight();
+
         //Camera initialisation
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 400, 225); //must be same ratio as screen.
+        camera.setToOrtho(false, 400, 225); //must be same ratio as screen or black lines between tiles can appear
         camera.position.x=0;
         camera.position.y=0;
         xSpeed=1;//we will move camera by these each frame
@@ -74,31 +82,43 @@ public class MainMenuScreen implements Screen {
         font.setColor(Color.BLACK);
 
         //BUTTONS
-        //Setup textures and variables
-        Texture buttonTexture = new Texture("UI/button_up.png");
-        TextureRegion buttonTextureRegion= new TextureRegion(buttonTexture, buttonTexture.getWidth(), buttonTexture.getHeight());
-        TextureRegionDrawable buttonTextureRegionDrawable =new TextureRegionDrawable(buttonTextureRegion);
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle(buttonTextureRegionDrawable, buttonTextureRegionDrawable, buttonTextureRegionDrawable, font );
-
-        Texture newButtonTexture = new Texture("UI/wide_button.png");
-        TextureRegion newButtonTextureRegion= new TextureRegion(newButtonTexture, newButtonTexture.getWidth(), newButtonTexture.getHeight());
-        TextureRegionDrawable newButtonTextureRegionDrawable =new TextureRegionDrawable(newButtonTextureRegion);
-        TextButton.TextButtonStyle newTextButtonStyle = new TextButton.TextButtonStyle(newButtonTextureRegionDrawable, newButtonTextureRegionDrawable, newButtonTextureRegionDrawable, font );
-
+        //set style
+        initialiseTextButtonStyles();
 
         //Settings button:
         settingsButton = new TextButton("SETTINGS", textButtonStyle); //Set the button up
         settingsButton.padBottom(7);//center text in graphic
         settingsButton.setScale(1F);
-        settingsButton.addListener(new InputListener() {
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                state = GAME_SETTINGS;
-                return false;
-            }
-        });
+
         //Quit button:
         quitButton = new TextButton("QUIT :(", textButtonStyle); //Set the button up
         quitButton.padBottom(6);
+
+        //New Game button
+        newButton = new TextButton("NEW GAME!!", newGameTextButtonStyle); //Set the button up
+        newButton.padBottom(6);
+
+        //set logic
+        buttonsOnClickLogic();
+
+        //Add everything to a table!
+        mainTable = new Table();
+        mainTable.add(newButton).colspan(2).padBottom(3);
+        mainTable.row();
+        mainTable.add(settingsButton).padRight(3);
+        mainTable.add(quitButton);
+        mainTable.setFillParent(true);
+        stage = new Stage(extendViewport);
+        stage.addActor(mainTable);
+        //We draw this instead of mainTable when settingsButton is clicked
+        settingsMenu = new SettingsMenu(state, camera, extendViewport, 1);
+    }
+
+    /**
+     * sets up what happens when each button is clicked(could be in constructor but seems easier to read this way)
+     */
+    private void buttonsOnClickLogic() {
+        //QUIT BUTTON: Quits (delay for the sound to play)
         quitButton.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -116,27 +136,39 @@ public class MainMenuScreen implements Screen {
             }
         });
 
-        //New Game button
-        newButton = new TextButton("NEW GAME!!", newTextButtonStyle); //Set the button up
-        newButton.padBottom(6);
+        //NEWGAME BUTTON: moves to next screen
         newButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                clickSound.play();
                 game.setScreen(new CustomiseSprite(game, camera));
                 dispose();
                 return false;
             }
         });
+        //SETTINGS BUTTON: sets state to settings if clicked!
+        settingsButton.addListener(new InputListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                clickSound.play();
+                state = GAME_SETTINGS;
+                return false;
+            }
+        });
+    }
 
-        mainTable = new Table();
-        mainTable.add(newButton).colspan(2).padBottom(3);
-        mainTable.row();
-        mainTable.add(settingsButton).padRight(3);
-        mainTable.add(quitButton);
-        mainTable.setFillParent(true);
-        stage = new Stage(extendViewport);
-        stage.addActor(mainTable);
-
-        settingsMenu = new SettingsMenu(state, camera, extendViewport, 1);
+    /**
+     * set button styles
+     */
+    private void initialiseTextButtonStyles() {
+        //Setup buttonstyles! (a new TextureRegionDrawable version for down would be nice and would kinda animate them)
+        Texture buttonTexture = new Texture("UI/button_up.png");
+        TextureRegion buttonTextureRegion= new TextureRegion(buttonTexture, buttonTexture.getWidth(), buttonTexture.getHeight());
+        TextureRegionDrawable buttonTextureRegionDrawable =new TextureRegionDrawable(buttonTextureRegion);
+        textButtonStyle = new TextButton.TextButtonStyle(buttonTextureRegionDrawable, buttonTextureRegionDrawable, buttonTextureRegionDrawable, font );
+        //w i d e  b u t t o n (its wider)
+        Texture newButtonTexture = new Texture("UI/wide_button.png");
+        TextureRegion newButtonTextureRegion= new TextureRegion(newButtonTexture, newButtonTexture.getWidth(), newButtonTexture.getHeight());
+        TextureRegionDrawable newButtonTextureRegionDrawable =new TextureRegionDrawable(newButtonTextureRegion);
+        newGameTextButtonStyle = new TextButton.TextButtonStyle(newButtonTextureRegionDrawable, newButtonTextureRegionDrawable, newButtonTextureRegionDrawable, font );
     }
 
     /**
@@ -144,49 +176,50 @@ public class MainMenuScreen implements Screen {
      */
     @Override
     public void show() {
-
         clickSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/switch2.ogg"));
     }
 
     /**
      * Called when the screen should render itself.
-     *
+     * Renders
      * @param delta The time in seconds since the last render.
      */
-
     @Override
     public void render(float delta) {
             ScreenUtils.clear(0, 0.2f, 0, 1);
+            //only one inputprocessor-buttton input listeners won't work without this (but you could multiplex it if needed)
             Gdx.input.setInputProcessor(stage);
 
-            //tilemap
+            //draws tilemap
             renderer.setView(camera);
             renderer.render();
+
             switch (state) {
                 case (GAME_MAINMENU):
-                    //text
                     game.batch.begin();
                     font.draw(game.batch, "Welcome to HeslingtonHustle!!! ", camera.position.x - camera.viewportWidth / 2, camera.position.y + camera.viewportHeight / 2);
-                    //buttons
+                    //update position of table to middle of screen and draw
                     mainTable.setPosition(camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2);
-                    stage.draw();
+                    stage.draw();//draws all buttons!
+
                     game.batch.end();
                     break;
                 case(GAME_SETTINGS):
+                    //draws and updates settingsMenu
                     settingsMenu.update();
                     break;
             }
-            //moving camera (if the map has a yOffSet or xOffSet i think it will break)
+
+            //moving camera
             camera.position.x+=xSpeed;
             camera.position.y+=ySpeed;
+            //"bounce" camera if it's about to show out of the map! (if the Tiledmap has a yOffSet or xOffSet will probably break)
             if(camera.position.y+ySpeed + camera.viewportHeight/2>= mapPixelHeight ||camera.position.y+ySpeed- camera.viewportHeight/2<=0 ){
                 ySpeed*=-1;
             }
             if(camera.position.x+xSpeed + camera.viewportWidth/2>= mapPixelWidth ||camera.position.x+xSpeed- camera.viewportWidth/2<=0 ){
                 xSpeed*=-1;
             }
-            //camera.position.x = Math.round(camera.position.x);
-            //camera.position.y = Math.round(camera.position.y);
             camera.update();
     }
 
@@ -234,8 +267,5 @@ public class MainMenuScreen implements Screen {
         settingsMenu.dispose();
 
     }
-
-
-    //...Rest of class omitted for succinctness.
 
 }
