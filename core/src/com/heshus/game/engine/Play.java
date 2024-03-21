@@ -342,6 +342,11 @@ public class Play implements Screen {
         stage.act(Gdx.graphics.getDeltaTime());
     }
 
+    /**
+     * Show is called the first time this object is drawn
+     * Used here to set up variables like sprites and textures, and assign references
+     * to the camera, renderer, collision layer, and our manager classes.
+     */
     @Override
     public void show() {
 
