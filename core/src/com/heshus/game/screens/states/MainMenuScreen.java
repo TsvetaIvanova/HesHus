@@ -17,6 +17,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -53,6 +54,8 @@ public class MainMenuScreen implements Screen {
     int xSpeed;
     int ySpeed;
     private Sound clickSound;
+    private TextButton gotItButton;
+    private boolean isNewGameClicked;
     /**
     *Constructor initiates variables and sets up listeners for buttons
     * @param game instance of central class HesHusGame
@@ -98,6 +101,10 @@ public class MainMenuScreen implements Screen {
         newButton = new TextButton("NEW GAME!!", newGameTextButtonStyle); //Set the button up
         newButton.padBottom(6);
 
+        //Got it! button for controls popup
+        gotItButton = new TextButton("Got it!", textButtonStyle); //Set the button up
+        gotItButton.padBottom(6);
+
         //set logic
         buttonsOnClickLogic();
 
@@ -140,8 +147,7 @@ public class MainMenuScreen implements Screen {
         newButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 clickSound.play();
-                game.setScreen(new CustomiseSprite(game, camera));
-                dispose();
+                isNewGameClicked=true;
                 return false;
             }
         });
@@ -150,6 +156,15 @@ public class MainMenuScreen implements Screen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 clickSound.play();
                 state = GAME_SETTINGS;
+                return false;
+            }
+        });
+        //SETTINGS BUTTON: sets state to settings if clicked!
+        gotItButton.addListener(new InputListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                clickSound.play();
+                game.setScreen(new CustomiseSprite(game, camera));
+                dispose();
                 return false;
             }
         });
@@ -197,11 +212,22 @@ public class MainMenuScreen implements Screen {
             switch (state) {
                 case (GAME_MAINMENU):
                     game.batch.begin();
-                    font.draw(game.batch, "Welcome to HeslingtonHustle!!! ", camera.position.x - camera.viewportWidth / 2, camera.position.y + camera.viewportHeight / 2);
-                    //update position of table to middle of screen and draw
-                    mainTable.setPosition(camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2);
-                    stage.draw();//draws all buttons!
+                    if (isNewGameClicked) {
+                        //Display controls (doesn't actually center text, just gets kinda close)
+                        font.draw(game.batch, "P or Esc to pause,E to interact ", camera.position.x- camera.viewportWidth/2 +camera.viewportWidth/6 , camera.position.y );
+                        font.draw(game.batch, "   WASD or Arrowkeys to move    ", camera.position.x- camera.viewportWidth/2 +camera.viewportWidth/6 , camera.position.y +font.getCapHeight()*2 );
 
+                        mainTable.setVisible(false);
+                        stage.addActor(gotItButton);
+                        gotItButton.setPosition(camera.position.x -gotItButton.getWidth()/2, camera.position.y - camera.viewportHeight / 2);
+                        stage.draw();
+                    }
+                    else {
+                        font.draw(game.batch, "Welcome to HeslingtonHustle!!! ", camera.position.x - camera.viewportWidth / 2, camera.position.y + camera.viewportHeight / 2);
+                        //update position of table to middle of screen and draw
+                        mainTable.setPosition(camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2);
+                        stage.draw();//draws all buttons!
+                    }
                     game.batch.end();
                     break;
                 case(GAME_SETTINGS):

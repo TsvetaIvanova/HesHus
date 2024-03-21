@@ -42,6 +42,7 @@ public class Play implements Screen {
     public static final int GAME_SETTINGS = 2;
     public static final int GAME_OVER = 3;
     public static final int GAME_MAINMENU =4;
+
     public static int state;
     private final HesHusGame game;
     private TiledMap map;
@@ -126,10 +127,8 @@ public class Play implements Screen {
     @Override
     public void render(float delta) {
         update();
-        draw();
-        stage.act(delta);
-        stage.draw();
 
+        draw();
     }
 
     /**
@@ -254,20 +253,30 @@ public class Play implements Screen {
                 }
                 //End of main renderer
                 renderer.getBatch().end();
+                //Draw sound buttons. (currently can't have buttons get input while other menus have input)
+                stage.act(Gdx.graphics.getDeltaTime());
+                stage.draw();
                 break;
                 case (GAME_PAUSED):
+                    //Dims screen when energy lost
+                    dimTexture.setAlpha((float)0.4 + DayManager.currentDay.getEnergy());
+                    dimTexture.draw(renderer.getBatch());
+
                     //Pause menu
                     renderer.getBatch().end();
                     pauseMenu.update(camera);
                     pauseMenu.draw();
                     break;
                 case (GAME_SETTINGS):
+                    //Dims screen when energy lost
+                    dimTexture.setAlpha((float)0.4 + DayManager.currentDay.getEnergy());
+                    dimTexture.draw(renderer.getBatch());
+
                     //Settings menu
                     renderer.getBatch().end();
                     settingsMenu.update();
                     break;
 
-                    //stage.draw();
                 }
 
         // updates and draws the stage
@@ -281,8 +290,6 @@ public class Play implements Screen {
          * @param delta The time in seconds since the last frame, used to update animations and process input.
          */
 
-        stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
 
     }
     /**
