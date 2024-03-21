@@ -8,12 +8,14 @@ public class Day {
     private int dayNumber, studyScore, eatScore, energy, recreationalScore;
     private float time;
 
+
     /**
      * Constructor for the current day
      * @param _dayNumber Current day
      * @param _time Current day's time
      * @param _energy Current day's energy
      */
+
     public Day(int _dayNumber, float _time, int _energy){
         this.dayNumber = _dayNumber;
         this.time = _time;
@@ -56,9 +58,11 @@ public class Day {
         DayManager.overallRecreationalScore++;
     }
 
+
     /**
      * reset current days time to 8am
      */
+
     public void resetTime() {
         this.time = 8;
     }
@@ -70,10 +74,12 @@ public class Day {
         this.energy = 100;
     }
 
+
     /**
      *
      * @return current day's game time
      */
+
     public float getTime() { return this.time; }
 
     /**

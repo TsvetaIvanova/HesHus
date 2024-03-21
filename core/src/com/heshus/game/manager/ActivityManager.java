@@ -13,9 +13,14 @@ import com.heshus.game.entities.Player;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 
 /**
+
+ * Manages all activities in the game that the player can perform
+ * by introducing property tags to the tiled map the player interacts with each property tag
+ * and according to what the type of activity is the player's energy and time is incremented or decremented
  * Manages how the activities are performed, why they are performed and energy/time constraints
  * Displays text whenever a task is completed
  */
+
 public class ActivityManager {
 
     private final TiledMapTileLayer collisionLayer;
@@ -39,18 +44,21 @@ public class ActivityManager {
      * Checks whether and which activity is performed based on location of player
      */
     public void checkActivity() {
-        // Assuming you have a reference to the Player object named 'player'
+        // based on the x, y coordinates of the player
         float avatarX = player.getX();
         float avatarY = player.getY();
 
         // Convert avatar position to tile coordinates
         int x = (int) avatarX;
         int y = (int) avatarY;
-
+        // checking for the property tag
         TiledMapTileLayer.Cell cell = collisionLayer.getCell(x/collisionLayer.getTileWidth() + 1, y/collisionLayer.getTileHeight() + 1);
         if (cell != null && cell.getTile() != null) {
             if (cell.getTile().getProperties().containsKey("eat") && Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+
+
                 performEatingActivity();
+              
             } else if (cell.getTile().getProperties().containsKey("study") && Gdx.input.isKeyJustPressed(Input.Keys.E)) {
                 performStudyingActivity();
             } else if (cell.getTile().getProperties().containsKey("recreation") && Gdx.input.isKeyJustPressed(Input.Keys.E)) {
@@ -62,15 +70,20 @@ public class ActivityManager {
     }
 
 
+
+
     /**
      * If available, controls variables indicating eating has been performed
      */
     private void performEatingActivity() {
+
         if(!(DayManager.currentDay.getEnergy() <= 0) && !(DayManager.currentDay.getTime() >= 24)) {
             decrementEnergy(10);
             incrementTime(2);
             DayManager.currentDay.incrementEatScore();
+
             //Holds the message to be displayed
+
             String holdText = "You feel refreshed";
             layout.setText(Play.getFont(), holdText);
             setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width / 2), Math.round(player.getY() / 16) * 16);
@@ -80,15 +93,21 @@ public class ActivityManager {
         }
     }
 
+    // incrementing each property tag activity, if time and have not run out it will decrement energy with 20 from 100 and increment time with 4
+  
+
     /**
      * If available, controls variables indicating studying has been performed
      */
     private void performStudyingActivity() {
+
         if(!(DayManager.currentDay.getEnergy() <= 0) && !(DayManager.currentDay.getTime() >= 24)) {
             decrementEnergy(20);
             incrementTime(4);
             DayManager.currentDay.incrementStudyScore();
+
             //Holds the message to be displayed
+
             String holdText = "You feel smarter";
             layout.setText(Play.getFont(), holdText);
             setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width / 2), Math.round(player.getY() / 16) * 16);
@@ -98,16 +117,23 @@ public class ActivityManager {
         }
     }
 
+
+    // incrementing each property tag activity, if time and have not run out it will decrement energy with 20 from 100 and increment time with 3
+    
+
     /**
      * If available, controls variables indicating recreation has been performed
      */
     private void performRecreationalActivity() {
+
         if(!(DayManager.currentDay.getEnergy() <= 0) && !(DayManager.currentDay.getTime() >= 24)){
 
             decrementEnergy(20);
             incrementTime(3);
             DayManager.currentDay.incrementRecreationalScore();
+
             //Holds the message to be displayed
+
             String holdText = "You have recreationed";
             layout.setText(Play.getFont(), holdText);
             setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/2), Math.round(player.getY() / 16) * 16);
@@ -118,9 +144,13 @@ public class ActivityManager {
 
     }
 
+
+    // incrementing each property tag activity, the player can only sleep when they have ran out of energy
+
     /**
      * Checks whether the player can sleep and if so, creates a new day
      */
+
     private void performSleepingActivity() {
         // decided to define day over with reaching 840 time
         if (DayManager.currentDay.getTime() >= 24 || DayManager.currentDay.getEnergy() <= 0) {
@@ -132,12 +162,20 @@ public class ActivityManager {
             // if the game is not over the avatar will move to the next day and reset their energy
             if (!DayManager.gameOver) {
                 DayManager.incrementDay();
-                //resetForNewDay();
+
+
+    // increments time by a setTime parameter
+   
+
+                
             }
         }
     }
 
     /**
+     /**
+     * @param setTime
+     * accepts as parameter a setTime for different activities
      * Decreases current day's energy
      * @param energy value to decrease energy by
      */
@@ -158,6 +196,7 @@ public class ActivityManager {
         }
     }
 
+
     /**
      * Sets another class' instance of 'player' to ActivityManager's player
      * @param player
@@ -166,12 +205,14 @@ public class ActivityManager {
         this.player = player;
     }
 
+
     /**
      *
      * @param text to be displayed
      * @param x horizontal position of text
      * @param y vertical position of text
      */
+
     public void setText(String text, float x, float y){
         activityText = text;
         textPosition.set(x, y + 40);

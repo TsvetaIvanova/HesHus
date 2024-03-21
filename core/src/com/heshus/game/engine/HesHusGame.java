@@ -35,29 +35,63 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.heshus.game.screens.states.MainMenuScreen;
 
+/**
+ * Main class for HesHus, and it extends the Game class from LibGDX
+ * manages some of our initial game settings
+ */
 public class HesHusGame extends Game {
-	// we can use the HesHusGame as a central game class for our screens/states
+	/**
+	 * the SpriteBatch is used for drawing some of the textures and sprites
+	 */
+	// we can use the HesHusGame as a second central game class for our screens/states
 	public SpriteBatch batch;
+
+	/**
+	 *  The font used to write text on the screen with LibGDX's Arial font as
+	 *  default
+	 */
 	public BitmapFont font;
+
+	/**
+	 * The Preferences is a hash map that holds certain value
+	 */
 	public static Preferences settings;
+	/**
+	 * This method sets up the initial settings for window size
+	 */
 	public void create() {
 		batch = new SpriteBatch();
-		font = new BitmapFont(); // use libGDX's default Arial font
+		// use libGDX's default Arial font
+		font = new BitmapFont();
 		setDefaultPreferences();
+		// adjusts the window size according to requirements
 		System.out.println(settings.getInteger("screenWidth"));
 		Gdx.graphics.setWindowedMode(settings.getInteger("windowWidth"), settings.getInteger("windowHeight"));
+		// setting to the MainMenuScreen
 		this.setScreen(new MainMenuScreen(this));
 
 	}
-
+	/**
+	 * the render method is called by the game loop from the application
+	 */
+	// important!
 	public void render() {
-		super.render(); // important!
+		super.render();
 	}
+	/**
+	 * the dispose frees up resource, only called when the game is closing
+	 */
 
 	public void dispose() {
+		// cleans up the Spritebatch resource to prevent memory leaks
 		batch.dispose();
+		// cleans up the font resource to prevent memory leaks
 		font.dispose();
 	}
+
+	/**
+	 * Sets the default preferences for the screen
+	 */
 	public void setDefaultPreferences(){
 		settings = Gdx.app.getPreferences("userSettings");
 		settings.putString("name", "bucket");
@@ -70,96 +104,3 @@ public class HesHusGame extends Game {
 
 }
 
-
-//	@Override
-//	public void create () {
-//		//entry point to the game
-//		setScreen(new Play());
-//	}
-//
-//	@Override
-//	public void render () {
-//		super.render();
-//	}
-//
-//	@Override
-//	public void dispose () {
-//		super.dispose();
-//	}
-
-
-
-	/*
-	private SpriteBatch batch;
-	private TiledMap tiledMap;
-	private OrthogonalTiledMapRenderer tiledMapRenderer;
-	private OrthographicCamera camera;
-	public Sprite sprite;
-	private Texture spriteTexture;
-	private float speed = 400;
-	 */
-
-
-	//@Override
-	//public void create () {
-		/*
-		batch = new SpriteBatch();
-		tiledMap = new TmxMapLoader().load("testmap.tmx");
-		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
-
-
-
-		camera = new OrthographicCamera();
-		// Changing setToOrtho from 800,480 to scale the window
-		camera.setToOrtho(false, 1600, 800);
-
-		spriteTexture = new Texture("bucket.png");
-		sprite = new Sprite(spriteTexture);
-
-		//placed the avatar before the first building they would need to interact with
-		sprite.setPosition(50 - sprite.getWidth() / 2, 200);
-
-		TiledMapTileLayer collisionLayer = (TiledMapTileLayer) tiledMap.getLayers().get("");
-		//activityManager = new ActivityManager(collisionLayer);
-
-		// Set this class as the input processor
-		Gdx.input.setInputProcessor(this);
-
-		 */
-	//}
-
-
-
-
-	/*
-	public Vector2 getSpritePosition() {
-		return new Vector2(sprite.getX(), sprite.getY());
-	}
-	*/
-
-	/*
-	@Override
-	public void dispose() {
-		batch.dispose();
-		tiledMap.dispose();
-		spriteTexture.dispose();
-	}
-
-	 */
-
-	/*
-	private void handleInput(float deltaTime) {
-		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
-			sprite.translateX(-speed * deltaTime);
-		}
-		if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
-			sprite.translateX(speed * deltaTime);
-		}
-		if (Gdx.input.isKeyPressed(Keys.UP)) {
-			sprite.translateY(speed * deltaTime);
-		}
-		if (Gdx.input.isKeyPressed(Keys.DOWN)) {
-			sprite.translateY(-speed * deltaTime);
-		}
-	}
-	*/

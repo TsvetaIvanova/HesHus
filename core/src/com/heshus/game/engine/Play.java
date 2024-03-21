@@ -98,8 +98,18 @@ public class Play implements Screen {
     private Button volumeOffButton;
     private Button volumeOnButton;
 
+
+
+
+
     /**
-     * Create the Play instance
+     * The Play class represents the game screen and manages some of the states functionalities
+     * as well as handling user input and game sprites
+     * It's also responsible for drawing the game world, the player character,
+     * and the UI elements like the pause and settings menus. It also handles sound effects
+     * and music playback based on game events.
+     * creates new instance of the Play screen with specific game and player sprite settings.
+     * @param playerSpriteSelection The texture for the player sprite to be used in the game.* Create the Play instance
      * @param game the game instance
      * @param playerSpriteSelection the texture which will be used as the player sprite
      */
@@ -108,6 +118,11 @@ public class Play implements Screen {
         this.playerTexture = playerSpriteSelection;
 
     }
+    /**
+     * Renders the game world, player, and UI elements. This method is called every frame.
+     *
+     * @param delta The time in seconds since the last render call.
+     */
     @Override
     public void render(float delta) {
         update();
@@ -117,6 +132,9 @@ public class Play implements Screen {
 
     }
 
+    /**
+     * Draws the game world, including the map, player, and HUD elements.
+     */
     private void draw(){
         ScreenUtils.clear(0,0,0,1);
         //CAMERA
@@ -134,7 +152,9 @@ public class Play implements Screen {
         // Calculate the positions based on the updated camera position
         float baseX = camera.position.x + camera.viewportWidth / 2 - buttonSize - padding;
         float baseY = camera.position.y + camera.viewportHeight / 2 - padding - buttonSize;
-        // Set the position for each volume button
+
+        // Set the position for each volume button to always stay in one place on screen
+
         increaseVolumeButton.setPosition(baseX - 2 * buttonSize, baseY);
         lowerVolumeButton.setPosition(baseX - 3 * buttonSize, baseY);
         volumeOffButton.setPosition(baseX - buttonSize, baseY);
@@ -142,7 +162,8 @@ public class Play implements Screen {
 
         //Tilemap
         renderer.setView(camera);
-        renderer.render(); //takes a layers[] argument if we want to specifically render certain layers
+       //takes a layers[] argument if we want to specifically render certain layers
+        renderer.render(); 
         renderer.getBatch().begin();
         //Player
         player.draw(renderer.getBatch());
@@ -154,11 +175,13 @@ public class Play implements Screen {
                 //HUD
                 //Drawing energy bar, can be replaced for a standard energy bar with comments
                 renderer.getBatch().setColor(Color.GRAY);
+
                 renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2), (camera.position.y - camera.viewportHeight/2), camera.viewportWidth, 14);
                 //renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 3, (camera.position.y - camera.viewportHeight/2) + 3, 204, 44);
                 renderer.getBatch().setColor(Color.YELLOW);
                 renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2), (camera.position.y - camera.viewportHeight/2), camera.viewportWidth * ((float) DayManager.currentDay.getEnergy() /100), 12);
                 //renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
+
                 renderer.getBatch().setColor(Color.WHITE);
 
                 //Draw activity text
@@ -186,18 +209,27 @@ public class Play implements Screen {
                 dimTexture.setAlpha((float)0.4 + DayManager.currentDay.getEnergy());
                 dimTexture.draw(renderer.getBatch());
 
+
+                /**
+                 * The counterbox setup, it stays in the upper left corner and allows through
+                 * using the LibGDX BitMapFont class to increment written integers over the white
+                 * counter box on the screen
+                 */
+
                 ///////////////////////////////////////////////////////////////////////////
                 // The Counter and Counter Icons                                         //
                 // Upper-left corner position for the counter box set and will not move //
                 float counterBoxX = camera.position.x - camera.viewportWidth / 2;
                 float counterBoxY = (camera.position.y + camera.viewportHeight / 2) - counterBoxTexture.getHeight();
-
+                // drawing the counterbox texture
                 renderer.getBatch().draw(counterBoxTexture, counterBoxX, counterBoxY);
 
-                //Setup variables for counters
+                // help space and structure the strings on top of the box
+
                 float iconSize = 20;
                 float iconSpacingX = 2;
                 float iconSpacingY = 8;
+                // this is the verticalbar, that represents a day and increments to 7 during the game
                 float verticalBarStartX = counterBoxX + iconSpacingX + 24;
                 float verticalBarStartY = counterBoxY + counterBoxTexture.getHeight() - iconSpacingY - iconSize - iconSpacingY + 13;
 
@@ -210,7 +242,8 @@ public class Play implements Screen {
                 float secondRowY = firstRowY - iconSize - iconSpacingY;
                 float thirdRowY = secondRowY - iconSize - iconSpacingY;
 
-                //Draw counters on top of box
+                // draw the player's score for the three activites
+
                 font.draw(renderer.getBatch(), String.valueOf(DayManager.overallEatScore), counterBoxX + 43, firstRowY+18);
                 font.draw(renderer.getBatch(), String.valueOf(DayManager.overallStudyScore), counterBoxX + 43, secondRowY+27);
                 font.draw(renderer.getBatch(), String.valueOf(DayManager.overallRecreationalScore), counterBoxX + 43, thirdRowY+36);
@@ -237,10 +270,28 @@ public class Play implements Screen {
                     //stage.draw();
                 }
 
+        // updates and draws the stage
+        // the stage is a container for all the actors
+        //coordinates user inputs
+        /**
+         * Updates the {@link Stage} with the time passed since the last frame and draws all {@link Actor}s added to it.
+         * This method should be called every frame to ensure the {@link Stage} accurately represents the current game state,
+         * including processing any input events and executing any actions on {@link Actor}s.
+         *
+         * @param delta The time in seconds since the last frame, used to update animations and process input.
+         */
+
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
 
     }
+    /**
+     * the method should be called every frame, updates the game state
+     * checks for the player's movement sounds
+     *  handles movement and game over scenario
+     *  as parameter it has time delta that is time in seconds
+     *  since last frame
+     */
     private void update(){
         //Detect if game should be paused or not
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)||Gdx.input.isKeyJustPressed(Input.Keys.P)){
@@ -265,7 +316,7 @@ public class Play implements Screen {
                 break;
         }
 
-        // check walking is happening
+        // check walking is happening, by first checking if the player has a velocity 0
         if (Math.abs(player.getVelocity().x) > 0 || Math.abs(player.getVelocity().y) > 0) {
             if (!isWalking) {
                 isWalking = true;
@@ -330,15 +381,15 @@ public class Play implements Screen {
         // Set up the counter and counter components
         counterBoxTexture = new Texture("Icons/counter-box.png");
 
-
+        // set up for the vertical bar that counts the days
         verticalBarTexture = new Texture("Icons/vertical-bar.png");
         verticalBarSprite = new Sprite(verticalBarTexture);
-
+        // set up and connect the audio for the steps of the player
         walkingSound1 = Gdx.audio.newSound(Gdx.files.internal("Sounds/tile1.mp3"));
         walkingSound2 = Gdx.audio.newSound(Gdx.files.internal("Sounds/tile2.mp3"));
         walkingSound3 = Gdx.audio.newSound(Gdx.files.internal("Sounds/tile3.mp3"));
         walkingSound4 = Gdx.audio.newSound(Gdx.files.internal("Sounds/tile4.mp3"));
-
+        // set up and connect the audio for the background music to always loop
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Sounds/background-music.mp3"));
         backgroundMusic.setLooping(true);
         backgroundMusic.setVolume(volume);
@@ -347,15 +398,25 @@ public class Play implements Screen {
         dimTexture = new Sprite(blankTexture);
         dimTexture.setColor(Color.BLACK);
         dimTexture.setSize(collisionLayer.getWidth() * 16, collisionLayer.getHeight() * 16);
-
+        // set up the click sound for the buttons ui
         clickSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/switch2.ogg"));
 
 
+
+        /**
+         * stage is initialised and the setup creates a stage for UI elements and input processing
+         * and preparing the buttons for volume control
+         */
         stage = new Stage(extendViewport, renderer.getBatch());
 
+        // a Multiplexer is needed in the play screen to be able to manage inputs from the UI and the player
         inputMultiplexer = new InputMultiplexer();
-        inputMultiplexer.addProcessor(stage); // Stage first to ensure UI input is prioritized
-        inputMultiplexer.addProcessor(player); // Then player
+        // Stage first to ensure UI input is prioritized
+        inputMultiplexer.addProcessor(stage);
+        // Then player
+        inputMultiplexer.addProcessor(player);
+        // Set the global input processor to receive input from touch keys to the input multiplexer
+
         Gdx.input.setInputProcessor(inputMultiplexer);
 
 
@@ -367,7 +428,9 @@ public class Play implements Screen {
 
 
 
-        // Create and set up buttons
+        // Create and set up the 4 volume buttons
+        // increases the volume of the game if not already to the max
+
         Button.ButtonStyle increaseVolumeStyle = new Button.ButtonStyle();
         increaseVolumeStyle.up = new TextureRegionDrawable(new TextureRegion(increaseVolumeTexture));
         increaseVolumeButton = new Button(increaseVolumeStyle);
@@ -382,6 +445,7 @@ public class Play implements Screen {
             }
         });
 
+        // lowers the volume, checks the volume and subtracts from it
         Button.ButtonStyle lowerVolumeStyle = new Button.ButtonStyle();
         lowerVolumeStyle.up = new TextureRegionDrawable(new TextureRegion(lowerVolumeTexture));
         lowerVolumeButton = new Button(lowerVolumeStyle);
@@ -394,7 +458,7 @@ public class Play implements Screen {
                 backgroundMusic.setVolume(volume);
             }
         });
-
+        // turns off the volume
         Button.ButtonStyle volumeOffStyle = new Button.ButtonStyle();
         volumeOffStyle.up = new TextureRegionDrawable(new TextureRegion(volumeOffTexture));
         volumeOffButton = new Button(volumeOffStyle);
@@ -405,7 +469,9 @@ public class Play implements Screen {
                 clickSound.play();
                 if (backgroundMusic.isPlaying()) {
                     backgroundMusic.pause();
+
                     volume = 0;
+
                 }
             }
         });
@@ -425,7 +491,7 @@ public class Play implements Screen {
                 }
             }
         });
-
+        // makes the buttons interactive
         stage.addActor(increaseVolumeButton);
         stage.addActor(lowerVolumeButton);
         stage.addActor(volumeOffButton);
@@ -490,14 +556,14 @@ public class Play implements Screen {
         volumeOnTexture.dispose();
         lowerVolumeTexture.dispose();
     }
-
+    // checks when to play the walking sound
     private void playWalkingSound(float delta) {
         if (!isWalking || walkingSoundTimer < WALKING_SOUND_DELAY) {
             walkingSoundTimer += delta;
             return;
         }
 
-
+        // when the player is moving alternates between different walking sounds
         walkingSoundTimer = 0;
 
         Sound soundToPlay = null;
