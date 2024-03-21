@@ -15,7 +15,7 @@ public class DesktopLauncher {
 		//changing setWindowedMode from w=800, h=480, to 256 and 256 to account
 		//for the changed TiledMap
 		//config.setWindowedMode(256, 256);
-		config.setWindowedMode(1020, 574);
+		config.setWindowedMode(800, 480);
 		config.setResizable(false);
 		config.useVsync(true);
 		new Lwjgl3Application(new HesHusGame(), config);
