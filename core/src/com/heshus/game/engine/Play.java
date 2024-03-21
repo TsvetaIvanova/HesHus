@@ -36,6 +36,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import static com.heshus.game.engine.HesHusGame.settings;
 
 public class Play implements Screen {
+
     public static final int GAME_RUNNING = 0;
     public static final int GAME_PAUSED = 1;
     public static final int GAME_SETTINGS = 2;
@@ -51,6 +52,7 @@ public class Play implements Screen {
     private TiledMapTileLayer collisionLayer;
     private ActivityManager activityManager;
     // private Game game;
+    private float volume = 0.5f;
 
     private Sprite blankTexture, textBubble, dimTexture;
     private Texture TblankTexture, textBubbleTexture;
@@ -96,21 +98,20 @@ public class Play implements Screen {
     private Button volumeOffButton;
     private Button volumeOnButton;
 
+
+
+
+
     /**
      * The Play class represents the game screen and manages some of the states functionalities
      * as well as handling user input and game sprites
      * It's also responsible for drawing the game world, the player character,
      * and the UI elements like the pause and settings menus. It also handles sound effects
      * and music playback based on game events.
-     */
-
-
-
-    /**
      * creates new instance of the Play screen with specific game and player sprite settings.
-     *
-     * @param game The main game class which this screen is part of.
-     * @param playerSpriteSelection The texture for the player sprite to be used in the game.
+     * @param playerSpriteSelection The texture for the player sprite to be used in the game.* Create the Play instance
+     * @param game the game instance
+     * @param playerSpriteSelection the texture which will be used as the player sprite
      */
     public Play(HesHusGame game, Texture playerSpriteSelection) {
         this.game = game;
@@ -151,7 +152,9 @@ public class Play implements Screen {
         // Calculate the positions based on the updated camera position
         float baseX = camera.position.x + camera.viewportWidth / 2 - buttonSize - padding;
         float baseY = camera.position.y + camera.viewportHeight / 2 - padding - buttonSize;
+
         // Set the position for each volume button to always stay in one place on screen
+
         increaseVolumeButton.setPosition(baseX - 2 * buttonSize, baseY);
         lowerVolumeButton.setPosition(baseX - 3 * buttonSize, baseY);
         volumeOffButton.setPosition(baseX - buttonSize, baseY);
@@ -159,7 +162,8 @@ public class Play implements Screen {
 
         //Tilemap
         renderer.setView(camera);
-        renderer.render(); //takes a layers[] argument if we want to specifically render certain layers
+       //takes a layers[] argument if we want to specifically render certain layers
+        renderer.render(); 
         renderer.getBatch().begin();
         //Player
         player.draw(renderer.getBatch());
@@ -169,17 +173,22 @@ public class Play implements Screen {
             case(GAME_RUNNING):
                 activityManager.checkActivity();
                 //HUD
-                //Drawing energy bar
+                //Drawing energy bar, can be replaced for a standard energy bar with comments
                 renderer.getBatch().setColor(Color.GRAY);
-                renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 3, (camera.position.y - camera.viewportHeight/2) + 3, 204, 44);
+
+                renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2), (camera.position.y - camera.viewportHeight/2), camera.viewportWidth, 14);
+                //renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 3, (camera.position.y - camera.viewportHeight/2) + 3, 204, 44);
                 renderer.getBatch().setColor(Color.YELLOW);
-                renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
+                renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2), (camera.position.y - camera.viewportHeight/2), camera.viewportWidth * ((float) DayManager.currentDay.getEnergy() /100), 12);
+                //renderer.getBatch().draw(blankTexture, (camera.position.x - camera.viewportWidth/2) + 5, (camera.position.y - camera.viewportHeight/2) + 5, 200 * ((float) DayManager.currentDay.getEnergy() /100), 40);
+
                 renderer.getBatch().setColor(Color.WHITE);
 
                 //Draw activity text
                 if(!activityManager.getText().isEmpty()){
                     //logic for drawing bubble
                     font.getData().setScale(1f);
+                    //Get text length
                     GlyphLayout layout = new GlyphLayout();
                     layout.setText(font, activityManager.getText());
                     renderer.getBatch().draw(textBubble, activityManager.getTextPosition().x - 2, activityManager.getTextPosition().y, layout.width + 4, 50);
@@ -214,7 +223,9 @@ public class Play implements Screen {
                 float counterBoxY = (camera.position.y + camera.viewportHeight / 2) - counterBoxTexture.getHeight();
                 // drawing the counterbox texture
                 renderer.getBatch().draw(counterBoxTexture, counterBoxX, counterBoxY);
+
                 // help space and structure the strings on top of the box
+
                 float iconSize = 20;
                 float iconSpacingX = 2;
                 float iconSpacingY = 8;
@@ -230,7 +241,9 @@ public class Play implements Screen {
                 float firstRowY = counterBoxY + counterBoxTexture.getHeight() - iconSpacingY - iconSize - 20;
                 float secondRowY = firstRowY - iconSize - iconSpacingY;
                 float thirdRowY = secondRowY - iconSize - iconSpacingY;
+
                 // draw the player's score for the three activites
+
                 font.draw(renderer.getBatch(), String.valueOf(DayManager.overallEatScore), counterBoxX + 43, firstRowY+18);
                 font.draw(renderer.getBatch(), String.valueOf(DayManager.overallStudyScore), counterBoxX + 43, secondRowY+27);
                 font.draw(renderer.getBatch(), String.valueOf(DayManager.overallRecreationalScore), counterBoxX + 43, thirdRowY+36);
@@ -239,7 +252,7 @@ public class Play implements Screen {
                 for (int i = 0; i < DayManager.currentDay.getDayNumber(); i++) {
                     renderer.getBatch().draw(verticalBarSprite, verticalBarStartX+15 + (5 + iconSpacingX) * i, verticalBarStartY, 5, 20);
                 }
-
+                //End of main renderer
                 renderer.getBatch().end();
                 break;
                 case (GAME_PAUSED):
@@ -256,6 +269,7 @@ public class Play implements Screen {
 
                     //stage.draw();
                 }
+
         // updates and draws the stage
         // the stage is a container for all the actors
         //coordinates user inputs
@@ -266,6 +280,7 @@ public class Play implements Screen {
          *
          * @param delta The time in seconds since the last frame, used to update animations and process input.
          */
+
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
 
@@ -323,8 +338,6 @@ public class Play implements Screen {
     @Override
     public void show() {
 
-
-
         // Initialize the camera
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 450);
@@ -352,7 +365,7 @@ public class Play implements Screen {
         font = new BitmapFont();
         font.getData().setScale(2);
 
-        // Set up texture for energy bar
+        // Set up blank texture (used for energy bar)
         TblankTexture = new Texture("Icons/WhiteSquare.png");
         blankTexture = new Sprite(TblankTexture);
 
@@ -379,7 +392,7 @@ public class Play implements Screen {
         // set up and connect the audio for the background music to always loop
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Sounds/background-music.mp3"));
         backgroundMusic.setLooping(true);
-        backgroundMusic.setVolume(0.5f);
+        backgroundMusic.setVolume(volume);
         backgroundMusic.play();
 
         dimTexture = new Sprite(blankTexture);
@@ -387,6 +400,7 @@ public class Play implements Screen {
         dimTexture.setSize(collisionLayer.getWidth() * 16, collisionLayer.getHeight() * 16);
         // set up the click sound for the buttons ui
         clickSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/switch2.ogg"));
+
 
 
         /**
@@ -402,6 +416,7 @@ public class Play implements Screen {
         // Then player
         inputMultiplexer.addProcessor(player);
         // Set the global input processor to receive input from touch keys to the input multiplexer
+
         Gdx.input.setInputProcessor(inputMultiplexer);
 
 
@@ -415,6 +430,7 @@ public class Play implements Screen {
 
         // Create and set up the 4 volume buttons
         // increases the volume of the game if not already to the max
+
         Button.ButtonStyle increaseVolumeStyle = new Button.ButtonStyle();
         increaseVolumeStyle.up = new TextureRegionDrawable(new TextureRegion(increaseVolumeTexture));
         increaseVolumeButton = new Button(increaseVolumeStyle);
@@ -424,7 +440,6 @@ public class Play implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 clickSound.play();
-                float volume = backgroundMusic.getVolume();
                 volume = Math.min(volume + 0.1f, 1.0f);
                 backgroundMusic.setVolume(volume);
             }
@@ -439,7 +454,6 @@ public class Play implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 clickSound.play();
-                float volume = backgroundMusic.getVolume();
                 volume = Math.max(volume - 0.1f, 0.0f);
                 backgroundMusic.setVolume(volume);
             }
@@ -455,6 +469,9 @@ public class Play implements Screen {
                 clickSound.play();
                 if (backgroundMusic.isPlaying()) {
                     backgroundMusic.pause();
+
+                    volume = 0;
+
                 }
             }
         });
@@ -470,6 +487,7 @@ public class Play implements Screen {
                 clickSound.play();
                 if (!backgroundMusic.isPlaying()) {
                     backgroundMusic.play();
+                    volume = 1.0f;
                 }
             }
         });
@@ -538,7 +556,7 @@ public class Play implements Screen {
         volumeOnTexture.dispose();
         lowerVolumeTexture.dispose();
     }
-    // checks if the
+    // checks when to play the walking sound
     private void playWalkingSound(float delta) {
         if (!isWalking || walkingSoundTimer < WALKING_SOUND_DELAY) {
             walkingSoundTimer += delta;
@@ -564,7 +582,7 @@ public class Play implements Screen {
                 break;
         }
         if (soundToPlay != null) {
-            soundToPlay.play(1.0f);
+            soundToPlay.play(volume);
             currentWalkingSoundIndex = (currentWalkingSoundIndex + 1) % 4;
         }
     }
@@ -600,6 +618,10 @@ public class Play implements Screen {
         }
     }
 
+    /**
+     * Get font in another class
+     * @return games value of font
+     */
     public static BitmapFont getFont(){
         return font;
     }
