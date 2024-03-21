@@ -12,6 +12,12 @@ import com.heshus.game.engine.Play;
 import com.heshus.game.entities.Player;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 
+/**
+ * Manages all activities in the game that the player can perform
+ * by introducing property tags to the tiled map the player interacts with each property tag
+ * and according to what the type of activity is the player's energy and time is incremented or decremented
+ */
+
 public class ActivityManager {
 
     private final TiledMapTileLayer collisionLayer;
@@ -30,20 +36,17 @@ public class ActivityManager {
 
     //decide activity based on the avatar's position for collision-based interactions
     public void checkActivity() {
-        // Assuming you have a reference to the Player object named 'player'
+        // based on the x, y coordinates of the player
         float avatarX = player.getX();
         float avatarY = player.getY();
 
         // Convert avatar position to tile coordinates
         int x = (int) avatarX;
         int y = (int) avatarY;
-
+        // checking for the property tag
         TiledMapTileLayer.Cell cell = collisionLayer.getCell(x/collisionLayer.getTileWidth() + 1, y/collisionLayer.getTileHeight() + 1);
         if (cell != null && cell.getTile() != null) {
             if (cell.getTile().getProperties().containsKey("eat") && Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                // just added for testing
-                // System.out.println("Eating activity detected.");
-                //DayManager.incrementDay();
                 performEatingActivity(cell);
             } else if (cell.getTile().getProperties().containsKey("study") && Gdx.input.isKeyJustPressed(Input.Keys.E)) {
                 performStudyingActivity(cell);
@@ -56,14 +59,12 @@ public class ActivityManager {
     }
 
 
-    // incrementing overall.. for now will adjust later
+    // incrementing each property tag activity, if time and have not run out it will decrement energy with 10 from 100 and increment time with 2
     private void performEatingActivity(TiledMapTileLayer.Cell cell) {
         if(!(DayManager.currentDay.getEnergy() <= 0) && !(DayManager.currentDay.getTime() >= 24)) {
             decrementEnergy(10);
             incrementTime(2);
             DayManager.currentDay.incrementEatScore();
-            // added just for testing
-            //DayManager.incrementDay();
             String holdText = "You feel refreshed";
             layout.setText(Play.getFont(), holdText);
             setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width / 2), Math.round(player.getY() / 16) * 16);
@@ -73,15 +74,13 @@ public class ActivityManager {
         }
     }
 
-    // incrementing overall.. for now will adjust later
+    // incrementing each property tag activity, if time and have not run out it will decrement energy with 20 from 100 and increment time with 4
     private void performStudyingActivity(TiledMapTileLayer.Cell cell) {
         if(!(DayManager.currentDay.getEnergy() <= 0) && !(DayManager.currentDay.getTime() >= 24)) {
             decrementEnergy(20);
             incrementTime(4);
 
             DayManager.currentDay.incrementStudyScore();
-            // added just for testing
-            //DayManager.incrementDay();
             String holdText = "You feel smarter";
             layout.setText(Play.getFont(), holdText);
             setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width / 2), Math.round(player.getY() / 16) * 16);
@@ -91,7 +90,7 @@ public class ActivityManager {
         }
     }
 
-    // incrementing overallRecreationalScore for now will adjust later
+    // incrementing each property tag activity, if time and have not run out it will decrement energy with 20 from 100 and increment time with 3
     private void performRecreationalActivity(TiledMapTileLayer.Cell cell) {
         if(!(DayManager.currentDay.getEnergy() <= 0) && !(DayManager.currentDay.getTime() >= 24)){
 
@@ -99,8 +98,6 @@ public class ActivityManager {
             incrementTime(3);
 
             DayManager.currentDay.incrementRecreationalScore();
-            // added just for testing
-            //DayManager.incrementDay();
             String holdText = "You have recreationed";
             layout.setText(Play.getFont(), holdText);
             setText(holdText, Math.round(player.getX() / 16) * 16 + 8 - (layout.width/2), Math.round(player.getY() / 16) * 16);
@@ -111,6 +108,7 @@ public class ActivityManager {
 
     }
 
+    // incrementing each property tag activity, the player can only sleep when they have ran out of energy
     private void performSleepingActivity() {
         // decided to define day over with reaching 840 time
         if (DayManager.currentDay.getTime() >= 24 || DayManager.currentDay.getEnergy() <= 0) {
@@ -121,29 +119,21 @@ public class ActivityManager {
             // if the game is not over the avatar will move to the next day and reset their energy
             if (!DayManager.gameOver) {
                 DayManager.incrementDay();
-                //resetForNewDay();
+
             }
         }
     }
 
-    private void resetForNewDay() {
-        // reset both time to be back at 480(8am) and energy to 100
-        DayManager.currentDay.resetTime();
-        DayManager.currentDay.resetEnergy();
 
-
-        //
-        if (DayManager.currentDay.getDayNumber() > 7) {
-            DayManager.gameOver = true;
-        }
-    }
-
-
-
+    // decrements energy by a set amount in "energy"
     private void decrementEnergy(int energy) {
         DayManager.currentDay.setEnergy(Math.max(0, DayManager.currentDay.getEnergy() - energy));
     }
-
+    // increments time by a setTime parameter
+    /**
+     * @param setTime
+     * accepts as parameter a setTime for different activities
+     */
     private void incrementTime(int setTime) {
         float newTime = DayManager.currentDay.getTime() + setTime;
         if (newTime >= 24) {
@@ -152,12 +142,21 @@ public class ActivityManager {
             DayManager.currentDay.setTime(newTime);
         }
     }
-
+    /**
+     * Sets the player object for the activity manager to interact with.
+     * @param player The player whose activities are to be managed.
+     */
     public void setPlayer(Player player) {
         this.player = player;
     }
 
     //Methods for text bubble
+    /**
+     * Sets the text and position for displaying a text bubble above the player.
+     * @param text The text to be displayed in the bubble.
+     * @param x The x-coordinate for the bubble's position.
+     * @param y The y-coordinate for the bubble's position.
+     */
 
     public void setText(String text, float x, float y){
         activityText = text;
