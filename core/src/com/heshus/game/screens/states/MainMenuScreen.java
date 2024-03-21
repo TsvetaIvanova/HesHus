@@ -143,7 +143,7 @@ public class MainMenuScreen implements Screen {
             }
         });
 
-        //NEWGAME BUTTON: moves to next screen
+        //NEWGAME BUTTON: Pops up controls, and the gotIt confirmation button
         newButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 clickSound.play();
@@ -159,7 +159,7 @@ public class MainMenuScreen implements Screen {
                 return false;
             }
         });
-        //SETTINGS BUTTON: sets state to settings if clicked!
+        //GOTITBUTTON: confirms player knows controls
         gotItButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 clickSound.play();
@@ -219,7 +219,7 @@ public class MainMenuScreen implements Screen {
 
                         mainTable.setVisible(false);
                         stage.addActor(gotItButton);
-                        gotItButton.setPosition(camera.position.x -gotItButton.getWidth()/2, camera.position.y - camera.viewportHeight / 2);
+                        gotItButton.setPosition(camera.position.x -gotItButton.getWidth()/2, camera.position.y - camera.viewportHeight / 2 + gotItButton.getHeight());
                         stage.draw();
                     }
                     else {
