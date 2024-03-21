@@ -341,7 +341,9 @@ public class Play implements Screen {
         playWalkingSound(Gdx.graphics.getDeltaTime());
         stage.act(Gdx.graphics.getDeltaTime());
     }
-
+    /**
+     * Called when this screen becomes the current screen for a {@link Game}.
+     */
     @Override
     public void show() {
 
@@ -513,6 +515,11 @@ public class Play implements Screen {
         dispose();
     }
 
+    /**
+     * Gets width and height screen resized to and updates viewport
+     * @param width width changed to
+     * @param height height changed to
+     */
     @Override
     public void resize(int width, int height) {
         extendViewport.update(width,height);
@@ -527,7 +534,9 @@ public class Play implements Screen {
     public void resume() {
 
     }
-
+    /**
+     * Called when this screen should release all resources.
+     */
     @Override
     public void dispose() {
         //if we forget to dispose something it causes a memory leak!
@@ -594,7 +603,11 @@ public class Play implements Screen {
         }
     }
 
-
+    /**
+     *If camera would show out of map, move it in
+     * @param cam camera to keep position within layer
+     * @param layer TiledMapTile layer to lock
+     */
     private void lockCameraInTiledMapLayer(OrthographicCamera cam, TiledMapTileLayer layer){
         //get variables needed to find edges of map!
         int mapPixelOffsetY =(int) layer.getOffsetY();
